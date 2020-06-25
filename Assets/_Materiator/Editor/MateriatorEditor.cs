@@ -11,7 +11,11 @@ namespace Materiator
 
         protected void InitializeEditor<T>()
         {
-            root = new VisualElement();
+            if (root == null)
+                root = new VisualElement();
+            else
+                root.Clear();
+
             tree = Resources.Load<VisualTreeAsset>(typeof(T).Name);
             tree.CloneTree(root);
         }

@@ -12,11 +12,6 @@ namespace Materiator
 
         public ShaderData ShaderData;
 
-        private void Awake()
-        {
-            Initialize();
-        }
-
         public void Initialize()
         {
             GetMeshReferences();
@@ -30,9 +25,16 @@ namespace Materiator
             SkinnedMeshRenderer = GetComponent<SkinnedMeshRenderer>();
 
             if (MeshFilter == null)
-                Mesh = SkinnedMeshRenderer.sharedMesh;
+            {
+                if (SkinnedMeshRenderer != null)
+                {
+                    Mesh = SkinnedMeshRenderer.sharedMesh;
+                }
+            }
             else
+            {
                 Mesh = MeshFilter.sharedMesh;
+            }
         }
     }
 }
