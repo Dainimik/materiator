@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6610ce87081f434eb698da7afac3d9f, type: 3}
   m_Name: StandardSpecular_BuiltInRenderPipeline
   m_EditorClassIdentifier: 
-  Shader: {fileID: 0}
-  BaseColorPropertyName: 
-  MainTexturePropertyName: 
+  Shader: {fileID: 45, guid: 0000000000000000f000000000000000, type: 0}
+  BaseColorPropertyName: _Color
+  MainTexturePropertyName: _MainTex
   MetallicSmoothnessTexturePropertyName: 
-  SpecularGlossTexturePropertyName: 
-  EmissionColorPropertyName: 
-  EmissionTexturePropertyName: 
-  MetallicSmoothnessKeywordName: 
-  EmissionKeywordName: 
-  IsEditable: 1
+  SpecularGlossTexturePropertyName: _SpecGlossMap
+  EmissionColorPropertyName: _EmissionColor
+  EmissionTexturePropertyName: _EmissionMap
+  MetallicSmoothnessKeywordName: _METALLICGLOSSMAP
+  EmissionKeywordName: _EMISSION
+  IsEditable: 0

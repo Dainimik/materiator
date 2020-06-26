@@ -12,11 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9993698cad73f364895202aff686f817, type: 3}
   m_Name: MateriatorSettings
   m_EditorClassIdentifier: 
-  PackAssets: 0
-  DefaultShaderData: {fileID: 0}
-  DefaultMateria: {fileID: 0}
-  ShaderDatas: []
-  Materia: []
-  HighlightColor: {r: 0, g: 0, b: 0, a: 0}
+  GridSize: 4
+  PackAssets: 1
+  DefaultShaderData: {fileID: 11400000, guid: d2cbf647c709b3a4da4a535dda5cd1dd, type: 2}
+  DefaultMateria: {fileID: 11400000, guid: 555ce609e5fd0014b8567f3e49bdf198, type: 2}
+  HighlightColor: {r: 1, g: 1, b: 0, a: 1}
   HighlightMode: 0
   FilterMode: 0

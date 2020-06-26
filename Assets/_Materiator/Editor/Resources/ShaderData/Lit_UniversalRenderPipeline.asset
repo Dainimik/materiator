@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6610ce87081f434eb698da7afac3d9f, type: 3}
   m_Name: Lit_UniversalRenderPipeline
   m_EditorClassIdentifier: 
-  Shader: {fileID: 0}
-  BaseColorPropertyName: 
-  MainTexturePropertyName: 
-  MetallicSmoothnessTexturePropertyName: 
-  SpecularGlossTexturePropertyName: 
-  EmissionColorPropertyName: 
-  EmissionTexturePropertyName: 
-  MetallicSmoothnessKeywordName: 
-  EmissionKeywordName: 
-  IsEditable: 1
+  Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
+  BaseColorPropertyName: _BaseColor
+  MainTexturePropertyName: _BaseMap
+  MetallicSmoothnessTexturePropertyName: _MetallicGlossMap
+  SpecularGlossTexturePropertyName: _SpecGlossMap
+  EmissionColorPropertyName: _EmissionColor
+  EmissionTexturePropertyName: _EmissionMap
+  MetallicSmoothnessKeywordName: _METALLICSPECGLOSSMAP
+  EmissionKeywordName: _EMISSION
+  IsEditable: 0
