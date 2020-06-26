@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="flex-direction: row; flex-wrap: nowrap; justify-content: space-between;">
+        <ui:Label text="Label" name="Number" />
+        <ui:TextField picking-mode="Ignore" name="TagName" style="width: 50%;" />
+        <ui:Button text="X" name="DeleteTagButton" style="width: 25px;" />
+    </ui:VisualElement>
+</ui:UXML>
