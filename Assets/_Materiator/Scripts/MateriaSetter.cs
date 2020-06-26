@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 
@@ -16,10 +15,6 @@ namespace Materiator
         public SkinnedMeshRenderer SkinnedMeshRenderer;
 
         public List<MateriaSlot> MateriaSlots;
-        //public SerializableIntMateriaDictionary Materia;
-        //public int[] MateriaIndices;
-        //public Dictionary<int, int> MateriaCategory;
-        //public MateriaPreset MateriaPreset;
 
         public SerializableDictionary<int, Rect> FilteredRects;
         public Rect[] Rects;
@@ -86,8 +81,6 @@ namespace Materiator
 
                 if (SkinnedMeshRenderer != null)
                     SkinnedMeshRenderer.sharedMesh = Mesh;
-
-                //_isUVPresent = GetUVCoordinates(out _colorUVCoord);
             }
 
             if (updateMaterial)
@@ -124,16 +117,11 @@ namespace Materiator
 
                 var colors = new Color32[maxX * maxY];
 
-                //Materia materia;
+                for (int i = 0; i < colors.Length; i++)
+                {
+                    colors[i] = MateriaSlots.Where(ms => ms.ID == rect.Key).First().Materia.BaseColor;
+                }
 
-                //if (Materia.TryGetValue(rect.Key, out materia))
-                //{
-                    for (int i = 0; i < colors.Length; i++)
-                    {
-                        colors[i] = MateriaSlots.Where(ms => ms.ID == rect.Key).First().Materia.BaseColor;
-                    }
-
-                //}
                 tex.SetPixels32(minX, minY, maxX, maxY, colors);
             }
 
