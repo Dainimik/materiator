@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15fb2ffd31eecd0468269e4dff1358c5, type: 3}
   m_Name: DefaultMateria
   m_EditorClassIdentifier: 
-  BaseColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  BaseColor:
+    serializedVersion: 2
+    rgba: 255
+  Metallic: 0
+  Smoothness: 0
+  EmissionColor: {r: 0, g: 0, b: 0, a: 0}
+  IsEmissive: 0
