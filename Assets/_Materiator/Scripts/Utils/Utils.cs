@@ -1,4 +1,4 @@
-﻿/*using UnityEngine;
+﻿using UnityEngine;
 
 namespace Materiator
 {
@@ -11,14 +11,14 @@ namespace Materiator
             if (name != null)
                 mat.name = name;
 
-            mat.SetColor(Settings.DefaultShaderData.MainColorPropertyName, Color.white);
+            mat.SetColor(Settings.DefaultShaderData.BaseColorPropertyName, Color.white);
             mat.EnableKeyword(Settings.DefaultShaderData.MetallicSmoothnessKeywordName);
             return mat;
         }
 
         public static void UpdateMaterial(Material material, ShaderData shaderData)
         {
-            material.SetColor(shaderData.MainColorPropertyName, Color.white);
+            material.SetColor(shaderData.BaseColorPropertyName, Color.white);
             material.EnableKeyword(shaderData.MetallicSmoothnessKeywordName);
         }
 
@@ -75,7 +75,7 @@ namespace Materiator
             return Mesh.Instantiate(mesh);
         }
 
-        public static void GenerateColorDataIcons(Materia materia, Material material)
+        /*public static void GenerateColorDataIcons(Materia materia, Material material)
         {
             if (materia.PreviewIcon != null)
                 Object.DestroyImmediate(materia.PreviewIcon);
@@ -100,7 +100,7 @@ namespace Materiator
 
             materia.PreviewIcon = GenerateThumbnail(material, Color.black);
             materia.PreviewIconGray = GenerateThumbnail(material, new Color(0.78431f, 0.78431f, 0.78431f, 1));
-        }
+        }*/
 
         public static Texture2D GenerateThumbnail(Material material, Color backgroundColor)
         {
@@ -116,4 +116,4 @@ namespace Materiator
             return Resources.Load<MateriatorSettings>("MateriatorSettings");
         }
     }
-}*/
+}
