@@ -5,6 +5,7 @@ namespace Materiator
     public static class Utils
     {
         public static MateriatorSettings Settings = LoadSettings();
+        public static MateriaTags MateriaTags = LoadMateriaTags();
         public static Material CreateMaterial(Shader shader, string name = null)
         {
             var mat = new Material(shader);
@@ -114,6 +115,10 @@ namespace Materiator
         public static MateriatorSettings LoadSettings()
         {
             return Resources.Load<MateriatorSettings>("MateriatorSettings");
+        }
+        public static MateriaTags LoadMateriaTags()
+        {
+            return Resources.Load<MateriaTags>("MateriaTags");
         }
     }
 }
