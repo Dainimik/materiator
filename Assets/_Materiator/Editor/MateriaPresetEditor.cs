@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using NUnit.Framework;
+using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -53,19 +54,37 @@ namespace Materiator
 
                 Rect r = new Rect(rect.x, rect.y, 150f, 22f);
 
-                EditorGUI.PropertyField(new Rect(r.x + 15, r.y, r.width, r.height), element.FindPropertyRelative("Tag"), GUIContent.none);
-                EditorGUI.PropertyField(new Rect(r.x + 185, r.y, rect.width - 175f, r.height), element.FindPropertyRelative("Materia"), GUIContent.none);
 
-                //materiaTag.stringValue = EditorGUI.Popup(new Rect(rect.x + 25f, rect.y, rect.width - 300f, rect.height), materiaTag.intValue, _materiaTagArray, EditorStyles.popup);
+                serializedObject.Update();
+                int _materiaTagIndex = 0;
+                _materiaTagIndex = EditorGUI.Popup(new Rect(r.x + 15, r.y, r.width, r.height), Utils.MateriaTags.MateriaTagsList.IndexOf(materiaTag.stringValue), Utils.MateriaTags.MateriaTagsArray, EditorStyles.popup);
                 if (EditorGUI.EndChangeCheck())
                 {
+                    var newTag = Utils.MateriaTags.MateriaTagsList[_materiaTagIndex];
                     var canSetTag = true;
-                    
+                    for (int i = 0; i < _materiaPreset.MateriaPresetItemList.Count; i++)
+                    {
+                        if (_materiaPreset.MateriaPresetItemList[i].Tag == newTag)
+                        {
+                            canSetTag = false;
+                        }
+                    }
 
-                    //_materiaTagArray = Utils.ReloadTagList();
+                    if (canSetTag)
+                    {
+                        Undo.RegisterCompleteObjectUndo(_materiaPreset, "Set Preset Materia Tag");
+                        _materiaPreset.MateriaPresetItemList[index].Tag = newTag;
+                    }
                 }
 
-                //EditorGUI.PropertyField(new Rect(rect.x, rect.y, 60, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("Type"), GUIContent.none);
+
+                //EditorGUI.PropertyField(new Rect(r.x + 15, r.y, r.width, r.height), element.FindPropertyRelative("Tag"), GUIContent.none);
+                EditorGUI.PropertyField(new Rect(r.x + 185, r.y, rect.width - 175f, r.height), element.FindPropertyRelative("Materia"), GUIContent.none);
+            };
+
+            _tagList.onAddCallback = (ReorderableList List) =>
+            {
+                _materiaPreset.MateriaPresetItemList.Add(new MateriaPresetItem("-"));
             };
         }
     }

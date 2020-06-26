@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: MateriaPreset
   m_EditorClassIdentifier: 
   MateriaPresetItemList:
-  - Tag: Red
+  - Tag: Metal
     Materia: {fileID: 11400000, guid: 555ce609e5fd0014b8567f3e49bdf198, type: 2}
-  - Tag: Green
+  - Tag: Plastic
     Materia: {fileID: 11400000, guid: 2bf52f2715bfa4d48a7bfe6d265ba1d0, type: 2}

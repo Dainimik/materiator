@@ -203,7 +203,7 @@ namespace Materiator
 
         private void GenerateMateriaSlots()
         {
-            if (!_materiaSetter.IsInitialized || _materiaSetter.MateriaSlots.Count == 0)
+            if (!_materiaSetter.IsInitialized || _materiaSetter.MateriaSlots?.Count == 0)
             {
                 var rects = MeshAnalyzer.CalculateRects(Utils.Settings.GridSize);
                 _materiaSetter.FilteredRects = MeshAnalyzer.FilterRects(rects, _materiaSetter.Mesh.uv);

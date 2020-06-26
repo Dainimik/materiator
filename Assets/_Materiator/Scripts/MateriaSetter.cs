@@ -14,7 +14,7 @@ namespace Materiator
         public MeshRenderer MeshRenderer;
         public SkinnedMeshRenderer SkinnedMeshRenderer;
 
-        public List<MateriaSlot> MateriaSlots;
+        public List<MateriaSlot> MateriaSlots = new List<MateriaSlot>();
 
         public SerializableDictionary<int, Rect> FilteredRects;
         public Rect[] Rects;

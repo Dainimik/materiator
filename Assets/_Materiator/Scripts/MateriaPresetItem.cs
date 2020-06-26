@@ -8,7 +8,7 @@ namespace Materiator
         public string Tag;
         public Materia Materia;
 
-        public MateriaPresetItem(string tag, Materia materia)
+        public MateriaPresetItem(string tag, Materia materia = null)
         {
             Tag = tag;
             Materia = materia;
