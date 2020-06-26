@@ -32,9 +32,9 @@ namespace Materiator
             var path = editorScriptPath + "/Resources";
             _materiaTags = AssetUtils.CreateScriptableObjectAsset<MateriaTags>(path, "MateriaTags");
 
-            _materiaTags.MateriaTagDictionary.Add(0, "-");
-            _materiaTags.MateriaTagDictionary.Add(1, "Metal");
-            _materiaTags.MateriaTagDictionary.Add(2, "Plastic");
+            _materiaTags.MateriaTagsList.Add("-");
+            _materiaTags.MateriaTagsList.Add("Metal");
+            _materiaTags.MateriaTagsList.Add("Plastic");
 
             return;
         }

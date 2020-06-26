@@ -12,9 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d9309e4140849548bf1f05b236a8218, type: 3}
   m_Name: MateriaPreset
   m_EditorClassIdentifier: 
-  MateriaCategories:
-    _keys: 
-    _values: []
-  Materia:
-    _keys: 
-    _values: []
+  MateriaPresetItemList:
+  - Tag: Red
+    Materia: {fileID: 11400000, guid: 555ce609e5fd0014b8567f3e49bdf198, type: 2}
+  - Tag: Green
+    Materia: {fileID: 11400000, guid: 2bf52f2715bfa4d48a7bfe6d265ba1d0, type: 2}

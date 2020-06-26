@@ -5,12 +5,11 @@ using UnityEngine.UIElements;
 namespace Materiator
 {
     [CustomEditor(typeof(MateriaTags))]
-    public class MateriaTagEditor : MateriatorEditor
+    public class MateriaTagsEditor : MateriatorEditor
     {
         private MateriaTags _materiaTags;
 
-        private Button _newTagButton;
-        private Button _deleteTagButton;
+        //private ReorderableList _tagsList;
 
         private void OnEnable()
         {
@@ -21,46 +20,25 @@ namespace Materiator
         {
             InitializeEditor<MateriaTags>();
 
-            SetUpButtons();
-            SyncCategoryUI();
+            //_tagsList = new ReorderableList(serializedObject.FindProperty("MateriaTagList"), true, true, true);
+            TagsListUI();
+            IMGUIContainer materiaTagsReorderableList = new IMGUIContainer(() => DrawDefaultInspector());
+            //IMGUIContainer materiaTagsReorderableList = new IMGUIContainer(() => DrawTagsList());
+            root.Add(materiaTagsReorderableList);
 
             return root;
         }
 
-        private void SetUpButtons()
+        private void DrawTagsList()
         {
-            _newTagButton = root.Q<Button>("NewTagButton");
-            _deleteTagButton = root.Q<Button>("DeleteTagButton");
-
-            _newTagButton.clicked += AddTag;
-
-            if (_deleteTagButton != null)
-            {
-                _deleteTagButton.clicked += DeleteTag;
-            }
+            serializedObject.Update();
+            //_tagsList.DoLayoutList();
+            serializedObject.ApplyModifiedProperties();
         }
 
-        private void AddTag()
+        private void TagsListUI()
         {
-            //Undo.RecordObject(targetMonster, "Add Monster Attack");
-            _materiaTags.MateriaTagDictionary.Add(_materiaTags.MateriaTagDictionary.Count + 1, "aaa");
-            var newTag = new MateriaTagElement();
-            root.Add(newTag);
-        }
 
-        private void DeleteTag()
-        {
-            //_materiaPreset.MateriaCategories.Remove(_materiaPreset.MateriaCategories.Count + 1, "aaa");
-        }
-
-        private void SyncCategoryUI()
-        {
-            //root.Clear();
-            for (var i = 0; i < _materiaTags.MateriaTagDictionary.Count; i++)
-            {
-                var newTag = new MateriaTagElement();
-                root.Add(newTag);
-            }
         }
     }
 }

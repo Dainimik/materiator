@@ -12,7 +12,6 @@ namespace Materiator
         private MateriaSetter _materiaSetter;
 
         private ReorderableList _materiaReorderableList;
-        private string[] category;
 
         private Button _reloadButton;
 
@@ -21,7 +20,6 @@ namespace Materiator
             _materiaSetter = (MateriaSetter)target;
 
             Initialize();
-            ReloadList();
         }
 
         public override VisualElement CreateInspectorGUI()
@@ -55,16 +53,12 @@ namespace Materiator
             GenerateMateriaSlots();
 
             _materiaSetter.UpdateTexturePixelColors();
+            //_materiaTagArray = Utils. ReloadTagList();
         }
 
         private void MateriaReorderableList()
         {
             _materiaReorderableList.DoLayoutList();
-        }
-
-        private void ReloadList()
-        {
-            category = Utils.MateriaTags.MateriaTagDictionary.Values.ToArray();
         }
 
         private void DrawMateriaReorderableList()
@@ -82,6 +76,7 @@ namespace Materiator
                 var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(index);
                 var elementID = element.FindPropertyRelative("ID");
                 var elementMateria = element.FindPropertyRelative("Materia").objectReferenceValue as Materia;
+                //var materiaTagID = element.FindPropertyRelative("MateriaTag").FindPropertyRelative("ID");
                 var materiaTag = element.FindPropertyRelative("MateriaTag");
 
                 Rect r = new Rect(rect.x, rect.y, 22f, 22f);
@@ -110,22 +105,25 @@ namespace Materiator
                 //EditorGUI.PropertyField(new Rect(rect.x + 50f, rect.y, rect.width - 75f, rect.height), element, GUIContent.none);
 
                 serializedObject.Update();
-                materiaTag.intValue = EditorGUI.Popup(new Rect(rect.x + 25f, rect.y, rect.width - 300f, rect.height), materiaTag.intValue, category, EditorStyles.popup);
+
+                int _materiaTagIndex = 0;
+                _materiaTagIndex = EditorGUI.Popup(new Rect(rect.x + 25f, rect.y, 95f, rect.height), Utils.MateriaTags.MateriaTagsList.IndexOf(materiaTag.stringValue), Utils.MateriaTags.MateriaTagsArray, EditorStyles.popup);
                 if (EditorGUI.EndChangeCheck())
                 {
+                    var newTag = Utils.MateriaTags.MateriaTagsList[_materiaTagIndex];
                     var canSetTag = true;
                     for (int i = 0; i < _materiaSetter.MateriaSlots.Count; i++)
                     {
-                        if (_materiaSetter.MateriaSlots[i].MateriaTag == materiaTag.intValue)
+                        if (_materiaSetter.MateriaSlots[i].MateriaTag == newTag)
                         {
                             canSetTag = false;
                         }
                     }
 
-                    if (canSetTag || materiaTag.intValue == 0)
+                    if (canSetTag || newTag == "-")
                     {
                         Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Materia Tag");
-                        _materiaSetter.MateriaSlots[index].MateriaTag = materiaTag.intValue;
+                        _materiaSetter.MateriaSlots[index].MateriaTag = newTag;
                     }
                 }
 

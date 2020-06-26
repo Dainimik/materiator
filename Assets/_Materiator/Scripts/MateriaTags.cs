@@ -1,10 +1,14 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Materiator
 {
     public class MateriaTags : ScriptableObject
     {
-        public SerializableDictionary<int, string> MateriaTagDictionary;
-        public SerializableIntMateriaDictionary Materia;
+        public List<string> MateriaTagsList = new List<string>();
+        public string[] MateriaTagsArray
+        {
+            get { return MateriaTagsList.ToArray(); }
+        }
     }
 }
