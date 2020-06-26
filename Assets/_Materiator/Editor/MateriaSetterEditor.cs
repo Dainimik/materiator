@@ -32,7 +32,7 @@ namespace Materiator
             root.Add(defaultInspector);
 
 
-            _materiaReorderableList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaIndices"), false, true, false, false);
+            _materiaReorderableList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaSlots"), false, true, false, false);
             DrawMateriaReorderableList();
             IMGUIContainer materiaReorderableList = new IMGUIContainer(() => MateriaReorderableList());
             root.Add(materiaReorderableList);
@@ -51,12 +51,10 @@ namespace Materiator
                 return;
             }*/
 
-            GenerateMateriaDictionary();
+            //GenerateMateriaDictionary();
+            GenerateMateriaSlots();
 
             _materiaSetter.UpdateTexturePixelColors();
-
-            _materiaSetter.MateriaIndices = new int[_materiaSetter.Materia.Count];
-            _materiaSetter.MateriaIndices = _materiaSetter.Materia.Keys.ToArray();
         }
 
         private void MateriaReorderableList()
@@ -66,38 +64,35 @@ namespace Materiator
 
         private void ReloadList()
         {
-            category = Utils.MateriaCategories.MateriaCategoriesDictionary.Values.ToArray();
+            category = Utils.MateriaTags.MateriaTagDictionary.Values.ToArray();
         }
 
         private void DrawMateriaReorderableList()
         {
             _materiaReorderableList.drawHeaderCallback = (Rect rect) =>
             {
-                EditorGUI.LabelField(new Rect(rect.x + 25f, rect.y, 50f, 20f), new GUIContent("CAT", "Category"), EditorStyles.boldLabel);
+                EditorGUI.LabelField(new Rect(rect.x + 25f, rect.y, 50f, 20f), new GUIContent("Tag", "Tag"), EditorStyles.boldLabel);
                 EditorGUI.LabelField(new Rect(rect.x + 125f, rect.y, 20f, 20f), new GUIContent("C", "Base Color"), EditorStyles.boldLabel);
                 EditorGUI.LabelField(new Rect(rect.x + 150f, rect.y, 20f, 20f), new GUIContent("E", "Emission Color"), EditorStyles.boldLabel);
-                EditorGUI.LabelField(new Rect(rect.x + 170f, rect.y, 100f, 20f), new GUIContent("Materia " + "(" + _materiaSetter.Materia.Count + ")"), EditorStyles.boldLabel);
+                EditorGUI.LabelField(new Rect(rect.x + 170f, rect.y, 100f, 20f), new GUIContent("Materia " + "(" + _materiaSetter.MateriaSlots.Count + ")"), EditorStyles.boldLabel);
             };
 
             _materiaReorderableList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
             {
                 var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(index);
+                var elementID = element.FindPropertyRelative("ID");
+                var elementMateria = element.FindPropertyRelative("Materia").objectReferenceValue as Materia;
+                var materiaTag = element.FindPropertyRelative("MateriaTag");
+
                 Rect r = new Rect(rect.x, rect.y, 22f, 22f);
 
-                if (!_materiaSetter.Materia.ContainsKey(element.intValue))
-                {
-                    EditorGUI.LabelField(r, new GUIContent((element.intValue + 1).ToString()));
-                    EditorGUI.LabelField(new Rect(rect.x + 70f, rect.y, rect.width - 95f, rect.height), "Create New Preset to Unlock Editing");
-                    return;
-                }
-
-                var color = _materiaSetter.Materia[element.intValue].BaseColor;
-                var emission = _materiaSetter.Materia[element.intValue].EmissionColor;
+                var color = elementMateria.BaseColor;
+                var emission = elementMateria.EmissionColor;
 
                 color.a = 255;
                 emission.a = 1f;
 
-                if (_materiaSetter.Materia[element.intValue].IsEmissive)
+                if (elementMateria.IsEmissive)
                 {
                     var texE = new Texture2D(4, 4);
                     Rect texRE = new Rect(rect.x + 45f, rect.y, 20f, 20f);
@@ -108,25 +103,46 @@ namespace Materiator
                 //Rect r = new Rect(rect.x, rect.y, 20f, 20f);
                 //GUI.DrawTexture(r, tex, ScaleMode.StretchToFill, false, 0, color, 0, 0);
 
-                EditorGUI.LabelField(r, new GUIContent((element.intValue + 1).ToString()));
+                EditorGUI.LabelField(r, new GUIContent((elementID.intValue + 1).ToString()));
                 //EditorGUI.LabelField(new Rect(rect.x + 20f, rect.y, rect.width, rect.height), new GUIContent(_materiaSetter.Materia[element.intValue].PreviewIconGray));
 
                 EditorGUI.BeginChangeCheck();
                 //EditorGUI.PropertyField(new Rect(rect.x + 50f, rect.y, rect.width - 75f, rect.height), element, GUIContent.none);
 
-                //_materiaSetter.MateriaCategory[element.intValue] = EditorGUI.Popup(new Rect(rect.x + 25f, rect.y, rect.width - 300f, rect.height), _materiaSetter.MateriaCategory[element.intValue], category, EditorStyles.popup);
-
-                //_colorData = _colorSetter.ColorData[element.intValue];
-                Materia oldCD = _materiaSetter.Materia[element.intValue];
-                _materiaSetter.Materia[element.intValue] = (Materia)EditorGUI.ObjectField(new Rect(rect.x + 170f, rect.y, rect.width - 195f, rect.height), _materiaSetter.Materia[element.intValue], typeof(Materia), false);
+                serializedObject.Update();
+                materiaTag.intValue = EditorGUI.Popup(new Rect(rect.x + 25f, rect.y, rect.width - 300f, rect.height), materiaTag.intValue, category, EditorStyles.popup);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    if (_materiaSetter.Materia[element.intValue] == null)
-                        _materiaSetter.Materia[element.intValue] = Utils.Settings.DefaultMateria;
+                    var canSetTag = true;
+                    for (int i = 0; i < _materiaSetter.MateriaSlots.Count; i++)
+                    {
+                        if (_materiaSetter.MateriaSlots[i].MateriaTag == materiaTag.intValue)
+                        {
+                            canSetTag = false;
+                        }
+                    }
+
+                    if (canSetTag || materiaTag.intValue == 0)
+                    {
+                        Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Materia Tag");
+                        _materiaSetter.MateriaSlots[index].MateriaTag = materiaTag.intValue;
+                    }
+                }
+
+                //_colorData = _colorSetter.ColorData[element.intValue];
+                Materia oldCD = elementMateria;
+                elementMateria = (Materia)EditorGUI.ObjectField(new Rect(rect.x + 170f, rect.y, rect.width - 195f, rect.height), elementMateria, typeof(Materia), false);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Materia");
+                    if (elementMateria == null)
+                        elementMateria = Utils.Settings.DefaultMateria;
+                    else
+                        _materiaSetter.MateriaSlots[index].Materia = elementMateria;
 
                     serializedObject.Update();
 
-                    if (_materiaSetter.Materia[element.intValue] != oldCD)
+                    if (elementMateria != oldCD)
                         //_isColorSetterDirty.boolValue = true;
 
                     serializedObject.ApplyModifiedProperties();
@@ -135,7 +151,7 @@ namespace Materiator
 
                 Rect cdExpandRect = new Rect(EditorGUIUtility.currentViewWidth - 60f, rect.y, 20f, 20f);
                 if (GUI.Button(cdExpandRect, new GUIContent(EditorGUIUtility.IconContent("d_editicon.sml").image, "Edit Color Data")))
-                    EditorUtils.InspectTarget(_materiaSetter.Materia[element.intValue]);
+                    EditorUtils.InspectTarget(elementMateria);
 
                 // This can be optimized
                 if (!_materiaReorderableList.HasKeyboardControl()) Reload();
@@ -145,7 +161,6 @@ namespace Materiator
             _materiaReorderableList.onSelectCallback = (ReorderableList list) =>
             {
                 var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(list.index);
-                if (!_materiaSetter.Materia.ContainsKey(element.intValue)) return;
 
                 Reload();
 
@@ -155,7 +170,6 @@ namespace Materiator
             _materiaReorderableList.onMouseUpCallback = (ReorderableList list) =>
             {
                 var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(list.index);
-                if (!_materiaSetter.Materia.ContainsKey(element.intValue)) return;
 
                 if (Utils.Settings.HighlightMode == HighlightMode.WhileLMBHeld) Reload();
             };
@@ -170,7 +184,7 @@ namespace Materiator
             };*/
         }
 
-        private void GenerateMateriaDictionary(bool resetToDefault = false)
+        /*private void GenerateMateriaDictionary(bool resetToDefault = false)
         {
             if (!_materiaSetter.IsInitialized || _materiaSetter.Materia.Count == 0)
             {
@@ -185,6 +199,23 @@ namespace Materiator
                 }
 
                 _materiaSetter.Materia = newMateriaDictionary;
+                _materiaSetter.Rects = rects;
+            }
+        }*/
+
+        private void GenerateMateriaSlots()
+        {
+            if (!_materiaSetter.IsInitialized || _materiaSetter.MateriaSlots.Count == 0)
+            {
+                var rects = MeshAnalyzer.CalculateRects(Utils.Settings.GridSize);
+                _materiaSetter.FilteredRects = MeshAnalyzer.FilterRects(rects, _materiaSetter.Mesh.uv);
+                _materiaSetter.MateriaSlots = new System.Collections.Generic.List<MateriaSlot>();
+
+                foreach (var rect in _materiaSetter.FilteredRects)
+                {
+                    _materiaSetter.MateriaSlots.Add(new MateriaSlot(rect.Key));
+                }
+
                 _materiaSetter.Rects = rects;
             }
         }
