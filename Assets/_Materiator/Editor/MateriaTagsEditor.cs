@@ -44,8 +44,8 @@ namespace Materiator
         {
             //Undo.RecordObject(targetMonster, "Add Monster Attack");
             _materiaTags.MateriaTagDictionary.Add(_materiaTags.MateriaTagDictionary.Count + 1, "aaa");
-            var newCategory = new MateriaCategoryElement();
-            root.Add(newCategory);
+            var newTag = new MateriaTagElement();
+            root.Add(newTag);
         }
 
         private void DeleteTag()
@@ -58,7 +58,7 @@ namespace Materiator
             //root.Clear();
             for (var i = 0; i < _materiaTags.MateriaTagDictionary.Count; i++)
             {
-                var newTag = new MateriaCategoryElement();
+                var newTag = new MateriaTagElement();
                 root.Add(newTag);
             }
         }
