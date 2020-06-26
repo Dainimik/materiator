@@ -1,29 +1,12 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Materiator
 {
-    public class MeshAnalyzer : MonoBehaviour
+    public static class MeshAnalyzer
     {
-        public int GridSize = 4;
-
-        private Mesh _mesh;
-        public Rect[] UVRects;
-        public GenericDictionary<int, Vector2> FilteredUVs;
-        public Vector2[] UVs;
-
-        private void Awake()
+        public static SerializableDictionary<int, Rect> FilterRects(Rect[] rects, Vector2[] uvs)
         {
-            _mesh = GetComponent<MeshFilter>().sharedMesh;
-            UVs = _mesh.uv;
-            UVRects = CalculateRects(GridSize);
-            FilteredUVs = FilterUVs(UVRects, _mesh.uv);
-            
-        }
-
-        private GenericDictionary<int, Vector2> FilterUVs(Rect[] rects, Vector2[] uvs)
-        {
-            var filteredUVs = new GenericDictionary<int, Vector2>();
+            var filteredRects = new SerializableDictionary<int, Rect>();
 
             for (int i = 0; i < uvs.Length; i++)
             {
@@ -31,15 +14,15 @@ namespace Materiator
                 {
                     if (rects[r].Contains(uvs[i]))
                     {
-                        if (!filteredUVs.ContainsKey(r))
+                        if (!filteredRects.ContainsKey(r))
                         {
-                            filteredUVs.Add(r, uvs[i]);
+                            filteredRects.Add(r, rects[r]);
                         } 
                     }
                 }
             }
 
-            return filteredUVs;
+            return filteredRects;
         }
 
         public static Rect[] CalculateRects(int size)
