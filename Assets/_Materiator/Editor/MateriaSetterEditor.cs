@@ -1,4 +1,5 @@
 ﻿using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Materiator
@@ -21,11 +22,15 @@ namespace Materiator
 
             Initialize();
 
+            IMGUIContainer defaultInspector = new IMGUIContainer(() => DrawDefaultInspector());
+            root.Add(defaultInspector);
+
             return root;
         }
 
         private void Initialize()
         {
+            _materiaSetter.IsInitialized = false;
             _materiaSetter.GetMeshReferences();
 
             /*if (!CheckAllSystems())
@@ -33,8 +38,28 @@ namespace Materiator
                 return;
             }*/
 
+            GenerateMateriaDictionary();
+
             SetUpButtons();
             _materiaSetter.Initialize();
+        }
+
+        private void GenerateMateriaDictionary()
+        {
+            if (!_materiaSetter.IsInitialized)
+            {
+                var newMateriaDictionary = new SerializableIntMateriaDictionary();
+
+                var rects = MeshAnalyzer.CalculateRects(Utils.Settings.GridSize);
+                _materiaSetter.FilteredRects = MeshAnalyzer.FilterRects(rects, _materiaSetter.Mesh.uv);
+
+                foreach (var rect in _materiaSetter.FilteredRects)
+                {
+                    newMateriaDictionary.Add(rect.Key, Utils.Settings.DefaultMateria);
+                }
+
+                _materiaSetter.Materia = newMateriaDictionary;
+            }
         }
 
         private void Reload()
