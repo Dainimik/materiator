@@ -24,26 +24,26 @@ namespace Materiator
             return existingAsset;
         }
 
-        public static T CreateOrReplaceScriptableObjectAsset<T>(T asset, string path, out bool wasExisting) where T : ScriptableObject
+        public static bool CreateOrReplaceScriptableObjectAsset<T>(T asset, string path, out T updatedAsset) where T : ScriptableObject
         {
-            wasExisting = false;
-            T existingAsset = AssetDatabase.LoadAssetAtPath<T>(path);
+            var wasExisting = false;
+            updatedAsset = AssetDatabase.LoadAssetAtPath<T>(path);
 
-            if (existingAsset == null)
+            if (updatedAsset == null)
             {
                 asset = ScriptableObject.CreateInstance<T>();
                 AssetDatabase.CreateAsset(asset, path);
-                existingAsset = asset;
+                updatedAsset = asset;
                 EditorUtility.SetDirty(asset);
                 AssetDatabase.ImportAsset(path);
             }
             else
             {
-                EditorUtility.CopySerialized(asset, existingAsset);
+                EditorUtility.CopySerialized(asset, updatedAsset);
                 wasExisting = true;
             }
 
-            return existingAsset;
+            return wasExisting;
         }
 
         public static T CreateScriptableObjectAsset<T>(string directory, string name) where T : ScriptableObject

@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using UnityEditor;
+﻿using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -13,7 +13,20 @@ namespace Materiator
 
         private ReorderableList _materiaReorderableList;
 
+        #region Serialized Properties
+
+        private SerializedProperty _materiaPreset;
+        private SerializedProperty _material;
+
+        #endregion
+
+        private ObjectField _materiaPresetObjectField;
+
         private Button _reloadButton;
+        private Button _newMateriaPresetButton;
+        private Button _cloneMateriaPresetButton;
+        private Button _reloadMateriaPresetButton;
+        private Button _saveMateriaSetterData;
 
         private void OnEnable()
         {
@@ -26,18 +39,23 @@ namespace Materiator
         {
             InitializeEditor<MateriaSetter>();
 
+            DrawPresetSection();
+            DrawOutputSection();
+            
+            DrawIMGUI();
+
+            return root;
+        }
+
+        private void DrawIMGUI()
+        {
             IMGUIContainer defaultInspector = new IMGUIContainer(() => DrawDefaultInspector());
             root.Add(defaultInspector);
-
 
             _materiaReorderableList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaSlots"), false, true, false, false);
             DrawMateriaReorderableList();
             IMGUIContainer materiaReorderableList = new IMGUIContainer(() => MateriaReorderableList());
             root.Add(materiaReorderableList);
-
-            SetUpButtons();
-
-            return root;
         }
 
         private void Initialize()
@@ -54,6 +72,42 @@ namespace Materiator
 
             _materiaSetter.UpdateTexturePixelColors();
             //_materiaTagArray = Utils. ReloadTagList();
+        }
+
+        private void DrawPresetSection()
+        {
+            if (_materiaSetter.MateriaPreset == null)
+            {
+                _reloadMateriaPresetButton.visible = true;
+            }
+            else
+            {
+                _reloadMateriaPresetButton.visible = false;
+            }
+
+            _materiaPresetObjectField.RegisterCallback<ChangeEvent<UnityEngine.Object>>(e =>
+            {
+                LoadPreset((MateriaPreset)_materiaPresetObjectField.value);
+            });
+        }
+
+        private void DrawOutputSection()
+        {
+
+        }
+
+        private void LoadPreset(MateriaPreset preset)
+        {
+            if (preset != null)
+            {
+                _reloadMateriaPresetButton.visible = true;
+                _materiaSetter.LoadPreset(preset);
+            }
+            else
+            {
+                _reloadMateriaPresetButton.visible = false;
+            }
+            serializedObject.Update();
         }
 
         private void MateriaReorderableList()
@@ -111,20 +165,8 @@ namespace Materiator
                 if (EditorGUI.EndChangeCheck())
                 {
                     var newTag = Utils.MateriaTags.MateriaTagsList[_materiaTagIndex];
-                    var canSetTag = true;
-                    for (int i = 0; i < _materiaSetter.MateriaSlots.Count; i++)
-                    {
-                        if (_materiaSetter.MateriaSlots[i].MateriaTag == newTag)
-                        {
-                            canSetTag = false;
-                        }
-                    }
-
-                    if (canSetTag || newTag == "-")
-                    {
-                        Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Materia Tag");
-                        _materiaSetter.MateriaSlots[index].MateriaTag = newTag;
-                    }
+                    Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Materia Tag");
+                    _materiaSetter.MateriaSlots[index].MateriaTag = newTag;
                 }
 
                 //_colorData = _colorSetter.ColorData[element.intValue];
@@ -223,6 +265,61 @@ namespace Materiator
             Initialize();
         }
 
+        private void NewPreset()
+        {
+            _materiaPreset.objectReferenceValue = null;
+
+            CreateEditorMaterial(false, _materiaSetter.gameObject.name);
+            //GenerateColorDataArray(true);
+            //EditorUtility.SetDirty(_materiaSetter);
+
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        private void ClonePreset()
+        {
+
+        }
+
+        private void ReloadPreset()
+        {
+
+        }
+
+        private void SaveData()
+        {
+            MateriaSetterData data;
+            AssetUtils.CreateOrReplaceScriptableObjectAsset(_materiaSetter.MateriaSetterData, Utils.Settings.SavePath, out data);
+        }
+
+        private void CreateEditorMaterial(bool clone = false, string name = null)
+        {
+            Utils.CreateMaterial(Utils.Settings.DefaultShaderData.Shader, name);
+
+            serializedObject.Update();
+            var newTextures = new Textures();
+
+            if (!clone)
+            {
+                _material.objectReferenceValue = Utils.CreateMaterial(_materiaSetter.ShaderData.Shader, name);
+                newTextures.CreateTextures(Utils.Settings.GridSize, Utils.Settings.GridSize);
+            }
+            else
+            {
+                _material.objectReferenceValue = Instantiate(_material.objectReferenceValue);
+                newTextures = newTextures.CopyTextures(_materiaSetter.Textures, Utils.Settings.FilterMode);
+            }
+
+            if (name != null)
+                _material.objectReferenceValue.name = name;
+
+            serializedObject.ApplyModifiedProperties();
+
+            _materiaSetter.Textures = newTextures;
+            _materiaSetter.SetTextures();
+            serializedObject.Update();
+        }
+
         /*private bool CheckAllSystems()
         {
             if (MateriatorSettings.Instance == null)
@@ -267,11 +364,34 @@ namespace Materiator
 
             return false;
         }*/
-
-        private void SetUpButtons()
+        protected override void GetProperties()
         {
+            _materiaPreset = serializedObject.FindProperty("MateriaPreset");
+            _material = serializedObject.FindProperty("Material");
+
+            _materiaPresetObjectField = root.Q<ObjectField>("MateriaPresetObjectField");
+            _materiaPresetObjectField.objectType = typeof(MateriaPreset);
+            
+
             _reloadButton = root.Q<Button>("ReloadButton");
+            _newMateriaPresetButton = root.Q<Button>("NewMateriaPresetButton");
+            _cloneMateriaPresetButton = root.Q<Button>("CloneMateriaPresetButton");
+            _reloadMateriaPresetButton = root.Q<Button>("ReloadMateriaPresetButton");
+            _saveMateriaSetterData = root.Q<Button>("SaveMateriaSetterDataButton");
+        }
+
+        protected override void BindProperties()
+        {
+            _materiaPresetObjectField.BindProperty(_materiaPreset);
+        }
+
+        protected override void RegisterButtons()
+        {
             _reloadButton.clicked += Reload;
+            _newMateriaPresetButton.clicked += NewPreset;
+            _cloneMateriaPresetButton.clicked += ClonePreset;
+            _reloadMateriaPresetButton.clicked += ReloadPreset;
+            _saveMateriaSetterData.clicked += SaveData;
         }
     }
 }

@@ -10,6 +10,7 @@ namespace Materiator
 
     public class MateriatorSettings : ScriptableObject
     {
+        public string SavePath;
         public int GridSize = 4;
         public bool PackAssets;
         public ShaderData DefaultShaderData;

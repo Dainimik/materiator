@@ -1,5 +1,4 @@
-﻿using NUnit.Framework;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -77,9 +76,17 @@ namespace Materiator
                     }
                 }
 
+                /*materia = (Materia)EditorGUI.ObjectField(new Rect(r.x + 185, r.y, rect.width - 185f, r.height), materia, typeof(Materia), false);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RegisterCompleteObjectUndo(_materiaPreset, "Change Materia");
+                    if (materia == null)
+                        materia = Utils.Settings.DefaultMateria;
 
-                //EditorGUI.PropertyField(new Rect(r.x + 15, r.y, r.width, r.height), element.FindPropertyRelative("Tag"), GUIContent.none);
-                EditorGUI.PropertyField(new Rect(r.x + 185, r.y, rect.width - 175f, r.height), element.FindPropertyRelative("Materia"), GUIContent.none);
+                    serializedObject.Update();
+                }*/
+
+                EditorGUI.PropertyField(new Rect(r.x + 185, r.y, rect.width - 185f, r.height), element.FindPropertyRelative("Materia"), GUIContent.none);
             };
 
             _tagList.onAddCallback = (ReorderableList List) =>

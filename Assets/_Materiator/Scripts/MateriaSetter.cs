@@ -8,6 +8,7 @@ namespace Materiator
     {
         public bool IsInitialized = false;
 
+        public MateriaSetterData MateriaSetterData;
         public Mesh Mesh;
         public MeshFilter MeshFilter;
         public Renderer Renderer;
@@ -19,6 +20,7 @@ namespace Materiator
         public SerializableDictionary<int, Rect> FilteredRects;
         public Rect[] Rects;
 
+        public MateriaPreset MateriaPreset;
         public ShaderData ShaderData;
         public Material Material;
 
@@ -126,6 +128,23 @@ namespace Materiator
             }
 
             tex.Apply();
+        }
+
+        public void LoadPreset(MateriaPreset preset)
+        {
+            if (preset != null)
+            {
+                for (int i = 0; i < MateriaSlots.Count; i++)
+                {
+                    for (int j = 0; j < preset.MateriaPresetItemList.Count; j++)
+                    {
+                        if (MateriaSlots[i].MateriaTag == preset.MateriaPresetItemList[j].Tag)
+                        {
+                            MateriaSlots[i].Materia = preset.MateriaPresetItemList[j].Materia;
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -7,7 +7,5 @@ namespace Materiator
     public class MateriaPreset : ScriptableObject
     {
         public List<MateriaPresetItem> MateriaPresetItemList = new List<MateriaPresetItem>();
-        //public List<string> MateriaTag;
     }
-
 }

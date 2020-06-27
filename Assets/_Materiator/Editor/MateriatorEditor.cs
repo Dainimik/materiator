@@ -17,7 +17,19 @@ namespace Materiator
                 root.Clear();
 
             tree = Resources.Load<VisualTreeAsset>(typeof(T).Name);
+            root.styleSheets.Add(Resources.Load<StyleSheet>("Materiator"));
             tree.CloneTree(root);
+
+            GetProperties();
+            BindProperties();
+            RegisterButtons();
+            
         }
+
+        protected virtual void GetProperties() { }
+
+        protected virtual void BindProperties() { }
+
+        protected virtual void RegisterButtons() { }
     }
 }

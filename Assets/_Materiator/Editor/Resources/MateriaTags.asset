@@ -12,4 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98a0da4775618c64c9071e6e22401428, type: 3}
   m_Name: MateriaTags
   m_EditorClassIdentifier: 
-  MateriaTagsList: []
+  MateriaTagsList:
+  - '-'
+  - Metal
+  - Plastic
