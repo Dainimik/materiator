@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿using System.IO;
+using TMPro;
+using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEditorInternal;
 using UnityEngine;
@@ -16,17 +18,20 @@ namespace Materiator
         #region Serialized Properties
 
         private SerializedProperty _materiaPreset;
+        private SerializedProperty _shaderData;
         private SerializedProperty _material;
 
         #endregion
 
         private ObjectField _materiaPresetObjectField;
+        private ObjectField _shaderDataObjectField;
 
         private Button _reloadButton;
         private Button _newMateriaPresetButton;
         private Button _cloneMateriaPresetButton;
         private Button _reloadMateriaPresetButton;
-        private Button _saveMateriaSetterData;
+        private Button _overwriteMateriaSetterData;
+        private Button _saveAsNewMateriaSetterData;
 
         private void OnEnable()
         {
@@ -286,14 +291,137 @@ namespace Materiator
 
         }
 
-        private void SaveData()
+        private void OverwriteMateriaSetterData()
         {
-            MateriaSetterData data;
+            /*MateriaSetterData data;
             var name = _materiaSetter.gameObject.name + ".asset";
             var path = Utils.Settings.SavePath + name;
             AssetUtils.CreateOrReplaceScriptableObjectAsset(_materiaSetter.MateriaSetterData, path, out data);
+
+            data.Material = (Material)_material.objectReferenceValue;
+            data.Textures = _materiaSetter.Textures;
+
+            AssetDatabase.AddObjectToAsset(data, (Material)_material.objectReferenceValue);
+            AssetDatabase.AddObjectToAsset(data, _materiaSetter.Textures.Color);
+            AssetDatabase.AddObjectToAsset(data, _materiaSetter.Textures.MetallicSmoothness);
+            AssetDatabase.AddObjectToAsset(data, _materiaSetter.Textures.Emission);
+
             _materiaSetter.MateriaSetterData = data;
+            serializedObject.Update();*/
+
+            WriteAssetsToDisk(AssetDatabase.GetAssetPath(_materiaSetter.MateriaSetterData), false, Utils.Settings.PackAssets);
+            _materiaSetter.UpdateRenderer(false);
+        }
+        private void SaveAsNewMateriaSetterData()
+        {
+            /*MateriaSetterData data;
+            var name = _materiaSetter.gameObject.name + ".asset";
+            var path = Utils.Settings.SavePath + name;
+            AssetUtils.CreateOrReplaceScriptableObjectAsset(_materiaSetter.MateriaSetterData, path, out data);
+
+            data.Material = (Material)_material.objectReferenceValue;
+            data.Textures = _materiaSetter.Textures;
+
+            AssetDatabase.AddObjectToAsset(data, (Material)_material.objectReferenceValue);
+            AssetDatabase.AddObjectToAsset(data, _materiaSetter.Textures.Color);
+            AssetDatabase.AddObjectToAsset(data, _materiaSetter.Textures.MetallicSmoothness);
+            AssetDatabase.AddObjectToAsset(data, _materiaSetter.Textures.Emission);
+
+            _materiaSetter.MateriaSetterData = data;
+            serializedObject.Update();*/
+
+            WriteAssetsToDisk(null, true, Utils.Settings.PackAssets);
+            _materiaSetter.UpdateRenderer(false);
+        }
+
+        public void WriteAssetsToDisk(string path, bool saveAsNew, bool packAssets)
+        {
+            string name;
+            string dir;
+
+            if (path != null)
+            {
+                dir = AssetUtils.GetDirectoryName(path);
+                name = AssetUtils.GetFileName(path);
+            }
+            else
+            {
+                dir = Utils.Settings.SavePath;
+                name = _materiaSetter.gameObject.name;
+                path = dir + name + ".asset";
+            }
+
+            var shaderData = (ShaderData)_shaderDataObjectField.value;
+            Material mat;
+            Textures texs;
+            var matName = name + "_Material";
+
+            bool wasMPExisting;
+            var data = AssetUtils.CreateOrReplaceScriptableObjectAsset(_materiaSetter.MateriaSetterData, path, out wasMPExisting);
+
+            if (wasMPExisting)
+                texs = data.Textures;
+            else
+                texs = _materiaSetter.Textures;
+
+            var presetFolderDir = dir;
+
+            var allAssetsAtPath = AssetDatabase.LoadAllAssetsAtPath(path);
+            if (saveAsNew && allAssetsAtPath.Length < 2)
+            {
+                mat = Instantiate(_materiaSetter.Material);
+                if (packAssets)
+                {
+                    mat.name = matName;
+                    texs = texs.CopyTextures(texs, Utils.Settings.FilterMode);
+                    texs.SetNames(name);
+
+                    AssetDatabase.AddObjectToAsset(mat, data);
+                    texs.AddTexturesToAsset(data);
+                }
+                else
+                {
+                    AssetDatabase.CreateAsset(mat, presetFolderDir + matName + ".mat");
+                    mat = (Material)AssetDatabase.LoadAssetAtPath(presetFolderDir + matName + ".mat", typeof(Material));
+
+                    texs.SetNames(name);
+                    texs.WriteTexturesToDisk(presetFolderDir);
+                }
+
+                _materiaSetter.Material = mat;
+                _materiaSetter.Textures = texs;
+                data.Material = mat;
+                data.Textures = texs;
+            }
+            else
+            {
+                mat = data.Material;
+                if (packAssets)
+                {
+                    data.Textures.CopySerialized(texs);
+                    data.Textures.SetTextures(data.Material, (ShaderData)_shaderData.objectReferenceValue);
+                }
+                else
+                {
+                    if (mat == null)
+                    {
+                        AssetDatabase.CreateAsset(mat, presetFolderDir + "/" + matName + ".mat");
+                        mat = (Material)AssetDatabase.LoadAssetAtPath(presetFolderDir + "/" + matName + ".mat", typeof(Material));
+                    }
+
+                    data.Textures.WriteTexturesToDisk(presetFolderDir);
+                    data.Textures.SetTextures(data.Material, (ShaderData)_shaderData.objectReferenceValue);
+                }
+            }
+
+            _materiaSetter.SetTextures();
+            _materiaSetter.MateriaSetterData = data;
+
             serializedObject.Update();
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            EditorUtils.MarkOpenPrefabSceneDirty();
         }
 
         private void CreateEditorMaterial(bool clone = false, string name = null)
@@ -371,22 +499,27 @@ namespace Materiator
         protected override void GetProperties()
         {
             _materiaPreset = serializedObject.FindProperty("MateriaPreset");
+            _shaderData = serializedObject.FindProperty("ShaderData");
             _material = serializedObject.FindProperty("Material");
 
             _materiaPresetObjectField = root.Q<ObjectField>("MateriaPresetObjectField");
             _materiaPresetObjectField.objectType = typeof(MateriaPreset);
-            
+            _shaderDataObjectField = root.Q<ObjectField>("ShaderDataObjectField");
+            _shaderDataObjectField.objectType = typeof(ShaderData);
+
 
             _reloadButton = root.Q<Button>("ReloadButton");
             _newMateriaPresetButton = root.Q<Button>("NewMateriaPresetButton");
             _cloneMateriaPresetButton = root.Q<Button>("CloneMateriaPresetButton");
             _reloadMateriaPresetButton = root.Q<Button>("ReloadMateriaPresetButton");
-            _saveMateriaSetterData = root.Q<Button>("SaveMateriaSetterDataButton");
+            _overwriteMateriaSetterData = root.Q<Button>("OverwriteMateriaSetterDataButton");
+            _saveAsNewMateriaSetterData = root.Q<Button>("SaveAsNewMateriaSetterDataButton");
         }
 
         protected override void BindProperties()
         {
             _materiaPresetObjectField.BindProperty(_materiaPreset);
+            _shaderDataObjectField.BindProperty(_shaderData);
         }
 
         protected override void RegisterButtons()
@@ -395,7 +528,8 @@ namespace Materiator
             _newMateriaPresetButton.clicked += NewPreset;
             _cloneMateriaPresetButton.clicked += ClonePreset;
             _reloadMateriaPresetButton.clicked += ReloadPreset;
-            _saveMateriaSetterData.clicked += SaveData;
+            _overwriteMateriaSetterData.clicked += OverwriteMateriaSetterData;
+            _saveAsNewMateriaSetterData.clicked += SaveAsNewMateriaSetterData;
         }
     }
 }
