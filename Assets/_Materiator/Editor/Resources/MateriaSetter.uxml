@@ -14,6 +14,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="ShaderSectionContainer">
+            <uie:ObjectField label="Materia Setter Data" name="MateriaSetterDataObjectField" />
             <uie:ObjectField label="Shader Data" name="ShaderDataObjectField" />
         </ui:VisualElement>
         <ui:VisualElement name="OutputSectionContainer">

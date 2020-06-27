@@ -18,12 +18,14 @@ namespace Materiator
         #region Serialized Properties
 
         private SerializedProperty _materiaPreset;
+        private SerializedProperty _materiaSetterData;
         private SerializedProperty _shaderData;
         private SerializedProperty _material;
 
         #endregion
 
         private ObjectField _materiaPresetObjectField;
+        private ObjectField _materiaSetterDataObjectField;
         private ObjectField _shaderDataObjectField;
 
         private Button _reloadButton;
@@ -293,43 +295,11 @@ namespace Materiator
 
         private void OverwriteMateriaSetterData()
         {
-            /*MateriaSetterData data;
-            var name = _materiaSetter.gameObject.name + ".asset";
-            var path = Utils.Settings.SavePath + name;
-            AssetUtils.CreateOrReplaceScriptableObjectAsset(_materiaSetter.MateriaSetterData, path, out data);
-
-            data.Material = (Material)_material.objectReferenceValue;
-            data.Textures = _materiaSetter.Textures;
-
-            AssetDatabase.AddObjectToAsset(data, (Material)_material.objectReferenceValue);
-            AssetDatabase.AddObjectToAsset(data, _materiaSetter.Textures.Color);
-            AssetDatabase.AddObjectToAsset(data, _materiaSetter.Textures.MetallicSmoothness);
-            AssetDatabase.AddObjectToAsset(data, _materiaSetter.Textures.Emission);
-
-            _materiaSetter.MateriaSetterData = data;
-            serializedObject.Update();*/
-
             WriteAssetsToDisk(AssetDatabase.GetAssetPath(_materiaSetter.MateriaSetterData), false, Utils.Settings.PackAssets);
             _materiaSetter.UpdateRenderer(false);
         }
         private void SaveAsNewMateriaSetterData()
         {
-            /*MateriaSetterData data;
-            var name = _materiaSetter.gameObject.name + ".asset";
-            var path = Utils.Settings.SavePath + name;
-            AssetUtils.CreateOrReplaceScriptableObjectAsset(_materiaSetter.MateriaSetterData, path, out data);
-
-            data.Material = (Material)_material.objectReferenceValue;
-            data.Textures = _materiaSetter.Textures;
-
-            AssetDatabase.AddObjectToAsset(data, (Material)_material.objectReferenceValue);
-            AssetDatabase.AddObjectToAsset(data, _materiaSetter.Textures.Color);
-            AssetDatabase.AddObjectToAsset(data, _materiaSetter.Textures.MetallicSmoothness);
-            AssetDatabase.AddObjectToAsset(data, _materiaSetter.Textures.Emission);
-
-            _materiaSetter.MateriaSetterData = data;
-            serializedObject.Update();*/
-
             WriteAssetsToDisk(null, true, Utils.Settings.PackAssets);
             _materiaSetter.UpdateRenderer(false);
         }
@@ -499,11 +469,14 @@ namespace Materiator
         protected override void GetProperties()
         {
             _materiaPreset = serializedObject.FindProperty("MateriaPreset");
+            _materiaSetterData = serializedObject.FindProperty("MateriaSetterData");
             _shaderData = serializedObject.FindProperty("ShaderData");
             _material = serializedObject.FindProperty("Material");
 
             _materiaPresetObjectField = root.Q<ObjectField>("MateriaPresetObjectField");
             _materiaPresetObjectField.objectType = typeof(MateriaPreset);
+            _materiaSetterDataObjectField = root.Q<ObjectField>("MateriaSetterDataObjectField");
+            _materiaSetterDataObjectField.objectType = typeof(MateriaSetterData);
             _shaderDataObjectField = root.Q<ObjectField>("ShaderDataObjectField");
             _shaderDataObjectField.objectType = typeof(ShaderData);
 
@@ -519,6 +492,7 @@ namespace Materiator
         protected override void BindProperties()
         {
             _materiaPresetObjectField.BindProperty(_materiaPreset);
+            _materiaSetterDataObjectField.BindProperty(_materiaSetterData);
             _shaderDataObjectField.BindProperty(_shaderData);
         }
 
