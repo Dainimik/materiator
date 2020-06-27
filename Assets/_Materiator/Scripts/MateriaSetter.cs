@@ -34,9 +34,19 @@ namespace Materiator
             GetMeshReferences();
             SetUpRenderer();
             InitializeTextures();
-            GenerateMateriaSlots();
+            AnalyzeMesh();
+            GenerateMateriaSlots(true);
 
             IsInitialized = true;
+        }
+
+        public void Refresh()
+        {
+            GetMeshReferences();
+            SetUpRenderer();
+            InitializeTextures();
+            AnalyzeMesh();
+            GenerateMateriaSlots(false);
         }
 
         private void GetMeshReferences()
@@ -107,20 +117,41 @@ namespace Materiator
             Textures.SetTextures(Material, ShaderData);
         }
 
-        public void GenerateMateriaSlots()
+        private void AnalyzeMesh()
         {
-            if (!IsInitialized || MateriaSlots?.Count == 0)
+            Rects = MeshAnalyzer.CalculateRects(Utils.Settings.GridSize);
+            FilteredRects = MeshAnalyzer.FilterRects(Rects, Mesh.uv);
+        }
+
+        public void GenerateMateriaSlots(bool reset)
+        {
+            var materiaSlotsCount = 0;
+
+            if (MateriaSlots != null)
             {
-                var rects = MeshAnalyzer.CalculateRects(Utils.Settings.GridSize);
-                FilteredRects = MeshAnalyzer.FilterRects(rects, Mesh.uv);
-                MateriaSlots = new List<MateriaSlot>();
+                materiaSlotsCount = MateriaSlots.Count;
+            }
+
+            if (materiaSlotsCount == 0 || FilteredRects.Count != materiaSlotsCount)
+            {
+                if (reset)
+                {
+                    MateriaSlots = new List<MateriaSlot>();
+                }
+
+                var keyArray = new int[MateriaSlots.Count];
+                for (int i = 0; i < keyArray.Length; i++)
+                {
+                    keyArray[i] = MateriaSlots[i].ID;
+                }
 
                 foreach (var rect in FilteredRects)
                 {
-                    MateriaSlots.Add(new MateriaSlot(rect.Key));
+                    if (!keyArray.Contains(rect.Key))
+                    {
+                        MateriaSlots.Add(new MateriaSlot(rect.Key));
+                    }
                 }
-
-                Rects = rects;
             }
         }
 
