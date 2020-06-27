@@ -16,7 +16,7 @@
         <ui:VisualElement name="OutputSectionContainer">
             <ui:Label text="Output" class="section-header" />
             <ui:VisualElement name="ButtonContainer">
-                <ui:Button text="Button" name="SaveMateriaSetterDataButton" />
+                <ui:Button text="Save" name="SaveMateriaSetterDataButton" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

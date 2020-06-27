@@ -289,7 +289,11 @@ namespace Materiator
         private void SaveData()
         {
             MateriaSetterData data;
-            AssetUtils.CreateOrReplaceScriptableObjectAsset(_materiaSetter.MateriaSetterData, Utils.Settings.SavePath, out data);
+            var name = _materiaSetter.gameObject.name + ".asset";
+            var path = Utils.Settings.SavePath + name;
+            AssetUtils.CreateOrReplaceScriptableObjectAsset(_materiaSetter.MateriaSetterData, path, out data);
+            _materiaSetter.MateriaSetterData = data;
+            serializedObject.Update();
         }
 
         private void CreateEditorMaterial(bool clone = false, string name = null)

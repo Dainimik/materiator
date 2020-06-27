@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9993698cad73f364895202aff686f817, type: 3}
   m_Name: MateriatorSettings
   m_EditorClassIdentifier: 
+  SavePath: Assets/_Materiator/
   GridSize: 4
   PackAssets: 1
   DefaultShaderData: {fileID: 11400000, guid: d2cbf647c709b3a4da4a535dda5cd1dd, type: 2}
