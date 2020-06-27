@@ -34,6 +34,7 @@ namespace Materiator
             GetMeshReferences();
             SetUpRenderer();
             InitializeTextures();
+            GenerateMateriaSlots();
 
             IsInitialized = true;
         }
@@ -104,6 +105,23 @@ namespace Materiator
             if (Material == null) return;
 
             Textures.SetTextures(Material, ShaderData);
+        }
+
+        public void GenerateMateriaSlots()
+        {
+            if (!IsInitialized || MateriaSlots?.Count == 0)
+            {
+                var rects = MeshAnalyzer.CalculateRects(Utils.Settings.GridSize);
+                FilteredRects = MeshAnalyzer.FilterRects(rects, Mesh.uv);
+                MateriaSlots = new List<MateriaSlot>();
+
+                foreach (var rect in FilteredRects)
+                {
+                    MateriaSlots.Add(new MateriaSlot(rect.Key));
+                }
+
+                Rects = rects;
+            }
         }
 
         public void UpdateTexturePixelColors()

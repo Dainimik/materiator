@@ -1,5 +1,4 @@
-﻿using System.IO;
-using TMPro;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEditorInternal;
@@ -74,11 +73,7 @@ namespace Materiator
                 return;
             }*/
 
-            //GenerateMateriaDictionary();
-            GenerateMateriaSlots();
-
             _materiaSetter.UpdateTexturePixelColors();
-            //_materiaTagArray = Utils. ReloadTagList();
         }
 
         private void DrawPresetSection()
@@ -249,23 +244,6 @@ namespace Materiator
                 _materiaSetter.Rects = rects;
             }
         }*/
-
-        private void GenerateMateriaSlots()
-        {
-            if (!_materiaSetter.IsInitialized || _materiaSetter.MateriaSlots?.Count == 0)
-            {
-                var rects = MeshAnalyzer.CalculateRects(Utils.Settings.GridSize);
-                _materiaSetter.FilteredRects = MeshAnalyzer.FilterRects(rects, _materiaSetter.Mesh.uv);
-                _materiaSetter.MateriaSlots = new System.Collections.Generic.List<MateriaSlot>();
-
-                foreach (var rect in _materiaSetter.FilteredRects)
-                {
-                    _materiaSetter.MateriaSlots.Add(new MateriaSlot(rect.Key));
-                }
-
-                _materiaSetter.Rects = rects;
-            }
-        }
 
         private void Reload()
         {
