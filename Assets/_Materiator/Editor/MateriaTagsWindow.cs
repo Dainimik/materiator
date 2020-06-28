@@ -16,6 +16,7 @@ namespace Materiator
 
         private void OnEnable()
         {
+            _materiaTags = Utils.LoadMateriaTags();
             if (_materiaTags == null) CreateDefaultTagsData();
             if (!_editor) Editor.CreateCachedEditor(_materiaTags, null, ref _editor);
         }
