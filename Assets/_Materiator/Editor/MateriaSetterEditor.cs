@@ -73,7 +73,7 @@ namespace Materiator
                 return;
             }*/
 
-            _materiaSetter.UpdateTexturePixelColors();
+            _materiaSetter.UpdateColorsOfAllTextures();
         }
 
         private void DrawPresetSection()
@@ -171,7 +171,6 @@ namespace Materiator
                     _materiaSetter.MateriaSlots[index].MateriaTag = newTag;
                 }
 
-                //_colorData = _colorSetter.ColorData[element.intValue];
                 Materia oldCD = elementMateria;
                 elementMateria = (Materia)EditorGUI.ObjectField(new Rect(rect.x + 170f, rect.y, rect.width - 195f, rect.height), elementMateria, typeof(Materia), false);
                 if (EditorGUI.EndChangeCheck())
@@ -183,6 +182,7 @@ namespace Materiator
                         _materiaSetter.MateriaSlots[index].Materia = elementMateria;
 
                     serializedObject.Update();
+                    _materiaSetter.UpdateColorsOfAllTextures();
 
                     if (elementMateria != oldCD)
                         //_isColorSetterDirty.boolValue = true;
@@ -194,28 +194,22 @@ namespace Materiator
                 Rect cdExpandRect = new Rect(EditorGUIUtility.currentViewWidth - 60f, rect.y, 20f, 20f);
                 if (GUI.Button(cdExpandRect, new GUIContent(EditorGUIUtility.IconContent("d_editicon.sml").image, "Edit Color Data")))
                     EditorUtils.InspectTarget(elementMateria);
-
-                // This can be optimized
-                if (!_materiaReorderableList.HasKeyboardControl()) Reload();
-                // -------------
             };
 
             _materiaReorderableList.onSelectCallback = (ReorderableList list) =>
             {
-                //var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(list.index);
+                var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(list.index).FindPropertyRelative("ID");
 
-                //Reload();
-
-                HandleMateriaSlotSelection(list.index, true);
+                HandleMateriaSlotSelection(element.intValue, true);
             };
 
             _materiaReorderableList.onMouseUpCallback = (ReorderableList list) =>
             {
-                //var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(list.index);
+                var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(list.index).FindPropertyRelative("ID");
 
                 //if (Utils.Settings.HighlightMode == HighlightMode.WhileLMBHeld) Reload();
 
-                HandleMateriaSlotSelection(list.index, false);
+                HandleMateriaSlotSelection(element.intValue, false);
             };
 
             /*_colorDataList.onReorderCallback = (ReorderableList list) =>
@@ -247,27 +241,45 @@ namespace Materiator
             }
         }*/
 
+        Texture2D _highlightedTexture;
         private void HandleMateriaSlotSelection(int index, bool selected)
         {
             var originalTexture = _materiaSetter.Textures.Color;
-            var highlightedTexture = new Texture2D(_materiaSetter.Textures.Color.width, _materiaSetter.Textures.Color.height);
 
-            EditorUtility.CopySerialized(originalTexture, highlightedTexture);
+            if (_highlightedTexture == null)
+            {
+                _highlightedTexture = new Texture2D(_materiaSetter.Textures.Color.width, _materiaSetter.Textures.Color.height, TextureFormat.RGBA32, false);
+                EditorUtility.CopySerialized(originalTexture, _highlightedTexture);
+                _highlightedTexture.filterMode = Utils.Settings.FilterMode;
+            }
+
+            var colors = originalTexture.GetPixels32();
+            var rectInt = Utils.GetRectIntFromRect(Utils.Settings.GridSize, _materiaSetter.FilteredRects[index]);
+
+            for (int i = 0; i < colors.Length; i++)
+            {
+                colors[i] = Utils.Settings.HighlightColor;
+            }
 
             if (selected)
             {
-                _materiaSetter.Renderer.sharedMaterial.SetTexture(_materiaSetter.ShaderData.MainTexturePropertyName, highlightedTexture);
+                _highlightedTexture.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, colors);
+                _highlightedTexture.Apply();
+
+                _materiaSetter.Renderer.sharedMaterial.SetTexture(_materiaSetter.ShaderData.MainTexturePropertyName, _highlightedTexture);
             }
             else
             {
+                _highlightedTexture.SetPixels32(originalTexture.GetPixels32());
+                _highlightedTexture.Apply();
+
                 _materiaSetter.Renderer.sharedMaterial.SetTexture(_materiaSetter.ShaderData.MainTexturePropertyName, originalTexture);
-                DestroyImmediate(highlightedTexture);
             }
         }
 
-        private void Reload()
+        private void Refresh()
         {
-            Initialize();
+            _materiaSetter.Refresh();
         }
 
         private void NewPreset()
@@ -496,7 +508,7 @@ namespace Materiator
 
         protected override void RegisterButtons()
         {
-            _reloadButton.clicked += Reload;
+            _reloadButton.clicked += Refresh;
             _newMateriaPresetButton.clicked += NewPreset;
             _cloneMateriaPresetButton.clicked += ClonePreset;
             _reloadMateriaPresetButton.clicked += ReloadPreset;
