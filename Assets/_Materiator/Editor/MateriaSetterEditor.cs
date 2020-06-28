@@ -202,18 +202,20 @@ namespace Materiator
 
             _materiaReorderableList.onSelectCallback = (ReorderableList list) =>
             {
-                var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(list.index);
+                //var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(list.index);
 
-                Reload();
+                //Reload();
 
-                //HighlightSelectedColorData(list.index);
+                HandleMateriaSlotSelection(list.index, true);
             };
 
             _materiaReorderableList.onMouseUpCallback = (ReorderableList list) =>
             {
-                var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(list.index);
+                //var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(list.index);
 
-                if (Utils.Settings.HighlightMode == HighlightMode.WhileLMBHeld) Reload();
+                //if (Utils.Settings.HighlightMode == HighlightMode.WhileLMBHeld) Reload();
+
+                HandleMateriaSlotSelection(list.index, false);
             };
 
             /*_colorDataList.onReorderCallback = (ReorderableList list) =>
@@ -244,6 +246,24 @@ namespace Materiator
                 _materiaSetter.Rects = rects;
             }
         }*/
+
+        private void HandleMateriaSlotSelection(int index, bool selected)
+        {
+            var originalTexture = _materiaSetter.Textures.Color;
+            var highlightedTexture = new Texture2D(_materiaSetter.Textures.Color.width, _materiaSetter.Textures.Color.height);
+
+            EditorUtility.CopySerialized(originalTexture, highlightedTexture);
+
+            if (selected)
+            {
+                _materiaSetter.Renderer.sharedMaterial.SetTexture(_materiaSetter.ShaderData.MainTexturePropertyName, highlightedTexture);
+            }
+            else
+            {
+                _materiaSetter.Renderer.sharedMaterial.SetTexture(_materiaSetter.ShaderData.MainTexturePropertyName, originalTexture);
+                DestroyImmediate(highlightedTexture);
+            }
+        }
 
         private void Reload()
         {
