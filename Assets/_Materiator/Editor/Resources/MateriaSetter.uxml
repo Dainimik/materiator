@@ -8,8 +8,6 @@
             <ui:Label text="Materia Preset" class="section-header" />
             <uie:ObjectField label="Active Preset" name="MateriaPresetObjectField" />
             <ui:VisualElement name="ButtonContainer" style="flex-direction: row;">
-                <ui:Button text="E" name="ExtractMateriaPresetButton" />
-                <ui:Button text="S" name="SaveMateriaPresetButton" />
                 <ui:Button text="Reload Preset" name="ReloadMateriaPresetButton" />
             </ui:VisualElement>
         </ui:VisualElement>

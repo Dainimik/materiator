@@ -30,8 +30,6 @@ namespace Materiator
         private ObjectField _shaderDataObjectField;
 
         private Button _reloadButton;
-        private Button _extractMateriaPresetButton;
-        private Button _saveMateriaPresetButton;
         private Button _reloadMateriaPresetButton;
         private Button _newMateriaSetterDataButton;
         private Button _cloneMateriaSetterDataButton;
@@ -350,16 +348,6 @@ namespace Materiator
             _materiaSetter.Refresh();
         }
 
-        private void ExtractPreset()
-        {
-
-        }
-
-        private void SavePreset()
-        {
-
-        }
-
         private void ReloadPreset()
         {
             LoadPreset((MateriaPreset)_materiaPresetObjectField.value);
@@ -608,8 +596,6 @@ namespace Materiator
 
 
             _reloadButton = root.Q<Button>("ReloadButton");
-            _extractMateriaPresetButton = root.Q<Button>("ExtractMateriaPresetButton");
-            _saveMateriaPresetButton = root.Q<Button>("SaveMateriaPresetButton");
             _reloadMateriaPresetButton = root.Q<Button>("ReloadMateriaPresetButton");
             _newMateriaSetterDataButton = root.Q<Button>("NewMateriaSetterDataButton");
             _cloneMateriaSetterDataButton = root.Q<Button>("CloneMateriaSetterDataButton");
@@ -628,8 +614,6 @@ namespace Materiator
         protected override void RegisterButtons()
         {
             _reloadButton.clicked += Refresh;
-            _extractMateriaPresetButton.clicked += ExtractPreset;
-            _saveMateriaPresetButton.clicked += SavePreset;
             _reloadMateriaPresetButton.clicked += ReloadPreset;
             _newMateriaSetterDataButton.clicked += NewData;
             _cloneMateriaSetterDataButton.clicked += CloneData;
