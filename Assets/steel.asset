@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a575a3c45dffddf4ba13f9f79f843e1d, type: 3}
+  m_Name: steel
+  m_EditorClassIdentifier: 
+  MateriaSlots:
+  - ID: 1
+    Materia: {fileID: 11400000, guid: 35303a3f5c117584b99fd840c725fcfc, type: 2}
+    MateriaTag: Plastic
+  - ID: 0
+    Materia: {fileID: 11400000, guid: 35303a3f5c117584b99fd840c725fcfc, type: 2}
+    MateriaTag: Plastic
+  - ID: 4
+    Materia: {fileID: 11400000, guid: 35303a3f5c117584b99fd840c725fcfc, type: 2}
+    MateriaTag: Plastic
+  MateriaPreset: {fileID: 11400000, guid: 9e1ed939e7392ec42b7f7b9cea9b5556, type: 2}
+  ShaderData: {fileID: 11400000, guid: d2cbf647c709b3a4da4a535dda5cd1dd, type: 2}
+  Material: {fileID: 2100000, guid: a0685cf119b5d2d4b995160d17ffc8c1, type: 2}
+  Textures:
+    Color: {fileID: 2800000, guid: 1df36f85d74a0b64b9907b484416f931, type: 3}
+    MetallicSmoothness: {fileID: 2800000, guid: da316f5360cd24040b4f6c45e589035b, type: 3}
+    Emission: {fileID: 2800000, guid: 821d5dc537a8fad4da49b4f526bed53d, type: 3}
