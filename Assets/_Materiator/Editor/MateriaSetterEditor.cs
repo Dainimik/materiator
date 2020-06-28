@@ -305,16 +305,16 @@ namespace Materiator
 
         private void OverwriteMateriaSetterData()
         {
-            WriteAssetsToDisk(AssetDatabase.GetAssetPath(_materiaSetter.MateriaSetterData), false, Utils.Settings.PackAssets);
+            WriteAssetsToDisk(AssetDatabase.GetAssetPath(_materiaSetter.MateriaSetterData), Utils.Settings.PackAssets);
             _materiaSetter.UpdateRenderer(false);
         }
         private void SaveAsNewMateriaSetterData()
         {
-            WriteAssetsToDisk(null, true, Utils.Settings.PackAssets);
+            WriteAssetsToDisk(null, Utils.Settings.PackAssets);
             _materiaSetter.UpdateRenderer(false);
         }
 
-        public void WriteAssetsToDisk(string path, bool saveAsNew, bool packAssets)
+        public void WriteAssetsToDisk(string path, bool packAssets)
         {
             string name;
             string dir;
@@ -331,7 +331,6 @@ namespace Materiator
                 path = dir + name + ".asset";
             }
 
-            var shaderData = (ShaderData)_shaderDataObjectField.value;
             Material mat;
             Textures texs;
             var matName = name + "_Material";
@@ -346,53 +345,39 @@ namespace Materiator
 
             var presetFolderDir = dir;
 
-            var allAssetsAtPath = AssetDatabase.LoadAllAssetsAtPath(path);
-            if (saveAsNew && allAssetsAtPath.Length < 2)
+
+
+
+
+
+            mat = Instantiate(_materiaSetter.Material);
+            if (packAssets)
             {
-                mat = Instantiate(_materiaSetter.Material);
-                if (packAssets)
-                {
-                    mat.name = matName;
-                    texs = texs.CopyTextures(texs, Utils.Settings.FilterMode);
-                    texs.SetNames(name);
+                mat.name = matName;
+                texs = texs.CopyTextures(texs, Utils.Settings.FilterMode);
+                texs.SetNames(name);
 
-                    AssetDatabase.AddObjectToAsset(mat, data);
-                    texs.AddTexturesToAsset(data);
-                }
-                else
-                {
-                    AssetDatabase.CreateAsset(mat, presetFolderDir + matName + ".mat");
-                    mat = (Material)AssetDatabase.LoadAssetAtPath(presetFolderDir + matName + ".mat", typeof(Material));
-
-                    texs.SetNames(name);
-                    texs.WriteTexturesToDisk(presetFolderDir);
-                }
-
-                _materiaSetter.Material = mat;
-                _materiaSetter.Textures = texs;
-                data.Material = mat;
-                data.Textures = texs;
+                AssetDatabase.AddObjectToAsset(mat, data);
+                texs.AddTexturesToAsset(data);
             }
             else
             {
-                mat = data.Material;
-                if (packAssets)
-                {
-                    data.Textures.CopySerialized(texs);
-                    data.Textures.SetTextures(data.Material, (ShaderData)_shaderData.objectReferenceValue);
-                }
-                else
-                {
-                    if (mat == null)
-                    {
-                        AssetDatabase.CreateAsset(mat, presetFolderDir + "/" + matName + ".mat");
-                        mat = (Material)AssetDatabase.LoadAssetAtPath(presetFolderDir + "/" + matName + ".mat", typeof(Material));
-                    }
+                AssetDatabase.CreateAsset(mat, presetFolderDir + matName + ".mat");
+                mat = (Material)AssetDatabase.LoadAssetAtPath(presetFolderDir + matName + ".mat", typeof(Material));
 
-                    data.Textures.WriteTexturesToDisk(presetFolderDir);
-                    data.Textures.SetTextures(data.Material, (ShaderData)_shaderData.objectReferenceValue);
-                }
+                texs.SetNames(name);
+                texs.WriteTexturesToDisk(presetFolderDir);
             }
+
+            _materiaSetter.Material = mat;
+            _materiaSetter.Textures = texs;
+            data.Material = mat;
+            data.Textures = texs;
+
+
+
+
+
 
             _materiaSetter.SetTextures();
             _materiaSetter.MateriaSetterData = data;
