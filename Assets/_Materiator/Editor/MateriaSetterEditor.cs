@@ -101,8 +101,13 @@ namespace Materiator
             {
                 return;
             }*/
+        }
 
-            _materiaSetter.UpdateColorsOfAllTextures();
+        private void ResetMateriaSetter()
+        {
+            //_materiaSetter.ResetMateriaSetter();
+
+            SetMateriaSetterDirty(true);
         }
 
         private void DrawPresetSection()
@@ -154,7 +159,7 @@ namespace Materiator
             }
             serializedObject.Update();
 
-            SetMateriaSetterDirty(false);
+            SetMateriaSetterDirty(true);
         }
 
         private void MateriaReorderableList()
@@ -339,14 +344,12 @@ namespace Materiator
 
         private void ReloadPreset()
         {
-            SetMateriaSetterDirty(false);
-
             LoadPreset((MateriaPreset)_materiaPresetObjectField.value);
         }
 
         private void NewData()
         {
-
+            ResetMateriaSetter();
         }
 
         private void CloneData()
@@ -368,6 +371,8 @@ namespace Materiator
         {
             if (_materiaSetterDataObjectField.value != null)
             {
+                //_reloadMateriaSetterDataButton.visible = true;
+
                 _materiaSetterData.objectReferenceValue = _materiaSetterDataObjectField.value;
                 var data = (MateriaSetterData)_materiaSetterDataObjectField.value;
 
@@ -377,11 +382,13 @@ namespace Materiator
 
                 serializedObject.Update();
 
-                _materiaSetter.UpdateColorsOfAllTextures();
+                _materiaSetter.UpdateRenderer();
             }
             else
             {
-                // craete new data tamplate
+                _reloadMateriaSetterDataButton.visible = false;
+
+                _materiaSetterDataObjectField.value = _materiaSetterData.objectReferenceValue;
             }
 
             SetMateriaSetterDirty(false);

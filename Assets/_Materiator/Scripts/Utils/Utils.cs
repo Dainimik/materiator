@@ -132,13 +132,13 @@ namespace Materiator
             var sourceFields = source.GetType().GetFields();
             var destinationFields = destination.GetType().GetFields();
 
-            foreach (var parentProperty in sourceFields)
+            foreach (var sourceField in sourceFields)
             {
-                foreach (var childProperty in destinationFields)
+                foreach (var destinationField in destinationFields)
                 {
-                    if (parentProperty.Name == childProperty.Name && parentProperty.FieldType == childProperty.FieldType)
+                    if (sourceField.Name == destinationField.Name && sourceField.FieldType == destinationField.FieldType)
                     {
-                        childProperty.SetValue(destination, parentProperty.GetValue(source));
+                        destinationField.SetValue(destination, sourceField.GetValue(source));
                         break;
                     }
                 }
