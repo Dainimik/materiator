@@ -36,6 +36,9 @@ namespace Materiator
         private Button _overwriteMateriaSetterData;
         private Button _saveAsNewMateriaSetterData;
 
+        private VisualElement _outputIndicator;
+        private Label _currentShaderLabel;
+
         private void OnEnable()
         {
             _materiaSetter = (MateriaSetter)target;
@@ -50,7 +53,7 @@ namespace Materiator
             DrawPresetSection();
             DrawDataSection();
             DrawOutputSection();
-            
+
             DrawIMGUI();
 
             return root;
@@ -81,13 +84,27 @@ namespace Materiator
 
         private void DrawIMGUI()
         {
-            IMGUIContainer defaultInspector = new IMGUIContainer(() => DrawDefaultInspector());
+            IMGUIContainer defaultInspector = new IMGUIContainer(() => IMGUI());
             root.Add(defaultInspector);
 
             _materiaReorderableList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaSlots"), false, true, false, false);
             DrawMateriaReorderableList();
             IMGUIContainer materiaReorderableList = new IMGUIContainer(() => MateriaReorderableList());
             root.Add(materiaReorderableList);
+        }
+
+        private void IMGUI()
+        {
+            if (_isDirty.boolValue == true)
+            {
+                _outputIndicator.style.backgroundColor = new Color(0.75f, 0f, 0f, 1f);
+            }
+            else
+            {
+                _outputIndicator.style.backgroundColor = new Color(0f, 0.75f, 0f, 1f);
+            }
+
+            DrawDefaultInspector();
         }
 
         private void Initialize()
@@ -124,6 +141,8 @@ namespace Materiator
 
         private void DrawDataSection()
         {
+            _currentShaderLabel.text = _materiaSetter.ShaderData.Shader.name;
+
             if (_materiaSetterDataObjectField.value == null)
             {
                 _reloadMateriaSetterDataButton.visible = false;
@@ -405,7 +424,10 @@ namespace Materiator
         {
             SetMateriaSetterDirty(true);
 
-            _materiaSetter.Renderer.sharedMaterial.shader = ((ShaderData)_shaderDataObjectField.value).Shader;
+            var shader = ((ShaderData)_shaderDataObjectField.value).Shader;
+
+            _materiaSetter.Renderer.sharedMaterial.shader = shader;
+            _currentShaderLabel.text = shader.name;
 
             serializedObject.ApplyModifiedProperties();
         }
@@ -415,7 +437,7 @@ namespace Materiator
             if (EditorUtility.DisplayDialog("Overwrite current data?", "Are you sure you want to overwrite " + _materiaSetterData.objectReferenceValue.name + " with current settings?", "Yes", "No"))
             {
                 WriteAssetsToDisk(AssetDatabase.GetAssetPath(_materiaSetter.MateriaSetterData), Utils.Settings.PackAssets);
-                _materiaSetter.UpdateRenderer(false);
+                
             }
         }
         private void SaveAsNewMateriaSetterData()
@@ -424,7 +446,6 @@ namespace Materiator
             if (path.Length != 0)
             {
                 WriteAssetsToDisk(path, Utils.Settings.PackAssets);
-                _materiaSetter.UpdateRenderer(false);
             }    
         }
 
@@ -506,6 +527,9 @@ namespace Materiator
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             EditorUtils.MarkOpenPrefabSceneDirty();
+
+            _materiaSetter.UpdateRenderer(false);
+            SetMateriaSetterDirty(false);
         }
 
         private void CreateEditorMaterial(bool clone = false, string name = null)
@@ -603,6 +627,9 @@ namespace Materiator
             _reloadMateriaSetterDataButton = root.Q<Button>("ReloadMateriaSetterDataButton");
             _overwriteMateriaSetterData = root.Q<Button>("OverwriteMateriaSetterDataButton");
             _saveAsNewMateriaSetterData = root.Q<Button>("SaveAsNewMateriaSetterDataButton");
+
+            _outputIndicator = root.Q<VisualElement>("OutputIndicator");
+            _currentShaderLabel = root.Q<Label>("CurrentShaderLabel");
         }
 
         protected override void BindProperties()

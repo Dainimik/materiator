@@ -4,27 +4,38 @@
         <ui:VisualElement name="TitleSectionContainer" style="align-items: flex-end;">
             <ui:Button text="Reload" name="ReloadButton" style="width: 50px; height: 25px; align-items: stretch;" />
         </ui:VisualElement>
-        <ui:VisualElement name="PresetSectionContainer">
+        <ui:VisualElement name="PresetSectionContainer" class="section-container">
             <ui:Label text="Materia Preset" class="section-header" />
-            <uie:ObjectField label="Active Preset" name="MateriaPresetObjectField" />
-            <ui:VisualElement name="ButtonContainer" style="flex-direction: row;">
-                <ui:Button text="Reload Preset" name="ReloadMateriaPresetButton" />
+            <ui:VisualElement name="PresetIndicator" class="status-indicator" style="background-color: rgb(166, 166, 166);" />
+            <ui:VisualElement name="ContentContainer" class="content-container">
+                <uie:ObjectField label="Active Preset" name="MateriaPresetObjectField" />
+                <ui:VisualElement name="ButtonContainer" style="flex-direction: row; justify-content: flex-end;">
+                    <ui:Button text="Reload Preset" name="ReloadMateriaPresetButton" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="DataSectionContainer">
+        <ui:VisualElement name="DataSectionContainer" class="section-container">
             <ui:Label text="Data" class="section-header" />
-            <uie:ObjectField label="Materia Setter Data" name="MateriaSetterDataObjectField" allow-scene-objects="false" />
-            <ui:VisualElement name="ButtonContainer" style="flex-direction: row;">
-                <ui:Button text="N" name="NewMateriaSetterDataButton" />
-                <ui:Button text="C" name="CloneMateriaSetterDataButton" />
-                <ui:Button text="Reload Data" name="ReloadMateriaSetterDataButton" />
+            <ui:VisualElement name="DataIndicator" class="status-indicator" />
+            <ui:VisualElement name="ContentContainer" class="content-container">
+                <uie:ObjectField label="Materia Setter Data" name="MateriaSetterDataObjectField" allow-scene-objects="false" />
+                <ui:VisualElement name="ButtonContainer" style="flex-direction: row; justify-content: space-between; margin-bottom: 15px;">
+                    <ui:VisualElement name="LeftAlignedButtonContainer" style="flex-direction: row;">
+                        <ui:Button text="C" name="CloneMateriaSetterDataButton" />
+                        <ui:Button text="N" name="NewMateriaSetterDataButton" />
+                    </ui:VisualElement>
+                    <ui:Button text="Reload Data" name="ReloadMateriaSetterDataButton" />
+                </ui:VisualElement>
+                <uie:ObjectField label="Shader Data" name="ShaderDataObjectField" />
+                <ui:VisualElement name="CurrentShaderContainer" style="flex-direction: row; justify-content: space-between;">
+                    <ui:Label text="Shader" style="margin-left: 3px; margin-right: 3px;" />
+                    <ui:Label name="CurrentShaderLabel" binding-path="_currentShaderLabel" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="ShaderSectionContainer">
-            <uie:ObjectField label="Shader Data" name="ShaderDataObjectField" />
-        </ui:VisualElement>
-        <ui:VisualElement name="OutputSectionContainer">
+        <ui:VisualElement name="OutputSectionContainer" class="section-container">
             <ui:Label text="Output" class="section-header" />
+            <ui:VisualElement name="OutputIndicator" class="status-indicator" style="background-color: rgba(166, 166, 166, 255);" />
             <ui:VisualElement name="ButtonContainer">
                 <ui:Button text="Overwrite" name="OverwriteMateriaSetterDataButton" />
                 <ui:Button text="Save As New" name="SaveAsNewMateriaSetterDataButton" />

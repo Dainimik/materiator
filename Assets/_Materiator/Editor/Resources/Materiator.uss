@@ -2,3 +2,20 @@
     font-size: 14px;
     -unity-font-style: bold;
 }
+
+.status-indicator {
+    background-color: rgba(166, 166, 166, 255);
+    margin-bottom: 4px;
+    margin-top: 4px;
+    height: 3px;
+}
+
+.section-container {
+}
+
+.content-container {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
