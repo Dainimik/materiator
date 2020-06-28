@@ -39,7 +39,7 @@ namespace Materiator
         {
             Color = CreateTexture2D(width, height, TextureFormat.RGBA32, Utils.Settings.FilterMode);
             MetallicSmoothness = CreateTexture2D(width, height, TextureFormat.RGBA32, Utils.Settings.FilterMode);
-            Emission = CreateTexture2D(width, height, TextureFormat.RGB24, Utils.Settings.FilterMode, UnityEngine.Color.black);
+            Emission = CreateTexture2D(width, height, TextureFormat.RGBA32, Utils.Settings.FilterMode, UnityEngine.Color.black);
         }
 
         public void SetNames(string name)
@@ -63,13 +63,6 @@ namespace Materiator
             material.SetTexture(shaderData.MainTexturePropertyName, Color);
             material.SetTexture(shaderData.MetallicSmoothnessTexturePropertyName, MetallicSmoothness);
             material.SetTexture(shaderData.EmissionTexturePropertyName, Emission);
-        }
-
-        public void SetPixel(int x, int y, Materia materia)
-        {
-            Color.SetPixel(x, y, materia.BaseColor);
-            MetallicSmoothness.SetPixel(x, y, new Color(materia.Metallic, 0f, 0f, materia.Smoothness));
-            Emission.SetPixel(x, y, materia.EmissionColor);
         }
 
         private Texture2D CreateTexture2D(int x, int y, TextureFormat textureFormat, FilterMode filterMode, Color? color = null)
