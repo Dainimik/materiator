@@ -10,7 +10,7 @@ namespace Materiator
     {
         private MateriaPreset _materiaPreset;
 
-        private ReorderableList _tagList;
+        private ReorderableList _materiaPresetItemList;
 
         private void OnEnable()
         {
@@ -21,8 +21,8 @@ namespace Materiator
         {
             InitializeEditor<MateriaPreset>();
 
-            _tagList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaPresetItemList"), true, true, true, true);
-            SetUpTagListUI();
+            _materiaPresetItemList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaPresetItemList"), true, true, true, true);
+            SetUpMateriaPresetItemListUI();
 
             IMGUIContainer materiaTagsReorderableList = new IMGUIContainer(() => ExecuteIMGUI());
             root.Add(materiaTagsReorderableList);
@@ -33,21 +33,21 @@ namespace Materiator
         private void ExecuteIMGUI()
         {
             serializedObject.Update();
-            _tagList.DoLayoutList();
+            _materiaPresetItemList.DoLayoutList();
             serializedObject.ApplyModifiedProperties();
         }
 
-        private void SetUpTagListUI()
+        private void SetUpMateriaPresetItemListUI()
         {
-            _tagList.drawHeaderCallback = (Rect rect) =>
+            _materiaPresetItemList.drawHeaderCallback = (Rect rect) =>
             {
                 EditorGUI.LabelField(new Rect(rect.x + 25f, rect.y, 50f, 20f), new GUIContent("Tag", "Tag"), EditorStyles.boldLabel);
                 EditorGUI.LabelField(new Rect(rect.x + 200f, rect.y, 200f, 20f), new GUIContent("Materia", "Materia"), EditorStyles.boldLabel);
             };
 
-            _tagList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+            _materiaPresetItemList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
             {
-                var element = _tagList.serializedProperty.GetArrayElementAtIndex(index);
+                var element = _materiaPresetItemList.serializedProperty.GetArrayElementAtIndex(index);
                 var materiaTag = element.FindPropertyRelative("Tag");
                 var materia = element.FindPropertyRelative("Materia").objectReferenceValue as Materia;
 
@@ -86,10 +86,18 @@ namespace Materiator
                     serializedObject.Update();
                 }*/
 
-                EditorGUI.PropertyField(new Rect(r.x + 185, r.y, rect.width - 185f, r.height), element.FindPropertyRelative("Materia"), GUIContent.none);
+                materia = (Materia)EditorGUI.ObjectField(new Rect(r.x + 185, r.y, rect.width - 185f, r.height), materia, typeof(Materia), false);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RegisterCompleteObjectUndo(_materiaPreset, "Change Materia");
+                    if (materia == null)
+                        materia = Utils.Settings.DefaultMateria;
+                    else
+                        _materiaPreset.MateriaPresetItemList[index].Materia = materia;
+                }
             };
 
-            _tagList.onAddCallback = (ReorderableList List) =>
+            _materiaPresetItemList.onAddCallback = (ReorderableList List) =>
             {
                 _materiaPreset.MateriaPresetItemList.Add(new MateriaPresetItem("-"));
             };
