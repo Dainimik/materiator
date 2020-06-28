@@ -76,20 +76,9 @@ namespace Materiator
                     }
                 }
 
-                /*materia = (Materia)EditorGUI.ObjectField(new Rect(r.x + 185, r.y, rect.width - 185f, r.height), materia, typeof(Materia), false);
-                if (EditorGUI.EndChangeCheck())
-                {
-                    Undo.RegisterCompleteObjectUndo(_materiaPreset, "Change Materia");
-                    if (materia == null)
-                        materia = Utils.Settings.DefaultMateria;
-
-                    serializedObject.Update();
-                }*/
-
                 materia = (Materia)EditorGUI.ObjectField(new Rect(r.x + 185, r.y, rect.width - 185f, r.height), materia, typeof(Materia), false);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    Undo.RegisterCompleteObjectUndo(_materiaPreset, "Change Materia");
                     if (materia == null)
                         materia = Utils.Settings.DefaultMateria;
                     else
