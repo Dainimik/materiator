@@ -57,7 +57,6 @@ namespace Materiator
 
         public static string GetFileName(string path, bool includeExtension = false)
         {
-            var name = "";
             string[] splitPath = path.Split(char.Parse("/"));
             if (includeExtension)
             {
