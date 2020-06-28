@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEditorInternal;
 using UnityEngine;
@@ -46,6 +45,7 @@ namespace Materiator
             InitializeEditor<MateriaSetter>();
 
             DrawPresetSection();
+            DrawDataSection();
             DrawOutputSection();
             
             DrawIMGUI();
@@ -87,9 +87,17 @@ namespace Materiator
                 _reloadMateriaPresetButton.visible = false;
             }
 
-            _materiaPresetObjectField.RegisterCallback<ChangeEvent<UnityEngine.Object>>(e =>
+            _materiaPresetObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
             {
                 LoadPreset((MateriaPreset)_materiaPresetObjectField.value);
+            });
+        }
+
+        private void DrawDataSection()
+        {
+            _shaderDataObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
+            {
+                OnShaderDataChanged();
             });
         }
 
@@ -301,6 +309,13 @@ namespace Materiator
         private void ReloadPreset()
         {
 
+        }
+
+        private void OnShaderDataChanged()
+        {
+            Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Shader Data");
+            _materiaSetter.Renderer.sharedMaterial.shader = ((ShaderData)_shaderDataObjectField.value).Shader;
+            EditorUtility.SetDirty(_materiaSetter);
         }
 
         private void OverwriteMateriaSetterData()

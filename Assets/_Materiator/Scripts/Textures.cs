@@ -64,6 +64,7 @@ namespace Materiator
 
             material.SetTexture(shaderData.MainTexturePropertyName, Color);
             material.SetTexture(shaderData.MetallicSmoothnessTexturePropertyName, MetallicSmoothness);
+            material.SetTexture(shaderData.SpecularGlossTexturePropertyName, MetallicSmoothness);
             material.SetTexture(shaderData.EmissionTexturePropertyName, Emission);
         }
 
