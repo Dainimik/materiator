@@ -95,6 +95,11 @@ namespace Materiator
 
         private void DrawDataSection()
         {
+            _materiaSetterDataObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
+            {
+                OnMateriaSetterDataChanged();
+            });
+
             _shaderDataObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
             {
                 OnShaderDataChanged();
@@ -311,6 +316,20 @@ namespace Materiator
 
         }
 
+        private void OnMateriaSetterDataChanged()
+        {
+            if (_materiaSetterDataObjectField.value != null)
+            {
+                _materiaSetterData.objectReferenceValue = _materiaSetterDataObjectField.value;
+            }
+            else
+            {
+                // craete new data tamplate
+            }
+
+            //serializedObject.ApplyModifiedProperties();
+        }
+
         private void OnShaderDataChanged()
         {
             Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Shader Data");
@@ -320,13 +339,20 @@ namespace Materiator
 
         private void OverwriteMateriaSetterData()
         {
-            WriteAssetsToDisk(AssetDatabase.GetAssetPath(_materiaSetter.MateriaSetterData), Utils.Settings.PackAssets);
-            _materiaSetter.UpdateRenderer(false);
+            if (EditorUtility.DisplayDialog("Overwrite current data?", "Are you sure you want to overwrite " + _materiaSetterData.objectReferenceValue.name + " with current settings?", "Yes", "No"))
+            {
+                WriteAssetsToDisk(AssetDatabase.GetAssetPath(_materiaSetter.MateriaSetterData), Utils.Settings.PackAssets);
+                _materiaSetter.UpdateRenderer(false);
+            }
         }
         private void SaveAsNewMateriaSetterData()
         {
-            WriteAssetsToDisk(null, Utils.Settings.PackAssets);
-            _materiaSetter.UpdateRenderer(false);
+            var path = EditorUtility.SaveFilePanelInProject("Save data", _materiaSetter.gameObject.name, "asset", "asset");
+            if (path.Length != 0)
+            {
+                WriteAssetsToDisk(path, Utils.Settings.PackAssets);
+                _materiaSetter.UpdateRenderer(false);
+            }    
         }
 
         public void WriteAssetsToDisk(string path, bool packAssets)
@@ -358,30 +384,31 @@ namespace Materiator
             else
                 texs = _materiaSetter.Textures;
 
-            var presetFolderDir = dir;
-
 
 
 
 
 
             mat = Instantiate(_materiaSetter.Material);
+            texs.CopyTextures(_materiaSetter.Textures, Utils.Settings.FilterMode);
+            texs.SetNames(name);
+
             if (packAssets)
             {
                 mat.name = matName;
-                texs = texs.CopyTextures(texs, Utils.Settings.FilterMode);
-                texs.SetNames(name);
 
                 AssetDatabase.AddObjectToAsset(mat, data);
                 texs.AddTexturesToAsset(data);
             }
             else
             {
-                AssetDatabase.CreateAsset(mat, presetFolderDir + matName + ".mat");
-                mat = (Material)AssetDatabase.LoadAssetAtPath(presetFolderDir + matName + ".mat", typeof(Material));
+                AssetUtils.CheckDirAndCreate(dir, name);
+                var folderDir = dir + "/" + name + "/";
 
-                texs.SetNames(name);
-                texs.WriteTexturesToDisk(presetFolderDir);
+                AssetDatabase.CreateAsset(mat, folderDir + name + "_Material.mat");
+                mat = (Material)AssetDatabase.LoadAssetAtPath(folderDir + name + "_Material.mat", typeof(Material));
+
+                texs.WriteTexturesToDisk(folderDir);
             }
 
             _materiaSetter.Material = mat;
@@ -419,7 +446,7 @@ namespace Materiator
             else
             {
                 _material.objectReferenceValue = Instantiate(_material.objectReferenceValue);
-                newTextures = newTextures.CopyTextures(_materiaSetter.Textures, Utils.Settings.FilterMode);
+                newTextures.CopyTextures(_materiaSetter.Textures, Utils.Settings.FilterMode);
             }
 
             if (name != null)

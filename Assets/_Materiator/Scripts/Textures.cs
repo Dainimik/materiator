@@ -135,19 +135,19 @@ namespace Materiator
             AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(Emission), name + "_Emission");
         }
 
-        public Textures CopyTextures(Textures textures, FilterMode filterMode, bool removeCloneFromName = false)
+        public Textures CopyTextures(Textures texturesToCopy, FilterMode filterMode, bool removeCloneFromName = false)
         {
             var texs = new Textures
             {
-                Color = Object.Instantiate(textures.Color),
-                MetallicSmoothness = Object.Instantiate(textures.MetallicSmoothness),
-                Emission = Object.Instantiate(textures.Color)
+                Color = Object.Instantiate(texturesToCopy.Color),
+                MetallicSmoothness = Object.Instantiate(texturesToCopy.MetallicSmoothness),
+                Emission = Object.Instantiate(texturesToCopy.Color)
             };
             texs.SetFilterMode(filterMode);
             texs.SetWrapMode(TextureWrapMode.Clamp);
 
             if (removeCloneFromName)
-                texs.Names = textures.Names;
+                texs.Names = texturesToCopy.Names;
 
             return texs;
         }
