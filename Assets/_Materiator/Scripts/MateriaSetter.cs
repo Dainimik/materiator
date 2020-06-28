@@ -7,6 +7,7 @@ namespace Materiator
     public class MateriaSetter : MonoBehaviour
     {
         public bool IsInitialized = false;
+        public bool IsDirty = true;
 
         public MateriaSetterData MateriaSetterData;
         public Mesh Mesh;

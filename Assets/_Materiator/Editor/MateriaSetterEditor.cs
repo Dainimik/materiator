@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Reflection;
+using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEditorInternal;
 using UnityEngine;
@@ -15,6 +16,7 @@ namespace Materiator
 
         #region Serialized Properties
 
+        private SerializedProperty _isDirty;
         private SerializedProperty _materiaPreset;
         private SerializedProperty _materiaSetterData;
         private SerializedProperty _shaderData;
@@ -53,6 +55,29 @@ namespace Materiator
             return root;
         }
 
+        private void SetMateriaSetterDirty(bool value)
+        {
+            if (value)
+            {
+                _isDirty.boolValue = true;
+            }
+            else
+            {
+                _isDirty.boolValue = false;
+            }
+
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        private void DiscardChanges()
+        {
+            FieldInfo[] fields = typeof(MateriaSetter).GetFields(BindingFlags.Public | BindingFlags.Instance);
+            foreach (var item in fields)
+            {
+                Debug.Log(item);
+            }
+        }
+
         private void DrawIMGUI()
         {
             IMGUIContainer defaultInspector = new IMGUIContainer(() => DrawDefaultInspector());
@@ -78,18 +103,18 @@ namespace Materiator
 
         private void DrawPresetSection()
         {
-            if (_materiaSetter.MateriaPreset == null)
+            if (_materiaPresetObjectField.value == null)
             {
-                _reloadMateriaPresetButton.visible = true;
+                _reloadMateriaPresetButton.visible = false;
             }
             else
             {
-                _reloadMateriaPresetButton.visible = false;
+                _reloadMateriaPresetButton.visible = true;
             }
 
             _materiaPresetObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
             {
-                LoadPreset((MateriaPreset)_materiaPresetObjectField.value);
+                OnMateriaPresetChanged();
             });
         }
 
@@ -123,6 +148,10 @@ namespace Materiator
                 _reloadMateriaPresetButton.visible = false;
             }
             serializedObject.Update();
+
+            SetMateriaSetterDirty(false);
+
+            serializedObject.ApplyModifiedProperties();
         }
 
         private void MateriaReorderableList()
@@ -302,18 +331,30 @@ namespace Materiator
             CreateEditorMaterial(false, _materiaSetter.gameObject.name);
             //GenerateColorDataArray(true);
             //EditorUtility.SetDirty(_materiaSetter);
+            SetMateriaSetterDirty(true);
 
             serializedObject.ApplyModifiedProperties();
         }
 
         private void ClonePreset()
         {
+            SetMateriaSetterDirty(true);
 
+            serializedObject.ApplyModifiedProperties();
         }
 
         private void ReloadPreset()
         {
+            SetMateriaSetterDirty(false);
 
+            LoadPreset((MateriaPreset)_materiaPresetObjectField.value);
+
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        private void OnMateriaPresetChanged()
+        {
+            LoadPreset((MateriaPreset)_materiaPresetObjectField.value);
         }
 
         private void OnMateriaSetterDataChanged()
@@ -327,14 +368,18 @@ namespace Materiator
                 // craete new data tamplate
             }
 
-            //serializedObject.ApplyModifiedProperties();
+            SetMateriaSetterDirty(true);
+
+            serializedObject.ApplyModifiedProperties();
         }
 
         private void OnShaderDataChanged()
         {
-            Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Shader Data");
+            SetMateriaSetterDirty(true);
+
             _materiaSetter.Renderer.sharedMaterial.shader = ((ShaderData)_shaderDataObjectField.value).Shader;
-            EditorUtility.SetDirty(_materiaSetter);
+
+            serializedObject.ApplyModifiedProperties();
         }
 
         private void OverwriteMateriaSetterData()
@@ -413,6 +458,10 @@ namespace Materiator
 
             _materiaSetter.Material = mat;
             _materiaSetter.Textures = texs;
+
+            data.MateriaSlots = _materiaSetter.MateriaSlots;
+            data.ShaderData = (ShaderData)_shaderData.objectReferenceValue;
+            data.MateriaPreset = (MateriaPreset)_materiaPreset.objectReferenceValue;
             data.Material = mat;
             data.Textures = texs;
 
@@ -505,6 +554,7 @@ namespace Materiator
         }*/
         protected override void GetProperties()
         {
+            _isDirty = serializedObject.FindProperty("IsDirty");
             _materiaPreset = serializedObject.FindProperty("MateriaPreset");
             _materiaSetterData = serializedObject.FindProperty("MateriaSetterData");
             _shaderData = serializedObject.FindProperty("ShaderData");
