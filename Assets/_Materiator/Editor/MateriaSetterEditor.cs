@@ -431,9 +431,7 @@ namespace Materiator
                 path = dir + name + ".asset";
             }
 
-            Material mat;
-            Textures texs;
-            var matName = name + "_Material";
+            Textures texs = new Textures();
 
             bool wasMPExisting;
             var data = AssetUtils.CreateOrReplaceScriptableObjectAsset(_materiaSetter.MateriaSetterData, path, out wasMPExisting);
@@ -441,20 +439,22 @@ namespace Materiator
             if (wasMPExisting)
                 texs = data.Textures;
             else
-                texs = _materiaSetter.Textures;
+                texs.CreateTextures((int)_materiaSetter.Textures.Size.x, (int)_materiaSetter.Textures.Size.y);
+                //texs = _materiaSetter.Textures;
 
 
 
 
 
 
-            mat = Instantiate(_materiaSetter.Material);
+            var mat = Instantiate(_materiaSetter.Material);
+
             texs.CopyTextures(_materiaSetter.Textures, Utils.Settings.FilterMode);
             texs.SetNames(name);
 
             if (packAssets)
             {
-                mat.name = matName;
+                mat.name = name + "_Material";
 
                 AssetDatabase.AddObjectToAsset(mat, data);
                 texs.AddTexturesToAsset(data);

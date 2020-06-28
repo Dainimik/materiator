@@ -37,6 +37,14 @@ namespace Materiator
             }
         }
 
+        public Vector2 Size
+        {
+            get
+            {
+                return new Vector2(Color.width, Color.height);
+            }
+        }
+
         public void CreateTextures(int width, int height)
         {
             Color = CreateTexture2D(width, height, TextureFormat.RGBA32, Utils.Settings.FilterMode);
