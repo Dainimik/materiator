@@ -161,8 +161,10 @@ namespace Materiator
             Textures.UpdateColors(FilteredRects, MateriaSlots);
         }
 
-        public void LoadPreset(MateriaPreset preset)
+        public void LoadPreset(MateriaPreset preset, out int numberOfSameMateria)
         {
+            numberOfSameMateria = 0;
+
             if (preset != null)
             {
                 for (int i = 0; i < MateriaSlots.Count; i++)
@@ -171,7 +173,14 @@ namespace Materiator
                     {
                         if (MateriaSlots[i].MateriaTag == preset.MateriaPresetItemList[j].Tag)
                         {
-                            MateriaSlots[i].Materia = preset.MateriaPresetItemList[j].Materia;
+                            if (MateriaSetterData.MateriaSlots[i].Materia == preset.MateriaPresetItemList[j].Materia)
+                            {
+                                numberOfSameMateria++;
+                            }
+                            else
+                            {
+                                MateriaSlots[i].Materia = preset.MateriaPresetItemList[j].Materia;
+                            }
                         }
                     }
                 }

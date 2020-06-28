@@ -129,6 +129,15 @@ namespace Materiator
 
         private void DrawDataSection()
         {
+            if (_materiaSetterDataObjectField.value == null)
+            {
+                _reloadMateriaSetterDataButton.visible = false;
+            }
+            else
+            {
+                _reloadMateriaSetterDataButton.visible = true;
+            }
+
             _materiaSetterDataObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
             {
                 OnMateriaSetterDataChanged();
@@ -147,19 +156,28 @@ namespace Materiator
 
         private void LoadPreset(MateriaPreset preset)
         {
+            var numberOfSameMateria = 0;
+
             if (preset != null)
             {
                 _reloadMateriaPresetButton.visible = true;
-                _materiaSetter.LoadPreset(preset);
+                _materiaSetter.LoadPreset(preset, out numberOfSameMateria);
             }
             else
             {
                 _reloadMateriaPresetButton.visible = false;
-                _materiaSetter.LoadPreset(null);
+                _materiaSetter.LoadPreset(null, out numberOfSameMateria);
             }
             serializedObject.Update();
 
-            SetMateriaSetterDirty(true);
+            if (numberOfSameMateria == _materiaSetter.MateriaSetterData.MateriaSlots.Count)
+            {
+                SetMateriaSetterDirty(false);
+            }
+            else
+            {
+                SetMateriaSetterDirty(true);
+            }
         }
 
         private void MateriaReorderableList()
