@@ -57,6 +57,11 @@ namespace Materiator
             return rects;
         }
 
+        public static RectInt GetRectIntFromRect(int gridSize, Rect rect)
+        {
+            return new RectInt((int)(gridSize * rect.x), (int)(gridSize * rect.y), (int)(gridSize * rect.width), (int)(gridSize * rect.height));
+        }
+
         public static int CalculateAtlasSize(int numberOfMeshes)
         {
             var ranges = new Vector2[] { new Vector2(0, 2), new Vector2(1, 5), new Vector2(4, 17), new Vector2(16, 65), new Vector2(64, 257), new Vector2(256, 1025), new Vector2(1024, 4097), new Vector2(4096, 16385), new Vector2(16384, 65537), new Vector2(65536, 262145), new Vector2(262144, 1048577), new Vector2(1048576, 4194305) };

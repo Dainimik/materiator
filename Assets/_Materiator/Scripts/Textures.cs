@@ -5,6 +5,8 @@ using UnityEditor;
 #endif
 using System;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Materiator
 {
@@ -63,6 +65,34 @@ namespace Materiator
             material.SetTexture(shaderData.MainTexturePropertyName, Color);
             material.SetTexture(shaderData.MetallicSmoothnessTexturePropertyName, MetallicSmoothness);
             material.SetTexture(shaderData.EmissionTexturePropertyName, Emission);
+        }
+
+        public void UpdateColors(SerializableDictionary<int, Rect> rects, List<MateriaSlot> materiaSlots)
+        {
+            foreach (var rect in rects)
+            {
+                var rectInt = Utils.GetRectIntFromRect(Utils.Settings.GridSize, rect.Value);
+                var numberOfColors = rectInt.width * rectInt.height;
+
+                var baseColors = new Color32[numberOfColors];
+                var metallic = new Color32[numberOfColors];
+                var emissionColors = new Color32[numberOfColors];
+
+                for (int i = 0; i < numberOfColors; i++)
+                {
+                    var metallic32 = (byte)(materiaSlots.Where(ms => ms.ID == rect.Key).First().Materia.Metallic * 255);
+
+                    baseColors[i] = materiaSlots.Where(ms => ms.ID == rect.Key).First().Materia.BaseColor;
+                    metallic[i] = new Color32(metallic32, metallic32, metallic32, metallic32);
+                    emissionColors[i] = materiaSlots.Where(ms => ms.ID == rect.Key).First().Materia.EmissionColor;
+                }
+
+                Color.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, baseColors);
+                MetallicSmoothness.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, metallic);
+                Emission.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, emissionColors);
+            }
+
+            Apply();
         }
 
         private Texture2D CreateTexture2D(int x, int y, TextureFormat textureFormat, FilterMode filterMode, Color? color = null)

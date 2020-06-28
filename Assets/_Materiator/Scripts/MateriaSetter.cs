@@ -155,28 +155,9 @@ namespace Materiator
             }
         }
 
-        public void UpdateTexturePixelColors()
+        public void UpdateColorsOfAllTextures()
         {
-            var tex = Textures.Color;
-
-            foreach (var rect in FilteredRects)
-            {
-                int minX = (int)(Utils.Settings.GridSize * rect.Value.x);
-                int minY = (int)(Utils.Settings.GridSize * rect.Value.y);
-                int maxX = (int)(Utils.Settings.GridSize * rect.Value.width);
-                int maxY = (int)(Utils.Settings.GridSize * rect.Value.height);
-
-                var colors = new Color32[maxX * maxY];
-
-                for (int i = 0; i < colors.Length; i++)
-                {
-                    colors[i] = MateriaSlots.Where(ms => ms.ID == rect.Key).First().Materia.BaseColor;
-                }
-
-                tex.SetPixels32(minX, minY, maxX, maxY, colors);
-            }
-
-            tex.Apply();
+            Textures.UpdateColors(FilteredRects, MateriaSlots);
         }
 
         public void LoadPreset(MateriaPreset preset)
