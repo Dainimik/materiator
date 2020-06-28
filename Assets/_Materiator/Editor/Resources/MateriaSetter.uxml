@@ -8,13 +8,21 @@
             <ui:Label text="Materia Preset" class="section-header" />
             <uie:ObjectField label="Active Preset" name="MateriaPresetObjectField" />
             <ui:VisualElement name="ButtonContainer" style="flex-direction: row;">
-                <ui:Button text="N" name="NewMateriaPresetButton" />
-                <ui:Button text="C" name="CloneMateriaPresetButton" />
+                <ui:Button text="E" name="ExtractMateriaPresetButton" />
+                <ui:Button text="S" name="SaveMateriaPresetButton" />
                 <ui:Button text="Reload Preset" name="ReloadMateriaPresetButton" />
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="DataSectionContainer">
+            <ui:Label text="Data" class="section-header" />
+            <uie:ObjectField label="Materia Setter Data" name="MateriaSetterDataObjectField" allow-scene-objects="false" />
+            <ui:VisualElement name="ButtonContainer" style="flex-direction: row;">
+                <ui:Button text="N" name="NewMateriaSetterDataButton" />
+                <ui:Button text="C" name="CloneMateriaSetterDataButton" />
+                <ui:Button text="Reload Data" name="ReloadMateriaSetterDataButton" />
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:VisualElement name="ShaderSectionContainer">
-            <uie:ObjectField label="Materia Setter Data" name="MateriaSetterDataObjectField" />
             <uie:ObjectField label="Shader Data" name="ShaderDataObjectField" />
         </ui:VisualElement>
         <ui:VisualElement name="OutputSectionContainer">

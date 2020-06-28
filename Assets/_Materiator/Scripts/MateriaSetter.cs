@@ -176,6 +176,13 @@ namespace Materiator
                     }
                 }
             }
+            else
+            {
+                for (int i = 0; i < MateriaSlots.Count; i++)
+                {
+                    MateriaSlots[i].Materia = Utils.Settings.DefaultMateria;
+                }
+            }
         }
     }
 }
