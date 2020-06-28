@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEditorInternal;
@@ -29,9 +30,12 @@ namespace Materiator
         private ObjectField _shaderDataObjectField;
 
         private Button _reloadButton;
-        private Button _newMateriaPresetButton;
-        private Button _cloneMateriaPresetButton;
+        private Button _extractMateriaPresetButton;
+        private Button _saveMateriaPresetButton;
         private Button _reloadMateriaPresetButton;
+        private Button _newMateriaSetterDataButton;
+        private Button _cloneMateriaSetterDataButton;
+        private Button _reloadMateriaSetterDataButton;
         private Button _overwriteMateriaSetterData;
         private Button _saveAsNewMateriaSetterData;
 
@@ -146,12 +150,11 @@ namespace Materiator
             else
             {
                 _reloadMateriaPresetButton.visible = false;
+                _materiaSetter.LoadPreset(null);
             }
             serializedObject.Update();
 
             SetMateriaSetterDirty(false);
-
-            serializedObject.ApplyModifiedProperties();
         }
 
         private void MateriaReorderableList()
@@ -324,23 +327,14 @@ namespace Materiator
             _materiaSetter.Refresh();
         }
 
-        private void NewPreset()
+        private void ExtractPreset()
         {
-            _materiaPreset.objectReferenceValue = null;
 
-            CreateEditorMaterial(false, _materiaSetter.gameObject.name);
-            //GenerateColorDataArray(true);
-            //EditorUtility.SetDirty(_materiaSetter);
-            SetMateriaSetterDirty(true);
-
-            serializedObject.ApplyModifiedProperties();
         }
 
-        private void ClonePreset()
+        private void SavePreset()
         {
-            SetMateriaSetterDirty(true);
 
-            serializedObject.ApplyModifiedProperties();
         }
 
         private void ReloadPreset()
@@ -348,8 +342,21 @@ namespace Materiator
             SetMateriaSetterDirty(false);
 
             LoadPreset((MateriaPreset)_materiaPresetObjectField.value);
+        }
 
-            serializedObject.ApplyModifiedProperties();
+        private void NewData()
+        {
+
+        }
+
+        private void CloneData()
+        {
+
+        }
+
+        private void ReloadData()
+        {
+            OnMateriaSetterDataChanged();
         }
 
         private void OnMateriaPresetChanged()
@@ -362,15 +369,22 @@ namespace Materiator
             if (_materiaSetterDataObjectField.value != null)
             {
                 _materiaSetterData.objectReferenceValue = _materiaSetterDataObjectField.value;
+                var data = (MateriaSetterData)_materiaSetterDataObjectField.value;
+
+                serializedObject.ApplyModifiedProperties();
+
+                Utils.CopyFields(data, _materiaSetter);
+
+                serializedObject.Update();
+
+                _materiaSetter.UpdateColorsOfAllTextures();
             }
             else
             {
                 // craete new data tamplate
             }
 
-            SetMateriaSetterDirty(true);
-
-            serializedObject.ApplyModifiedProperties();
+            SetMateriaSetterDirty(false);
         }
 
         private void OnShaderDataChanged()
@@ -569,9 +583,12 @@ namespace Materiator
 
 
             _reloadButton = root.Q<Button>("ReloadButton");
-            _newMateriaPresetButton = root.Q<Button>("NewMateriaPresetButton");
-            _cloneMateriaPresetButton = root.Q<Button>("CloneMateriaPresetButton");
+            _extractMateriaPresetButton = root.Q<Button>("ExtractMateriaPresetButton");
+            _saveMateriaPresetButton = root.Q<Button>("SaveMateriaPresetButton");
             _reloadMateriaPresetButton = root.Q<Button>("ReloadMateriaPresetButton");
+            _newMateriaSetterDataButton = root.Q<Button>("NewMateriaSetterDataButton");
+            _cloneMateriaSetterDataButton = root.Q<Button>("CloneMateriaSetterDataButton");
+            _reloadMateriaSetterDataButton = root.Q<Button>("ReloadMateriaSetterDataButton");
             _overwriteMateriaSetterData = root.Q<Button>("OverwriteMateriaSetterDataButton");
             _saveAsNewMateriaSetterData = root.Q<Button>("SaveAsNewMateriaSetterDataButton");
         }
@@ -586,9 +603,12 @@ namespace Materiator
         protected override void RegisterButtons()
         {
             _reloadButton.clicked += Refresh;
-            _newMateriaPresetButton.clicked += NewPreset;
-            _cloneMateriaPresetButton.clicked += ClonePreset;
+            _extractMateriaPresetButton.clicked += ExtractPreset;
+            _saveMateriaPresetButton.clicked += SavePreset;
             _reloadMateriaPresetButton.clicked += ReloadPreset;
+            _newMateriaSetterDataButton.clicked += NewData;
+            _cloneMateriaSetterDataButton.clicked += CloneData;
+            _reloadMateriaSetterDataButton.clicked += ReloadData;
             _overwriteMateriaSetterData.clicked += OverwriteMateriaSetterData;
             _saveAsNewMateriaSetterData.clicked += SaveAsNewMateriaSetterData;
         }

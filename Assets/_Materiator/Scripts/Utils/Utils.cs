@@ -125,5 +125,24 @@ namespace Materiator
         {
             return Resources.Load<MateriaTags>("MateriaTags");
         }
+
+
+        public static void CopyFields<P, C>(P source, C destination) where P : class where C : class
+        {
+            var sourceFields = source.GetType().GetFields();
+            var destinationFields = destination.GetType().GetFields();
+
+            foreach (var parentProperty in sourceFields)
+            {
+                foreach (var childProperty in destinationFields)
+                {
+                    if (parentProperty.Name == childProperty.Name && parentProperty.FieldType == childProperty.FieldType)
+                    {
+                        childProperty.SetValue(destination, parentProperty.GetValue(source));
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

@@ -19,6 +19,8 @@ namespace Materiator
         public Color HighlightColor;
         public HighlightMode HighlightMode;
         public FilterMode FilterMode;
+
+        public string DefaultTag { get { return "-"; } }
     }
 }
 
