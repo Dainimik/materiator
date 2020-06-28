@@ -10,14 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d9309e4140849548bf1f05b236a8218, type: 3}
-  m_Name: MateriaPreset
+  m_Name: Green_Barrel
   m_EditorClassIdentifier: 
   MateriaPresetItemList:
-  - Tag: '-'
-    Materia: {fileID: 0}
   - Tag: Metal
     Materia: {fileID: 11400000, guid: 35303a3f5c117584b99fd840c725fcfc, type: 2}
   - Tag: Plastic
     Materia: {fileID: 11400000, guid: 2bf52f2715bfa4d48a7bfe6d265ba1d0, type: 2}
-  - Tag: Lights
-    Materia: {fileID: 11400000, guid: 79e496399a7542c48a52cbceb68b872d, type: 2}
