@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 
 namespace Materiator
@@ -38,7 +37,6 @@ namespace Materiator
             InitializeTextures();
             AnalyzeMesh();
             GenerateMateriaSlots(true);
-            IsDirty = true;
 
             IsInitialized = true;
         }
@@ -64,6 +62,7 @@ namespace Materiator
             }
 
             Initialize();
+            IsDirty = true;
         }
 
         private void GetMeshReferences()

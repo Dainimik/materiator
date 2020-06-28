@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEditorInternal;
@@ -227,15 +226,18 @@ namespace Materiator
                 serializedObject.Update();
 
                 int _materiaTagIndex = 0;
+                EditorGUI.BeginChangeCheck();
                 _materiaTagIndex = EditorGUI.Popup(new Rect(rect.x + 25f, rect.y, 95f, rect.height), Utils.MateriaTags.MateriaTagsList.IndexOf(materiaTag.stringValue), Utils.MateriaTags.MateriaTagsArray, EditorStyles.popup);
                 if (EditorGUI.EndChangeCheck())
                 {
                     var newTag = Utils.MateriaTags.MateriaTagsList[_materiaTagIndex];
                     Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Materia Tag");
                     _materiaSetter.MateriaSlots[index].MateriaTag = newTag;
+                    SetMateriaSetterDirty(true);
                 }
 
                 Materia oldCD = elementMateria;
+                EditorGUI.BeginChangeCheck();
                 elementMateria = (Materia)EditorGUI.ObjectField(new Rect(rect.x + 170f, rect.y, rect.width - 195f, rect.height), elementMateria, typeof(Materia), false);
                 if (EditorGUI.EndChangeCheck())
                 {
@@ -253,6 +255,7 @@ namespace Materiator
 
                     serializedObject.ApplyModifiedProperties();
                     //_emissionInUse = IsEmissionInUse(_materiaSetter.Materia);
+                    SetMateriaSetterDirty(true);
                 }
 
                 Rect cdExpandRect = new Rect(EditorGUIUtility.currentViewWidth - 60f, rect.y, 20f, 20f);
