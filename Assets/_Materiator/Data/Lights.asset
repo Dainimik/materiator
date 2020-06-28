@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 15fb2ffd31eecd0468269e4dff1358c5, type: 3}
-  m_Name: DefaultMateria
+  m_Name: Lights
   m_EditorClassIdentifier: 
   BaseColor:
     serializedVersion: 2
-    rgba: 10000536
+    rgba: 4294967295
   Metallic: 0
   Smoothness: 0
-  EmissionColor: {r: 0, g: 0, b: 0, a: 0}
-  IsEmissive: 0
+  EmissionColor: {r: 1, g: 0.96225405, b: 0, a: 0}
+  IsEmissive: 1

@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 15fb2ffd31eecd0468269e4dff1358c5, type: 3}
-  m_Name: DefaultMateria
+  m_Name: Steel
   m_EditorClassIdentifier: 
   BaseColor:
     serializedVersion: 2
-    rgba: 10000536
-  Metallic: 0
-  Smoothness: 0
+    rgba: 4290559164
+  Metallic: 1
+  Smoothness: 0.6
   EmissionColor: {r: 0, g: 0, b: 0, a: 0}
   IsEmissive: 0
