@@ -103,9 +103,7 @@ namespace Materiator
 
         private void ResetMateriaSetter()
         {
-            //_materiaSetter.ResetMateriaSetter();
-
-            SetMateriaSetterDirty(true);
+            _materiaSetter.ResetMateriaSetter();
         }
 
         private void DrawPresetSection()
@@ -168,7 +166,7 @@ namespace Materiator
             }
             serializedObject.Update();
 
-            if (numberOfSameMateria == _materiaSetter.MateriaSetterData.MateriaSlots.Count)
+            if (numberOfSameMateria == _materiaSetter.MateriaSetterData?.MateriaSlots.Count)
             {
                 SetMateriaSetterDirty(false);
             }

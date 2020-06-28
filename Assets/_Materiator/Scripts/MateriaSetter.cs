@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace Materiator
@@ -16,7 +17,7 @@ namespace Materiator
         public MeshRenderer MeshRenderer;
         public SkinnedMeshRenderer SkinnedMeshRenderer;
 
-        public List<MateriaSlot> MateriaSlots = new List<MateriaSlot>();
+        public List<MateriaSlot> MateriaSlots;
 
         public SerializableDictionary<int, Rect> FilteredRects;
         public Rect[] Rects;
@@ -25,7 +26,7 @@ namespace Materiator
         public ShaderData ShaderData;
         public Material Material;
 
-        public Textures Textures = new Textures();
+        public Textures Textures;
 
 
         public void Initialize()
@@ -37,6 +38,7 @@ namespace Materiator
             InitializeTextures();
             AnalyzeMesh();
             GenerateMateriaSlots(true);
+            IsDirty = true;
 
             IsInitialized = true;
         }
@@ -48,6 +50,20 @@ namespace Materiator
             InitializeTextures();
             AnalyzeMesh();
             GenerateMateriaSlots(false);
+        }
+
+        public void ResetMateriaSetter()
+        {
+            Renderer.sharedMaterial = null;
+
+            var fields = GetType().GetFields();
+
+            for (int i = 0; i < fields.Length; i++)
+            {
+                fields[i].SetValue(this, null);
+            }
+
+            Initialize();
         }
 
         private void GetMeshReferences()
@@ -103,6 +119,11 @@ namespace Materiator
 
         private void InitializeTextures()
         {
+            if (Textures == null)
+            {
+                Textures = new Textures();
+            }
+
             if (Textures.Color == null || Textures.MetallicSmoothness == null || Textures.Emission == null)
             {
                 Textures.CreateTextures(Utils.Settings.GridSize, Utils.Settings.GridSize);
