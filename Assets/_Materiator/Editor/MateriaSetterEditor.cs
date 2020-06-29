@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEditorInternal;
@@ -63,11 +64,20 @@ namespace Materiator
         {
             if (value)
             {
-                _isDirty.boolValue = true;
+                if (!_isDirty.boolValue)
+                {
+                    _isDirty.boolValue = true;
+
+                    CreateEditModeData();
+                    //CreateEditorMaterialWithTextures(true, _material.name);
+                }
             }
             else
             {
-                _isDirty.boolValue = false;
+                if (_isDirty.boolValue)
+                {
+                    _isDirty.boolValue = false;
+                }  
             }
 
             serializedObject.ApplyModifiedProperties();
@@ -201,6 +211,22 @@ namespace Materiator
             _materiaReorderableList.DoLayoutList();
         }
 
+        private void CreateEditModeData()
+        {
+            CreateEditorMaterialWithTextures(true, _material.name);
+
+            var newMateriaSlots = new List<MateriaSlot>();
+
+            foreach (var item in _materiaSetter.MateriaSetterData.MateriaSlots)
+            {
+                newMateriaSlots.Add(new MateriaSlot(item.ID, item.Materia, item.MateriaTag));
+            }
+            serializedObject.Update();
+            _materiaSetter.MateriaSlots = newMateriaSlots;
+            _materiaSetter.UpdateRenderer();
+            serializedObject.Update();
+        }
+
         private void DrawMateriaReorderableList()
         {
             _materiaReorderableList.drawHeaderCallback = (Rect rect) =>
@@ -213,10 +239,10 @@ namespace Materiator
 
             _materiaReorderableList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
             {
+                serializedObject.Update();
                 var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(index);
                 var elementID = element.FindPropertyRelative("ID");
                 var elementMateria = element.FindPropertyRelative("Materia").objectReferenceValue as Materia;
-                //var materiaTagID = element.FindPropertyRelative("MateriaTag").FindPropertyRelative("ID");
                 var materiaTag = element.FindPropertyRelative("MateriaTag");
 
                 Rect r = new Rect(rect.x, rect.y, 22f, 22f);
@@ -235,14 +261,8 @@ namespace Materiator
                 }
 
                 var tex = new Texture2D(4, 4);
-                //Rect r = new Rect(rect.x, rect.y, 20f, 20f);
-                //GUI.DrawTexture(r, tex, ScaleMode.StretchToFill, false, 0, color, 0, 0);
 
                 EditorGUI.LabelField(r, new GUIContent((elementID.intValue + 1).ToString()));
-                //EditorGUI.LabelField(new Rect(rect.x + 20f, rect.y, rect.width, rect.height), new GUIContent(_materiaSetter.Materia[element.intValue].PreviewIconGray));
-
-                EditorGUI.BeginChangeCheck();
-                //EditorGUI.PropertyField(new Rect(rect.x + 50f, rect.y, rect.width - 75f, rect.height), element, GUIContent.none);
 
                 serializedObject.Update();
 
@@ -251,18 +271,19 @@ namespace Materiator
                 _materiaTagIndex = EditorGUI.Popup(new Rect(rect.x + 25f, rect.y, 95f, rect.height), Utils.MateriaTags.MateriaTagsList.IndexOf(materiaTag.stringValue), Utils.MateriaTags.MateriaTagsArray, EditorStyles.popup);
                 if (EditorGUI.EndChangeCheck())
                 {
+                    SetMateriaSetterDirty(true);
                     var newTag = Utils.MateriaTags.MateriaTagsList[_materiaTagIndex];
                     Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Materia Tag");
                     _materiaSetter.MateriaSlots[index].MateriaTag = newTag;
-                    SetMateriaSetterDirty(true);
                 }
 
-                Materia oldCD = elementMateria;
                 EditorGUI.BeginChangeCheck();
                 elementMateria = (Materia)EditorGUI.ObjectField(new Rect(rect.x + 170f, rect.y, rect.width - 195f, rect.height), elementMateria, typeof(Materia), false);
                 if (EditorGUI.EndChangeCheck())
                 {
                     Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Materia");
+                    SetMateriaSetterDirty(true);
+
                     if (elementMateria == null)
                         elementMateria = Utils.Settings.DefaultMateria;
                     else
@@ -271,12 +292,8 @@ namespace Materiator
                     serializedObject.Update();
                     _materiaSetter.UpdateColorsOfAllTextures();
 
-                    if (elementMateria != oldCD)
-                        //_isColorSetterDirty.boolValue = true;
-
                     serializedObject.ApplyModifiedProperties();
                     //_emissionInUse = IsEmissionInUse(_materiaSetter.Materia);
-                    SetMateriaSetterDirty(true);
                 }
 
                 Rect cdExpandRect = new Rect(EditorGUIUtility.currentViewWidth - 60f, rect.y, 20f, 20f);
@@ -406,11 +423,8 @@ namespace Materiator
 
                 serializedObject.ApplyModifiedProperties();
 
-                CreateEditorMaterialWithTextures(true, data.Material.name);
-                //var texs = new Textures();
-                //texs.CreateTextures(data.Textures.Size.x, data.Textures.Size.y);
-                //texs.CopyTextures(data.Textures, data.Textures.FilterMode, true);
-                //texs.SetTextures(_materiaSetter.Renderer.sharedMaterial, data.ShaderData);
+                Utils.ShallowCopyFields(data, _materiaSetter);
+
                 serializedObject.Update();
 
                 _materiaSetter.UpdateRenderer();

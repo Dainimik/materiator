@@ -9,11 +9,28 @@ namespace Materiator
         public Materia Materia;
         public string MateriaTag;
 
-        public MateriaSlot(int id)
+        public MateriaSlot(int id, Materia materia = null, string tag = null)
         {
             ID = id;
-            Materia = Utils.Settings.DefaultMateria;
-            MateriaTag = "-";
+
+            if (materia != null)
+            {
+                Materia = materia;
+            }
+            else
+            {
+                Materia = Utils.Settings.DefaultMateria;
+            }
+            
+            if (tag != null)
+            {
+                MateriaTag = tag;
+            }
+            else
+            {
+                MateriaTag = "-";
+            }
+            
         }
     }
 }
