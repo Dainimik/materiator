@@ -184,6 +184,7 @@ namespace Materiator
         public void LoadPreset(MateriaPreset preset, out int numberOfSameMateria)
         {
             numberOfSameMateria = 0;
+            Materia materia;
 
             if (preset != null)
             {
@@ -193,7 +194,16 @@ namespace Materiator
                     {
                         if (MateriaSlots[i].MateriaTag == preset.MateriaPresetItemList[j].Tag)
                         {
-                            if (MateriaSetterData.MateriaSlots[i].Materia == preset.MateriaPresetItemList[j].Materia)
+                            if (MateriaSetterData != null)
+                            {
+                                materia = MateriaSetterData.MateriaSlots[i].Materia;
+                            }
+                            else
+                            {
+                                materia = MateriaSlots[i].Materia;
+                            }
+
+                            if (materia == preset.MateriaPresetItemList[j].Materia)
                             {
                                 numberOfSameMateria++;
                             }
