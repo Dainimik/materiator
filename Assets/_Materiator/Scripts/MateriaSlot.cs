@@ -7,7 +7,7 @@ namespace Materiator
     {
         public int ID;
         public Materia Materia;
-        public string MateriaTag;
+        public string Tag;
 
         public MateriaSlot(int id, Materia materia = null, string tag = null)
         {
@@ -24,11 +24,11 @@ namespace Materiator
             
             if (tag != null)
             {
-                MateriaTag = tag;
+                Tag = tag;
             }
             else
             {
-                MateriaTag = "-";
+                Tag = Utils.Settings.DefaultTag;
             }
             
         }

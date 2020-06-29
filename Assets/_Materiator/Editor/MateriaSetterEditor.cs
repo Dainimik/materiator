@@ -318,7 +318,7 @@ namespace Materiator
 
             foreach (var item in _materiaSetter.MateriaSetterData.MateriaSlots)
             {
-                newMateriaSlots.Add(new MateriaSlot(item.ID, item.Materia, item.MateriaTag));
+                newMateriaSlots.Add(new MateriaSlot(item.ID, item.Materia, item.Tag));
             }
             serializedObject.Update();
             _materiaSetter.MateriaSlots = newMateriaSlots;
@@ -342,7 +342,7 @@ namespace Materiator
                 var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(index);
                 var elementID = element.FindPropertyRelative("ID");
                 var elementMateria = element.FindPropertyRelative("Materia").objectReferenceValue as Materia;
-                var materiaTag = element.FindPropertyRelative("MateriaTag");
+                var materiaTag = element.FindPropertyRelative("Tag");
 
                 Rect r = new Rect(rect.x, rect.y, 22f, 22f);
 
@@ -373,7 +373,7 @@ namespace Materiator
                     SetMateriaSetterDirty(true);
                     var newTag = Utils.MateriaTags.MateriaTagsList[_materiaTagIndex];
                     Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Materia Tag");
-                    _materiaSetter.MateriaSlots[index].MateriaTag = newTag;
+                    _materiaSetter.MateriaSlots[index].Tag = newTag;
                 }
 
                 EditorGUI.BeginChangeCheck();
@@ -411,20 +411,11 @@ namespace Materiator
             _materiaReorderableList.onMouseUpCallback = (ReorderableList list) =>
             {
                 var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(list.index).FindPropertyRelative("ID");
-
                 //if (Utils.Settings.HighlightMode == HighlightMode.WhileLMBHeld) Reload();
 
                 HandleMateriaSlotSelection(element.intValue, false);
+
             };
-
-            /*_colorDataList.onReorderCallback = (ReorderableList list) =>
-            {
-                if (_settings.HighlightMode == HighlightMode.WhileLMBHeld)
-                    _colorDataList.ReleaseKeyboardFocus();
-
-                Refresh();
-                _isColorSetterDirty.boolValue = true;
-            };*/
         }
 
         /*private void GenerateMateriaDictionary(bool resetToDefault = false)

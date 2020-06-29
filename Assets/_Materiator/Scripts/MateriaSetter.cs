@@ -192,7 +192,7 @@ namespace Materiator
                 {
                     for (int j = 0; j < preset.MateriaPresetItemList.Count; j++)
                     {
-                        if (MateriaSlots[i].MateriaTag == preset.MateriaPresetItemList[j].Tag)
+                        if (MateriaSlots[i].Tag == preset.MateriaPresetItemList[j].Tag)
                         {
                             if (MateriaSetterData != null)
                             {

@@ -23,7 +23,6 @@ namespace Materiator
             GetProperties();
             BindProperties();
             RegisterButtons();
-            
         }
 
         protected virtual void GetProperties() { }

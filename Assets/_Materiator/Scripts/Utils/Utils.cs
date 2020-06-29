@@ -1,7 +1,4 @@
-﻿using System;
-using System.Reflection;
-using UnityEditor.Compilation;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Materiator
 {
