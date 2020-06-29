@@ -248,7 +248,7 @@ namespace Materiator
                         }
 
                         borderColor = Color.green;
-                        item.style.backgroundColor = borderColor;
+                        item.style.backgroundColor = color;
                         item.style.borderTopColor = borderColor;
                         item.style.borderBottomColor = borderColor;
                         item.style.borderLeftColor = borderColor;
@@ -274,7 +274,14 @@ namespace Materiator
 
         private void DrawOutputSection()
         {
-
+            if (_materiaSetterData.objectReferenceValue == null)
+            {
+                _overwriteMateriaSetterData.SetEnabled(false);
+            }
+            else
+            {
+                _overwriteMateriaSetterData.SetEnabled(true);
+            }
         }
 
         private void LoadPreset(MateriaPreset preset)
