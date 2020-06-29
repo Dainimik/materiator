@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -41,8 +42,11 @@ namespace Materiator
         private VisualElement _outputIndicator;
         private VisualElement _dataIndicator;
 
+        private VisualElement _IMGUIContainer;
+
         private VisualElement _uvIslandContainer;
         private VisualElement _uvGridItem;
+        private EnumField _uvDisplayModeEnumField;
 
         private Label _currentShaderLabel;
 
@@ -106,7 +110,7 @@ namespace Materiator
             _materiaReorderableList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaSlots"), true, true, false, false);
             DrawMateriaReorderableList();
             IMGUIContainer materiaReorderableList = new IMGUIContainer(() => MateriaReorderableList());
-            root.Add(materiaReorderableList);
+            _IMGUIContainer.Add(materiaReorderableList);
         }
 
         private void IMGUI()
@@ -122,7 +126,7 @@ namespace Materiator
                 _dataIndicator.style.backgroundColor = new Color(0f, 0.75f, 0f, 1f);
             }
 
-            DrawDefaultInspector();
+            //DrawDefaultInspector();
         }
 
         private void Initialize()
@@ -159,6 +163,8 @@ namespace Materiator
 
         private void DrawDataSection()
         {
+            DrawUVInspector(false);
+
             _currentShaderLabel.text = _materiaSetter.ShaderData.Shader.name;
 
             if (_materiaSetterDataObjectField.value == null)
@@ -170,11 +176,15 @@ namespace Materiator
                 _reloadMateriaSetterDataButton.visible = true;
             }
 
-            DrawUVInspector();
-
             _materiaSetterDataObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
             {
                 OnMateriaSetterDataChanged();
+            });
+
+            _uvDisplayModeEnumField.RegisterCallback<ChangeEvent<System.Enum>>(e =>
+            {
+                _uvDisplayModeEnumField.value = e.newValue;
+                DrawUVInspector(true);
             });
 
             _shaderDataObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
@@ -183,8 +193,22 @@ namespace Materiator
             });
         }
 
-        private void DrawUVInspector()
+        public enum UVDisplayMode
         {
+            BaseColor,
+            MetallicSpecularGlossSmoothness,
+            EmissionColor
+        }
+
+        private UVDisplayMode _uvDisplayMode;
+
+        private void DrawUVInspector(bool redraw)
+        {
+            if (redraw)
+            {
+                _uvIslandContainer.Clear();
+            }
+
             var rects = _materiaSetter.Rects;
             var size = Mathf.Sqrt(rects.Length);
 
@@ -201,7 +225,32 @@ namespace Materiator
                     var item = new VisualElement();
                     item.name = "UVGridItem";
                     item.styleSheets.Add(Resources.Load<StyleSheet>("Materiator"));
+
+                    if (_materiaSetter.FilteredRects.ContainsKey(i))
+                    {
+                        Color color = Utils.Settings.DefaultMateria.BaseColor;
+                        switch (_uvDisplayModeEnumField.value)
+                        {
+                            case UVDisplayMode.BaseColor:
+                                color = (Color)_materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.BaseColor;
+                                break;
+                            case UVDisplayMode.MetallicSpecularGlossSmoothness:
+                                var metallic = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.Metallic;
+                                var metallicColor = new Color(metallic, metallic, metallic, 1f);
+                                color = metallicColor;
+                                break;
+                            case UVDisplayMode.EmissionColor:
+                                color = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.EmissionColor;
+                                break;
+                        }
+                        item.style.backgroundColor = color;
+                    }
+
                     horizontalContainer.Add(item);
+
+                    var label = new Label();
+                    label.text = (i + 1).ToString();
+                    item.Add(label);
                 }
             }
         }
@@ -682,8 +731,13 @@ namespace Materiator
             _outputIndicator = root.Q<VisualElement>("OutputIndicator");
             _dataIndicator = root.Q<VisualElement>("DataIndicator");
 
+            _IMGUIContainer = root.Q<VisualElement>("IMGUIContainer");
+
             _uvIslandContainer = root.Q<VisualElement>("UVIslandContainer");
             _uvGridItem = root.Q<VisualElement>("UVGridItem");
+
+            _uvDisplayModeEnumField = root.Q<EnumField>("UVDisplayMode");
+            _uvDisplayModeEnumField.Init(UVDisplayMode.BaseColor);
 
             _currentShaderLabel = root.Q<Label>("CurrentShaderLabel");
         }
@@ -693,6 +747,8 @@ namespace Materiator
             _materiaPresetObjectField.BindProperty(_materiaPreset);
             _materiaSetterDataObjectField.BindProperty(_materiaSetterData);
             _shaderDataObjectField.BindProperty(_shaderData);
+
+            //_uvDisplayModeEnumField.
         }
 
         protected override void RegisterButtons()

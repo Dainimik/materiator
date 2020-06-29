@@ -26,11 +26,13 @@
                     </ui:VisualElement>
                     <ui:Button text="Reload Data" name="ReloadMateriaSetterDataButton" />
                 </ui:VisualElement>
-                <ui:VisualElement name="UVDisplayContainer">
-                    <ui:Label text="UV" style="margin-left: 3px; margin-right: 3px;" />
-                    <ui:VisualElement name="UVIslandContainer" style="width: 128px; height: 128px;" />
+                <ui:VisualElement name="UVDisplayContainer" style="margin-bottom: 15px;">
+                    <ui:Label text="UV Inspector" style="margin-left: 3px; margin-right: 3px; -unity-font-style: bold;" />
+                    <uie:EnumField label="Display Mode" name="UVDisplayMode" binding-path="_uvDisplayMode" />
+                    <ui:VisualElement name="UVIslandContainer" style="width: 128px; height: 128px; flex-direction: column-reverse;" />
                 </ui:VisualElement>
-                <uie:ObjectField label="Shader Data" name="ShaderDataObjectField" />
+                <ui:VisualElement name="IMGUIContainer" />
+                <uie:ObjectField label="Shader Data" name="ShaderDataObjectField" allow-scene-objects="false" />
                 <ui:VisualElement name="CurrentShaderContainer" style="flex-direction: row; justify-content: space-between;">
                     <ui:Label text="Shader" style="margin-left: 3px; margin-right: 3px;" />
                     <ui:Label name="CurrentShaderLabel" binding-path="_currentShaderLabel" />
