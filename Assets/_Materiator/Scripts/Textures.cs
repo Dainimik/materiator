@@ -17,6 +17,8 @@ namespace Materiator
         public Texture2D MetallicSmoothness;
         public Texture2D Emission;
 
+        public FilterMode FilterMode { get; private set; }
+
         public string[] Names
         {
             get
@@ -37,19 +39,21 @@ namespace Materiator
             }
         }
 
-        public Vector2 Size
+        public Vector2Int Size
         {
             get
             {
-                return new Vector2(Color.width, Color.height);
+                return new Vector2Int(Color.width, Color.height);
             }
         }
 
         public void CreateTextures(int width, int height)
         {
-            Color = CreateTexture2D(width, height, TextureFormat.RGBA32, Utils.Settings.FilterMode);
-            MetallicSmoothness = CreateTexture2D(width, height, TextureFormat.RGBA32, Utils.Settings.FilterMode);
-            Emission = CreateTexture2D(width, height, TextureFormat.RGBA32, Utils.Settings.FilterMode, UnityEngine.Color.black);
+            FilterMode = Utils.Settings.FilterMode;
+
+            Color = CreateTexture2D(width, height, TextureFormat.RGBA32, FilterMode);
+            MetallicSmoothness = CreateTexture2D(width, height, TextureFormat.RGBA32, FilterMode);
+            Emission = CreateTexture2D(width, height, TextureFormat.RGBA32, FilterMode, UnityEngine.Color.black);
         }
 
         public void SetNames(string name)
@@ -143,19 +147,20 @@ namespace Materiator
             AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(Emission), name + "_Emission");
         }
 
-        public Textures CopyTextures(Textures texturesToCopy, FilterMode filterMode, bool removeCloneFromName = false)
+        public Textures CloneTextures(FilterMode filterMode, bool removeCloneFromName = false)
         {
+            //Don't create new instance here
             var texs = new Textures
             {
-                Color = Object.Instantiate(texturesToCopy.Color),
-                MetallicSmoothness = Object.Instantiate(texturesToCopy.MetallicSmoothness),
-                Emission = Object.Instantiate(texturesToCopy.Color)
+                Color = Object.Instantiate(Color),
+                MetallicSmoothness = Object.Instantiate(MetallicSmoothness),
+                Emission = Object.Instantiate(Color)
             };
             texs.SetFilterMode(filterMode);
             texs.SetWrapMode(TextureWrapMode.Clamp);
 
             if (removeCloneFromName)
-                texs.Names = texturesToCopy.Names;
+                texs.Names = Names;
 
             return texs;
         }

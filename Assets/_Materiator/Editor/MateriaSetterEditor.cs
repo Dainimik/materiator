@@ -183,7 +183,7 @@ namespace Materiator
                 _materiaSetter.LoadPreset(null, out numberOfSameMateria);
             }
             serializedObject.Update();
-
+            Debug.Log(numberOfSameMateria + "                             " + _materiaSetter.MateriaSetterData?.MateriaSlots.Count);
             if (numberOfSameMateria == _materiaSetter.MateriaSetterData?.MateriaSlots.Count)
             {
                 SetMateriaSetterDirty(false);
@@ -192,6 +192,8 @@ namespace Materiator
             {
                 SetMateriaSetterDirty(true);
             }
+
+            _materiaSetter.UpdateColorsOfAllTextures();
         }
 
         private void MateriaReorderableList()
@@ -390,7 +392,7 @@ namespace Materiator
 
         private void OnMateriaPresetChanged()
         {
-            LoadPreset((MateriaPreset)_materiaPresetObjectField.value);
+            
         }
 
         private void OnMateriaSetterDataChanged()
@@ -404,11 +406,16 @@ namespace Materiator
 
                 serializedObject.ApplyModifiedProperties();
 
-                Utils.CopyFields(data, _materiaSetter);
-
+                CreateEditorMaterialWithTextures(true, data.Material.name);
+                //var texs = new Textures();
+                //texs.CreateTextures(data.Textures.Size.x, data.Textures.Size.y);
+                //texs.CopyTextures(data.Textures, data.Textures.FilterMode, true);
+                //texs.SetTextures(_materiaSetter.Renderer.sharedMaterial, data.ShaderData);
                 serializedObject.Update();
 
                 _materiaSetter.UpdateRenderer();
+
+                _materiaSetter.UpdateColorsOfAllTextures();
             }
             else
             {
@@ -484,7 +491,7 @@ namespace Materiator
 
             var mat = Instantiate(_materiaSetter.Material);
 
-            texs.CopyTextures(_materiaSetter.Textures, Utils.Settings.FilterMode);
+            texs = _materiaSetter.Textures.CloneTextures(Utils.Settings.FilterMode);
             texs.SetNames(name);
 
             if (packAssets)
@@ -532,22 +539,19 @@ namespace Materiator
             SetMateriaSetterDirty(false);
         }
 
-        private void CreateEditorMaterial(bool clone = false, string name = null)
+        private void CreateEditorMaterialWithTextures(bool clone = false, string name = null)
         {
-            Utils.CreateMaterial(Utils.Settings.DefaultShaderData.Shader, name);
-
-            serializedObject.Update();
             var newTextures = new Textures();
 
             if (!clone)
             {
-                _material.objectReferenceValue = Utils.CreateMaterial(_materiaSetter.ShaderData.Shader, name);
+                _material.objectReferenceValue = Utils.CreateMaterial(_materiaSetter.MateriaSetterData.ShaderData.Shader, name);
                 newTextures.CreateTextures(Utils.Settings.GridSize, Utils.Settings.GridSize);
             }
             else
             {
                 _material.objectReferenceValue = Instantiate(_material.objectReferenceValue);
-                newTextures.CopyTextures(_materiaSetter.Textures, Utils.Settings.FilterMode);
+                newTextures = _materiaSetter.MateriaSetterData.Textures.CloneTextures(_materiaSetter.MateriaSetterData.Textures.FilterMode, true);
             }
 
             if (name != null)
