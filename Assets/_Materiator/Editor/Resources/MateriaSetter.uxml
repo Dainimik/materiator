@@ -26,6 +26,10 @@
                     </ui:VisualElement>
                     <ui:Button text="Reload Data" name="ReloadMateriaSetterDataButton" />
                 </ui:VisualElement>
+                <ui:VisualElement name="UVDisplayContainer">
+                    <ui:Label text="UV" style="margin-left: 3px; margin-right: 3px;" />
+                    <ui:VisualElement name="UVIslandContainer" style="width: 128px; height: 128px;" />
+                </ui:VisualElement>
                 <uie:ObjectField label="Shader Data" name="ShaderDataObjectField" />
                 <ui:VisualElement name="CurrentShaderContainer" style="flex-direction: row; justify-content: space-between;">
                     <ui:Label text="Shader" style="margin-left: 3px; margin-right: 3px;" />

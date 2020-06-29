@@ -37,7 +37,13 @@ namespace Materiator
         private Button _overwriteMateriaSetterData;
         private Button _saveAsNewMateriaSetterData;
 
+        private VisualElement _presetIndicator;
         private VisualElement _outputIndicator;
+        private VisualElement _dataIndicator;
+
+        private VisualElement _uvIslandContainer;
+        private VisualElement _uvGridItem;
+
         private Label _currentShaderLabel;
 
         private void OnEnable()
@@ -97,7 +103,7 @@ namespace Materiator
             IMGUIContainer defaultInspector = new IMGUIContainer(() => IMGUI());
             root.Add(defaultInspector);
 
-            _materiaReorderableList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaSlots"), false, true, false, false);
+            _materiaReorderableList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaSlots"), true, true, false, false);
             DrawMateriaReorderableList();
             IMGUIContainer materiaReorderableList = new IMGUIContainer(() => MateriaReorderableList());
             root.Add(materiaReorderableList);
@@ -108,10 +114,12 @@ namespace Materiator
             if (_isDirty.boolValue == true)
             {
                 _outputIndicator.style.backgroundColor = new Color(0.75f, 0f, 0f, 1f);
+                _dataIndicator.style.backgroundColor = new Color(0.75f, 0f, 0f, 1f);
             }
             else
             {
                 _outputIndicator.style.backgroundColor = new Color(0f, 0.75f, 0f, 1f);
+                _dataIndicator.style.backgroundColor = new Color(0f, 0.75f, 0f, 1f);
             }
 
             DrawDefaultInspector();
@@ -162,6 +170,8 @@ namespace Materiator
                 _reloadMateriaSetterDataButton.visible = true;
             }
 
+            DrawUVInspector();
+
             _materiaSetterDataObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
             {
                 OnMateriaSetterDataChanged();
@@ -171,6 +181,29 @@ namespace Materiator
             {
                 OnShaderDataChanged();
             });
+        }
+
+        private void DrawUVInspector()
+        {
+            var rects = _materiaSetter.Rects;
+            var size = Mathf.Sqrt(rects.Length);
+
+            for (int i = 0, y = 0; y < size; y++)
+            {
+                var horizontalContainer = new VisualElement();
+                horizontalContainer.style.flexGrow = 1;
+                horizontalContainer.style.flexShrink = 0;
+                horizontalContainer.style.flexDirection = FlexDirection.Row;
+                _uvIslandContainer.Add(horizontalContainer);
+
+                for (int x = 0; x < size; x++, i++)
+                {
+                    var item = new VisualElement();
+                    item.name = "UVGridItem";
+                    item.styleSheets.Add(Resources.Load<StyleSheet>("Materiator"));
+                    horizontalContainer.Add(item);
+                }
+            }
         }
 
         private void DrawOutputSection()
@@ -193,7 +226,7 @@ namespace Materiator
                 _materiaSetter.LoadPreset(null, out numberOfSameMateria);
             }
             serializedObject.Update();
-            Debug.Log(numberOfSameMateria + "                             " + _materiaSetter.MateriaSetterData?.MateriaSlots.Count);
+
             if (numberOfSameMateria == _materiaSetter.MateriaSetterData?.MateriaSlots.Count)
             {
                 SetMateriaSetterDirty(false);
@@ -647,6 +680,11 @@ namespace Materiator
             _saveAsNewMateriaSetterData = root.Q<Button>("SaveAsNewMateriaSetterDataButton");
 
             _outputIndicator = root.Q<VisualElement>("OutputIndicator");
+            _dataIndicator = root.Q<VisualElement>("DataIndicator");
+
+            _uvIslandContainer = root.Q<VisualElement>("UVIslandContainer");
+            _uvGridItem = root.Q<VisualElement>("UVGridItem");
+
             _currentShaderLabel = root.Q<Label>("CurrentShaderLabel");
         }
 
