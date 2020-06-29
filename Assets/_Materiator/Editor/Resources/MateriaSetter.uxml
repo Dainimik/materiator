@@ -21,8 +21,8 @@
                 <uie:ObjectField label="Materia Setter Data" name="MateriaSetterDataObjectField" allow-scene-objects="false" />
                 <ui:VisualElement name="ButtonContainer" style="flex-direction: row; justify-content: space-between; margin-bottom: 15px;">
                     <ui:VisualElement name="LeftAlignedButtonContainer" style="flex-direction: row;">
-                        <ui:Button text="C" name="CloneMateriaSetterDataButton" />
                         <ui:Button text="N" name="NewMateriaSetterDataButton" />
+                        <ui:Button text="C" name="CloneMateriaSetterDataButton" />
                     </ui:VisualElement>
                     <ui:Button text="Reload Data" name="ReloadMateriaSetterDataButton" />
                 </ui:VisualElement>
