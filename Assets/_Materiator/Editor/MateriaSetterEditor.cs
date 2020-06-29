@@ -148,14 +148,7 @@ namespace Materiator
 
         private void DrawPresetSection()
         {
-            if (_materiaPresetObjectField.value == null)
-            {
-                _reloadMateriaPresetButton.visible = false;
-            }
-            else
-            {
-                _reloadMateriaPresetButton.visible = true;
-            }
+            OnMateriaPresetChanged();
 
             _materiaPresetObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
             {
@@ -171,11 +164,11 @@ namespace Materiator
 
             if (_materiaSetterDataObjectField.value == null)
             {
-                _reloadMateriaSetterDataButton.visible = false;
+                _reloadMateriaSetterDataButton.SetEnabled(false);
             }
             else
             {
-                _reloadMateriaSetterDataButton.visible = true;
+                _reloadMateriaSetterDataButton.SetEnabled(true);
             }
 
             _materiaSetterDataObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
@@ -516,7 +509,14 @@ namespace Materiator
 
         private void OnMateriaPresetChanged()
         {
-            
+            if (_materiaPresetObjectField.value == null)
+            {
+                _reloadMateriaPresetButton.SetEnabled(false);
+            }
+            else
+            {
+                _reloadMateriaPresetButton.SetEnabled(true);
+            }
         }
 
         private void OnMateriaSetterDataChanged()
@@ -540,7 +540,7 @@ namespace Materiator
             }
             else
             {
-                _reloadMateriaSetterDataButton.visible = false;
+                _reloadMateriaSetterDataButton.SetEnabled(false);
 
                 _materiaSetterDataObjectField.value = _materiaSetterData.objectReferenceValue;
             }
