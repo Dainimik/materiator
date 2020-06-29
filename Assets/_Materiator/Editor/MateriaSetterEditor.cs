@@ -90,6 +90,8 @@ namespace Materiator
                 }  
             }
 
+            DrawUVInspector(true);
+
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -211,6 +213,7 @@ namespace Materiator
 
             var rects = _materiaSetter.Rects;
             var size = Mathf.Sqrt(rects.Length);
+            Color borderColor;
 
             for (int i = 0, y = 0; y < size; y++)
             {
@@ -232,7 +235,7 @@ namespace Materiator
                         switch (_uvDisplayModeEnumField.value)
                         {
                             case UVDisplayMode.BaseColor:
-                                color = (Color)_materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.BaseColor;
+                                color = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.BaseColor;
                                 break;
                             case UVDisplayMode.MetallicSpecularGlossSmoothness:
                                 var metallic = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.Metallic;
@@ -243,7 +246,21 @@ namespace Materiator
                                 color = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.EmissionColor;
                                 break;
                         }
-                        item.style.backgroundColor = color;
+
+                        borderColor = Color.green;
+                        item.style.backgroundColor = borderColor;
+                        item.style.borderTopColor = borderColor;
+                        item.style.borderBottomColor = borderColor;
+                        item.style.borderLeftColor = borderColor;
+                        item.style.borderRightColor = borderColor;
+                    }
+                    else
+                    {
+                        borderColor = Color.red;
+                        item.style.borderTopColor = borderColor;
+                        item.style.borderBottomColor = borderColor;
+                        item.style.borderLeftColor = borderColor;
+                        item.style.borderRightColor = borderColor;
                     }
 
                     horizontalContainer.Add(item);
@@ -372,6 +389,7 @@ namespace Materiator
                         _materiaSetter.MateriaSlots[index].Materia = elementMateria;
 
                     serializedObject.Update();
+                    DrawUVInspector(true);
                     _materiaSetter.UpdateColorsOfAllTextures();
 
                     serializedObject.ApplyModifiedProperties();
