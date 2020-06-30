@@ -28,14 +28,14 @@ namespace Materiator
         public static Rect[] CalculateRects(int size, Rect offset)
         {
             var rects = new Rect[size * size];
-            var rectSize = 1 / (float)size;
+            var rectSize = 1 / (float)size * offset.width;
 
             for (int i = 0, y = 0; y < size; y++)
             {
                 for (int x = 0; x < size; x++, i++)
                 {
                     if (i >= size * size) break;
-                    rects[i] = new Rect(offset.x + (x / (float)size), offset.y + (y / (float)size), rectSize, rectSize);
+                    rects[i] = new Rect(offset.x + (x / (float)size * offset.width), offset.y + (y / (float)size * offset.height), rectSize, rectSize);
                     rects[i].xMin = rects[i].x;
                     rects[i].yMin = rects[i].y;
                     rects[i].xMax = rects[i].x + rectSize;
