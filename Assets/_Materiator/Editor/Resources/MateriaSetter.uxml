@@ -1,7 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <ui:VisualElement name="MateriaSetterGUI">
         <Style src="Materiator.uss" />
-        <ui:VisualElement name="TitleSectionContainer" style="align-items: flex-end;">
+        <ui:VisualElement name="TitleSectionContainer" style="align-items: center; flex-direction: row; justify-content: flex-end;">
+            <ui:Button text="Switch Edit Mode" name="SwitchEditMode" style="border-left-color: rgb(76, 132, 255); border-right-color: rgb(76, 132, 255); border-top-color: rgb(76, 132, 255); border-bottom-color: rgb(76, 132, 255); border-left-width: 4px; border-right-width: 4px; border-top-width: 4px; border-bottom-width: 4px; height: 25px; border-top-left-radius: 1px; border-bottom-left-radius: 1px; border-top-right-radius: 1px; border-bottom-right-radius: 1px;" />
             <ui:Button text="Reload" name="ReloadButton" style="width: 50px; height: 25px; align-items: stretch;" />
         </ui:VisualElement>
         <ui:VisualElement name="AtlasSectionContainer">
@@ -10,7 +11,6 @@
             <ui:VisualElement name="ContentContainer" class="content-container">
                 <uie:ObjectField label="Atlas" name="MateriaAtlasObjectField" allow-scene-objects="false" />
                 <ui:VisualElement name="ButtonContainer" style="flex-direction: row; justify-content: flex-end;">
-                    <ui:Button text="Switch Edit Mode" name="SwitchEditMode" />
                     <ui:Button text="Reload Atlas" name="ReloadMateriaAtlasButton" />
                 </ui:VisualElement>
             </ui:VisualElement>

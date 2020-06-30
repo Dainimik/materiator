@@ -33,7 +33,7 @@ namespace Materiator
         private ObjectField _shaderDataObjectField;
 
         private Button _reloadButton;
-        private Button _switchEditMode;
+        private Button _switchEditModeButton;
         private Button _reloadMateriaAtlasButton;
         private Button _reloadMateriaPresetButton;
         private Button _newMateriaSetterDataButton;
@@ -65,6 +65,7 @@ namespace Materiator
         {
             InitializeEditor<MateriaSetter>();
 
+            DrawAtlasSection();
             DrawPresetSection();
             DrawDataSection();
             DrawOutputSection();
@@ -457,7 +458,7 @@ namespace Materiator
                     //_emissionInUse = IsEmissionInUse(_materiaSetter.Materia);
                 }
 
-                Rect cdExpandRect = new Rect(EditorGUIUtility.currentViewWidth - 60f, rect.y, 20f, 20f);
+                Rect cdExpandRect = new Rect(EditorGUIUtility.currentViewWidth - 70f, rect.y, 20f, 20f);
                 if (GUI.Button(cdExpandRect, new GUIContent(EditorGUIUtility.IconContent("d_editicon.sml").image, "Edit Color Data")))
                     EditorUtils.InspectTarget(elementMateria);
             };
@@ -588,6 +589,17 @@ namespace Materiator
             {
                 _reloadMateriaAtlasButton.SetEnabled(true);
             }
+
+            if (_materiaSetter.MateriaAtlas  == null)
+            {
+                _switchEditModeButton.SetEnabled(false);
+            }
+            else
+            {
+                _switchEditModeButton.SetEnabled(true);
+            }
+
+            _switchEditModeButton.text = _editMode.enumNames[_editMode.enumValueIndex] + " Mode";
         }
 
         private void OnMateriaPresetChanged()
@@ -808,7 +820,7 @@ namespace Materiator
 
 
             _reloadButton = root.Q<Button>("ReloadButton");
-            _switchEditMode = root.Q<Button>("SwitchEditMode");
+            _switchEditModeButton = root.Q<Button>("SwitchEditMode");
             _reloadMateriaAtlasButton = root.Q<Button>("ReloadMateriaAtlasButton");
             _reloadMateriaPresetButton = root.Q<Button>("ReloadMateriaPresetButton");
             _newMateriaSetterDataButton = root.Q<Button>("NewMateriaSetterDataButton");
@@ -843,7 +855,7 @@ namespace Materiator
         protected override void RegisterButtons()
         {
             _reloadButton.clicked += Refresh;
-            _switchEditMode.clicked += SwitchEditMode;
+            _switchEditModeButton.clicked += SwitchEditMode;
             _reloadMateriaAtlasButton.clicked += ReloadAtlas;
             _reloadMateriaPresetButton.clicked += ReloadPreset;
             _newMateriaSetterDataButton.clicked += NewData;
