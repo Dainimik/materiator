@@ -300,7 +300,6 @@ namespace Materiator
 
                 Textures.SetTextures(Material, ShaderData);
                 UpdateRenderer();
-                GenerateMateriaSlots(true, true);
             }
         }
 

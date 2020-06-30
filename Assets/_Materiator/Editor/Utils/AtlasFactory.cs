@@ -113,11 +113,12 @@ namespace Materiator
                         data.AtlasedGridSize = gridSize;
                         data.GridSize = gridSize;
 
+                        ms[j].MateriaSetterData = data;
+
                         ms[j].MateriaAtlas = atlas;
                         ms[j].OriginalMesh = ms[j].Mesh;
                         ms[j].AtlasedMesh = atlasedMesh;
                         ms[j].AtlasedUVRect = rects[rectIndex];
-                        data.AtlasedGridSize = gridSize;
 
                         //AssetDatabase.AddObjectToAsset(newMeshData, prefabs[i]);
                         AssetDatabase.AddObjectToAsset(atlasedMesh, data);
