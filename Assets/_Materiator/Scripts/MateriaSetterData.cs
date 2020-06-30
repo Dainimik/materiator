@@ -13,11 +13,10 @@ namespace Materiator
         public Textures Textures;
 
         public MateriaAtlas MateriaAtlas;
-        public Mesh OriginalMesh;
+        public Mesh NativeMesh;
         public Mesh AtlasedMesh;
         public int AtlasedGridSize;
-        public int OriginalGridSize;
-        public int GridSize;
+        public int NativeGridSize;
         public Rect AtlasedUVRect;
     }
 }

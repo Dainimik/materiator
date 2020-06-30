@@ -542,13 +542,14 @@ namespace Materiator
 
         private void SwitchEditMode()
         {
+            Debug.Log(_materiaSetter.EditMode);
             if (_materiaSetter.EditMode == EditMode.Nascent)
             {
-                _materiaSetter.LoadAtlas(_materiaSetter.MateriaAtlas);
+                _materiaSetter.LoadAtlas(_materiaSetter.MateriaSetterData.MateriaAtlas);
             }
             if (_materiaSetter.EditMode == EditMode.Atlas)
             {
-                _materiaSetter.UnloadAtlas(_materiaSetter.MateriaAtlas);
+                _materiaSetter.UnloadAtlas();
             }
         }
 
@@ -722,9 +723,8 @@ namespace Materiator
             data.MateriaPreset = (MateriaPreset)_materiaPreset.objectReferenceValue;
             data.Material = mat;
             data.Textures = texs;
-            data.OriginalMesh = _materiaSetter.Mesh;
-            data.OriginalGridSize = _materiaSetter.OriginalGridSize;
-            data.GridSize = _materiaSetter.GridSize;
+            data.NativeMesh = _materiaSetter.Mesh;
+            data.NativeGridSize = _materiaSetter.NativeGridSize;
 
 
 

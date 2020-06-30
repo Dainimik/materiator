@@ -6,7 +6,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2854779779898104161}
+  m_GameObject: {fileID: 4983220211666045947}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9cc8b14ac3fd0804585ec453092f7071, type: 3}
@@ -15,22 +15,22 @@ MonoBehaviour:
   IsInitialized: 1
   IsDirty: 0
   EditMode: 0
-  MateriaSetterData: {fileID: 11400000, guid: 1496803d70f601049828a075abb9a02e, type: 2}
+  MateriaSetterData: {fileID: 11400000, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
   Mesh: {fileID: 2750013030952444713, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
-  MeshFilter: {fileID: 1979961147879853182}
-  Renderer: {fileID: 4368152325704186036}
-  MeshRenderer: {fileID: 4368152325704186036}
+  MeshFilter: {fileID: 8774137254707306212}
+  Renderer: {fileID: 6784400234631490094}
+  MeshRenderer: {fileID: 6784400234631490094}
   SkinnedMeshRenderer: {fileID: 0}
   MateriaSlots:
   - ID: 1
-    Materia: {fileID: 11400000, guid: 2bf52f2715bfa4d48a7bfe6d265ba1d0, type: 2}
-    Tag: Plastic
-  - ID: 0
-    Materia: {fileID: 11400000, guid: 2bf52f2715bfa4d48a7bfe6d265ba1d0, type: 2}
-    Tag: Plastic
-  - ID: 4
-    Materia: {fileID: 11400000, guid: 2bf52f2715bfa4d48a7bfe6d265ba1d0, type: 2}
+    Materia: {fileID: 11400000, guid: 35303a3f5c117584b99fd840c725fcfc, type: 2}
     Tag: Metal
+  - ID: 0
+    Materia: {fileID: 11400000, guid: 555ce609e5fd0014b8567f3e49bdf198, type: 2}
+    Tag: '-'
+  - ID: 4
+    Materia: {fileID: 11400000, guid: 555ce609e5fd0014b8567f3e49bdf198, type: 2}
+    Tag: '-'
   FilteredRects:
     _keys: 010000000000000004000000
     _values:
@@ -133,15 +133,14 @@ MonoBehaviour:
   MateriaAtlas: {fileID: 0}
   MateriaPreset: {fileID: 0}
   ShaderData: {fileID: 11400000, guid: d2cbf647c709b3a4da4a535dda5cd1dd, type: 2}
-  Material: {fileID: -1589666382171462978, guid: 1496803d70f601049828a075abb9a02e, type: 2}
+  Material: {fileID: -5914938977817029695, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
   Textures:
-    Color: {fileID: 3678677079552257481, guid: 1496803d70f601049828a075abb9a02e, type: 2}
-    MetallicSmoothness: {fileID: 7461302910492791953, guid: 1496803d70f601049828a075abb9a02e, type: 2}
-    Emission: {fileID: 2390449062983488911, guid: 1496803d70f601049828a075abb9a02e, type: 2}
-  OriginalMesh: {fileID: 2750013030952444713, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
+    Color: {fileID: -8945241735410499290, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
+    MetallicSmoothness: {fileID: -5066688091537240320, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
+    Emission: {fileID: 8558548604577358918, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
+  OriginalMesh: {fileID: 0}
   AtlasedMesh: {fileID: 0}
   OriginalGridSize: 4
-  AtlasedGridSize: 0
   GridSize: 4
   AtlasedUVRect:
     serializedVersion: 2
@@ -149,7 +148,7 @@ MonoBehaviour:
     y: 0
     width: 0
     height: 0
---- !u!1001 &3125320863411758128
+--- !u!1001 &5325116991838353066
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -203,25 +202,29 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: -1589666382171462978, guid: 1496803d70f601049828a075abb9a02e, type: 2}
+      objectReference: {fileID: -5914938977817029695, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
     - target: {fileID: 919132149155446097, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
       propertyPath: m_Name
       value: OilBarrel
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
---- !u!1 &2854779779898104161 stripped
+--- !u!1 &4983220211666045947 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
-  m_PrefabInstance: {fileID: 3125320863411758128}
+  m_PrefabInstance: {fileID: 5325116991838353066}
   m_PrefabAsset: {fileID: 0}
---- !u!33 &1979961147879853182 stripped
+--- !u!33 &8774137254707306212 stripped
 MeshFilter:
   m_CorrespondingSourceObject: {fileID: -5754084199372789682, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
-  m_PrefabInstance: {fileID: 3125320863411758128}
+  m_PrefabInstance: {fileID: 5325116991838353066}
   m_PrefabAsset: {fileID: 0}
---- !u!23 &4368152325704186036 stripped
+--- !u!23 &6784400234631490094 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
-  m_PrefabInstance: {fileID: 3125320863411758128}
+  m_PrefabInstance: {fileID: 5325116991838353066}
   m_PrefabAsset: {fileID: 0}

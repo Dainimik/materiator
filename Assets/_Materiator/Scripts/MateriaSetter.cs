@@ -37,8 +37,7 @@ namespace Materiator
 
         public Mesh OriginalMesh;
         public Mesh AtlasedMesh;
-        public int OriginalGridSize;
-        public int AtlasedGridSize;
+        public int NativeGridSize;
         public int GridSize;
         public Rect AtlasedUVRect;
 
@@ -140,11 +139,11 @@ namespace Materiator
 
             if (Textures.Color == null || Textures.MetallicSmoothness == null || Textures.Emission == null)
             {
-                if (OriginalGridSize == 0)
+                if (NativeGridSize == 0)
                 {
                     // why do i need this many gridSize variables?
-                    OriginalGridSize = Utils.Settings.GridSize;
-                    GridSize = OriginalGridSize;
+                    NativeGridSize = Utils.Settings.GridSize;
+                    GridSize = NativeGridSize;
                 }
 
                 Textures.CreateTextures(GridSize, GridSize);
@@ -166,15 +165,15 @@ namespace Materiator
 
             if (EditMode == EditMode.Nascent)
             {
-                GridSize = OriginalGridSize;
+                GridSize = NativeGridSize;
             }
             if (EditMode == EditMode.Atlas)
             {
-                GridSize = AtlasedGridSize;
+                GridSize = MateriaSetterData.AtlasedGridSize;
                 uvPositionRect = AtlasedUVRect;
             }
 
-            Rects = MeshAnalyzer.CalculateRects(OriginalGridSize, uvPositionRect);
+            Rects = MeshAnalyzer.CalculateRects(NativeGridSize, uvPositionRect);
             FilteredRects = MeshAnalyzer.FilterRects(Rects, Mesh.uv);
         }
 
@@ -291,33 +290,34 @@ namespace Materiator
             {
                 EditMode = EditMode.Atlas;
 
-                Utils.ShallowCopyFields(MateriaSetterData, this);
+                //Utils.ShallowCopyFields(MateriaSetterData, this);
+
+                MateriaAtlas = atlas;
 
                 ShaderData = atlas.ShaderData;
                 Material = atlas.Material;
                 Textures = atlas.Textures;
                 Mesh = MateriaSetterData.AtlasedMesh;
+                GridSize = MateriaSetterData.AtlasedGridSize;
 
                 Textures.SetTextures(Material, ShaderData);
                 UpdateRenderer();
             }
         }
 
-        public void UnloadAtlas(MateriaAtlas atlas)
+        public void UnloadAtlas()
         {
-            if (atlas != null)
-            {
-                EditMode = EditMode.Nascent;
+            EditMode = EditMode.Nascent;
 
-                ShaderData = atlas.ShaderData;
-                Material = atlas.Material;
-                Textures = atlas.Textures;
-                Mesh = MateriaSetterData.AtlasedMesh;
+            ShaderData = MateriaSetterData.ShaderData;
+            Material = MateriaSetterData.Material;
+            Textures = MateriaSetterData.Textures;
+            Mesh = MateriaSetterData.NativeMesh;
+            GridSize = MateriaSetterData.NativeGridSize;
 
-                Textures.SetTextures(Material, ShaderData);
-                UpdateRenderer();
-                GenerateMateriaSlots(true);
-            }
+            Textures.SetTextures(Material, ShaderData);
+            UpdateRenderer();
+            GenerateMateriaSlots(true);
         }
     }
 }

@@ -104,14 +104,13 @@ namespace Materiator
 
 
                         // does this need to be here?
-                        data.OriginalGridSize = ms[j].GridSize;
+                        data.NativeGridSize = ms[j].GridSize;
                         //---------------------------
                         data.MateriaAtlas = atlas;
-                        data.OriginalMesh = ms[j].Mesh;
+                        data.NativeMesh = ms[j].Mesh;
                         data.AtlasedMesh = atlasedMesh;
                         data.AtlasedUVRect = rects[rectIndex];
                         data.AtlasedGridSize = gridSize;
-                        data.GridSize = gridSize;
 
                         ms[j].MateriaSetterData = data;
 
