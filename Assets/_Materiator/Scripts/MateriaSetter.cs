@@ -51,7 +51,7 @@ namespace Materiator
             SetUpRenderer();
             InitializeTextures();
             AnalyzeMesh();
-            GenerateMateriaSlots(true);
+            GenerateMateriaSlots();
 
             IsInitialized = true;
         }
@@ -62,7 +62,7 @@ namespace Materiator
             SetUpRenderer();
             InitializeTextures();
             AnalyzeMesh();
-            GenerateMateriaSlots(false);
+            GenerateMateriaSlots();
         }
 
         public void ResetMateriaSetter()
@@ -178,17 +178,37 @@ namespace Materiator
             FilteredRects = MeshAnalyzer.FilterRects(Rects, Mesh.uv);
         }
 
-        public void GenerateMateriaSlots(bool reset)
+        public void GenerateMateriaSlots(bool reset = false, bool refresh = false)
         {
             var materiaSlotsCount = 0;
 
             if (MateriaSlots != null)
             {
+                var newMateriaSlots = new List<MateriaSlot>();
+
+                foreach (var ms in MateriaSlots)
+                {
+                    if (FilteredRects.ContainsKey(ms.ID))
+                    {
+                        newMateriaSlots.Add(new MateriaSlot(ms.ID, ms.Materia, ms.Tag));
+                    }
+                }
+
+                if (newMateriaSlots.Count != MateriaSlots.Count)
+                {
+                    MateriaSlots = newMateriaSlots;
+                }
+
                 materiaSlotsCount = MateriaSlots.Count;
             }
 
-            if (reset || materiaSlotsCount == 0 || FilteredRects.Count != materiaSlotsCount)
+            if (reset || refresh || materiaSlotsCount == 0 || FilteredRects.Count != materiaSlotsCount)
             {
+                if (MateriaSlots == null)
+                {
+                    MateriaSlots = new List<MateriaSlot>();
+                }
+
                 if (reset)
                 {
                     if (MateriaSlots != null)
@@ -271,7 +291,7 @@ namespace Materiator
             {
                 EditMode = EditMode.Atlas;
 
-                Utils.ShallowCopyFields(ShaderData, this);
+                Utils.ShallowCopyFields(MateriaSetterData, this);
 
                 ShaderData = atlas.ShaderData;
                 Material = atlas.Material;
@@ -280,7 +300,7 @@ namespace Materiator
 
                 Textures.SetTextures(Material, ShaderData);
                 UpdateRenderer();
-                GenerateMateriaSlots(true);
+                GenerateMateriaSlots(true, true);
             }
         }
 

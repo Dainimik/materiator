@@ -92,7 +92,6 @@ namespace Materiator
                     _isDirty.boolValue = true;
 
                     CreateEditModeData();
-                    //CreateEditorMaterialWithTextures(true, _material.name);
                 }
             }
             else
@@ -349,6 +348,7 @@ namespace Materiator
             {
                 newMateriaSlots.Add(new MateriaSlot(item.ID, item.Materia, item.Tag));
             }
+
             serializedObject.Update();
             _materiaSetter.MateriaSlots = newMateriaSlots;
             _materiaSetter.UpdateRenderer();
@@ -505,6 +505,7 @@ namespace Materiator
         private void Refresh()
         {
             _materiaSetter.Refresh();
+            DrawUVInspector(true);
         }
 
         private void SwitchEditMode()
@@ -582,7 +583,7 @@ namespace Materiator
                 serializedObject.Update();
 
                 _materiaSetter.UpdateRenderer();
-                _materiaSetter.GenerateMateriaSlots(true);
+                _materiaSetter.GenerateMateriaSlots();
 
                 _materiaSetter.UpdateColorsOfAllTextures();
             }
