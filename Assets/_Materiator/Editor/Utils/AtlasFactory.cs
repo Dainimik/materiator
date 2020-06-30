@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace Materiator
@@ -103,9 +102,6 @@ namespace Materiator
                         atlas.ShaderData = group.Key;
 
 
-                        // does this need to be here?
-                        data.NativeGridSize = ms[j].GridSize;
-                        //---------------------------
                         data.MateriaAtlas = atlas;
                         data.NativeMesh = ms[j].Mesh;
                         data.AtlasedMesh = atlasedMesh;

@@ -21,115 +21,11 @@ MonoBehaviour:
   Renderer: {fileID: 6784400234631490094}
   MeshRenderer: {fileID: 6784400234631490094}
   SkinnedMeshRenderer: {fileID: 0}
-  MateriaSlots:
-  - ID: 1
-    Materia: {fileID: 11400000, guid: 35303a3f5c117584b99fd840c725fcfc, type: 2}
-    Tag: Metal
-  - ID: 0
-    Materia: {fileID: 11400000, guid: 555ce609e5fd0014b8567f3e49bdf198, type: 2}
-    Tag: '-'
-  - ID: 4
-    Materia: {fileID: 11400000, guid: 555ce609e5fd0014b8567f3e49bdf198, type: 2}
-    Tag: '-'
+  MateriaSlots: []
   FilteredRects:
-    _keys: 010000000000000004000000
-    _values:
-    - serializedVersion: 2
-      x: 0.25
-      y: 0
-      width: 0.25
-      height: 0.25
-    - serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0.25
-      height: 0.25
-    - serializedVersion: 2
-      x: 0
-      y: 0.25
-      width: 0.25
-      height: 0.25
-  Rects:
-  - serializedVersion: 2
-    x: 0
-    y: 0
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.25
-    y: 0
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.5
-    y: 0
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.75
-    y: 0
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0
-    y: 0.25
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.25
-    y: 0.25
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.5
-    y: 0.25
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.75
-    y: 0.25
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0
-    y: 0.5
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.25
-    y: 0.5
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.5
-    y: 0.5
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.75
-    y: 0.5
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0
-    y: 0.75
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.25
-    y: 0.75
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.5
-    y: 0.75
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.75
-    y: 0.75
-    width: 0.25
-    height: 0.25
+    _keys: 
+    _values: []
+  Rects: []
   MateriaAtlas: {fileID: 0}
   MateriaPreset: {fileID: 0}
   ShaderData: {fileID: 11400000, guid: d2cbf647c709b3a4da4a535dda5cd1dd, type: 2}
@@ -140,8 +36,8 @@ MonoBehaviour:
     Emission: {fileID: 8558548604577358918, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
   OriginalMesh: {fileID: 0}
   AtlasedMesh: {fileID: 0}
-  OriginalGridSize: 4
-  GridSize: 4
+  NativeGridSize: 4
+  GridSize: 0
   AtlasedUVRect:
     serializedVersion: 2
     x: 0
@@ -205,7 +101,7 @@ PrefabInstance:
       objectReference: {fileID: -5914938977817029695, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
     - target: {fileID: 919132149155446097, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
       propertyPath: m_Name
-      value: OilBarrel
+      value: OilBarrel Variant
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
       propertyPath: m_IsActive

@@ -543,12 +543,11 @@ namespace Materiator
 
         private void SwitchEditMode()
         {
-            Debug.Log(_materiaSetter.EditMode);
-            if (_materiaSetter.EditMode == EditMode.Nascent)
+            if (_materiaSetter.EditMode == EditMode.Native)
             {
                 _materiaSetter.LoadAtlas(_materiaSetter.MateriaSetterData.MateriaAtlas);
             }
-            if (_materiaSetter.EditMode == EditMode.Atlas)
+            else if (_materiaSetter.EditMode == EditMode.Atlas)
             {
                 _materiaSetter.UnloadAtlas();
             }

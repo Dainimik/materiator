@@ -6,7 +6,7 @@ namespace Materiator
 {
     public enum EditMode
     {
-        Nascent = 0,
+        Native = 0,
         Atlas = 1
     }
 
@@ -163,7 +163,7 @@ namespace Materiator
         {
             var uvPositionRect = new Rect(0f, 0f, 1f, 1f);
 
-            if (EditMode == EditMode.Nascent)
+            if (EditMode == EditMode.Native)
             {
                 GridSize = NativeGridSize;
             }
@@ -299,6 +299,7 @@ namespace Materiator
                 Textures = atlas.Textures;
                 Mesh = MateriaSetterData.AtlasedMesh;
                 GridSize = MateriaSetterData.AtlasedGridSize;
+                Debug.Log(GridSize + "                   " + MateriaSetterData.AtlasedGridSize);
 
                 Textures.SetTextures(Material, ShaderData);
                 UpdateRenderer();
@@ -307,7 +308,7 @@ namespace Materiator
 
         public void UnloadAtlas()
         {
-            EditMode = EditMode.Nascent;
+            EditMode = EditMode.Native;
 
             ShaderData = MateriaSetterData.ShaderData;
             Material = MateriaSetterData.Material;
@@ -317,7 +318,6 @@ namespace Materiator
 
             Textures.SetTextures(Material, ShaderData);
             UpdateRenderer();
-            GenerateMateriaSlots(true);
         }
     }
 }
