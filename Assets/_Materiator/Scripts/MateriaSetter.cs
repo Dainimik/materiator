@@ -4,10 +4,17 @@ using UnityEngine;
 
 namespace Materiator
 {
+    public enum EditMode
+    {
+        Nascent,
+        Atlas
+    }
+
     public class MateriaSetter : MonoBehaviour
     {
         public bool IsInitialized = false;
         public bool IsDirty = true;
+        public EditMode EditMode;
 
         public MateriaSetterData MateriaSetterData;
         public Mesh Mesh;
@@ -21,11 +28,19 @@ namespace Materiator
         public SerializableDictionary<int, Rect> FilteredRects;
         public Rect[] Rects;
 
+        public MateriaAtlas MateriaAtlas;
         public MateriaPreset MateriaPreset;
         public ShaderData ShaderData;
         public Material Material;
 
         public Textures Textures;
+
+        public Mesh OriginalMesh;
+        public Mesh AtlasedMesh;
+        public int OriginalGridSize;
+        public int AtlasedGridSize;
+        public int GridSize;
+        public Rect AtlasedUVRect;
 
 
         public void Initialize()
@@ -125,7 +140,14 @@ namespace Materiator
 
             if (Textures.Color == null || Textures.MetallicSmoothness == null || Textures.Emission == null)
             {
-                Textures.CreateTextures(Utils.Settings.GridSize, Utils.Settings.GridSize);
+                if (OriginalGridSize == 0)
+                {
+                    // why do i need this many gridSize variables?
+                    OriginalGridSize = Utils.Settings.GridSize;
+                    GridSize = OriginalGridSize;
+                }
+
+                Textures.CreateTextures(GridSize, GridSize);
             }
 
             SetTextures();
@@ -140,7 +162,19 @@ namespace Materiator
 
         private void AnalyzeMesh()
         {
-            Rects = MeshAnalyzer.CalculateRects(Utils.Settings.GridSize);
+            var uvPositionRect = new Rect(0f, 0f, 1f, 1f);
+
+            if (EditMode == EditMode.Nascent)
+            {
+                GridSize = OriginalGridSize;
+            }
+            if (EditMode == EditMode.Atlas)
+            {
+                GridSize = AtlasedGridSize;
+                uvPositionRect = AtlasedUVRect;
+            }
+
+            Rects = MeshAnalyzer.CalculateRects(GridSize, uvPositionRect);
             FilteredRects = MeshAnalyzer.FilterRects(Rects, Mesh.uv);
         }
 
@@ -153,11 +187,18 @@ namespace Materiator
                 materiaSlotsCount = MateriaSlots.Count;
             }
 
-            if (materiaSlotsCount == 0 || FilteredRects.Count != materiaSlotsCount)
+            if (reset || materiaSlotsCount == 0 || FilteredRects.Count != materiaSlotsCount)
             {
                 if (reset)
                 {
-                    MateriaSlots = new List<MateriaSlot>();
+                    if (MateriaSlots != null)
+                    {
+                        MateriaSlots.Clear(); 
+                    }
+                    else
+                    {
+                        MateriaSlots = new List<MateriaSlot>();
+                    }
                 }
 
                 var keyArray = new int[MateriaSlots.Count];
@@ -178,7 +219,7 @@ namespace Materiator
 
         public void UpdateColorsOfAllTextures()
         {
-            Textures.UpdateColors(FilteredRects, MateriaSlots);
+            Textures.UpdateColors(FilteredRects, GridSize, MateriaSlots);
         }
 
         public void LoadPreset(MateriaPreset preset, out int numberOfSameMateria)
@@ -221,6 +262,42 @@ namespace Materiator
                 {
                     MateriaSlots[i].Materia = Utils.Settings.DefaultMateria;
                 }
+            }
+        }
+
+        public void LoadAtlas(MateriaAtlas atlas)
+        {
+            if (atlas != null)
+            {
+                EditMode = EditMode.Atlas;
+
+                Utils.ShallowCopyFields(ShaderData, this);
+
+                ShaderData = atlas.ShaderData;
+                Material = atlas.Material;
+                Textures = atlas.Textures;
+                Mesh = MateriaSetterData.AtlasedMesh;
+
+                Textures.SetTextures(Material, ShaderData);
+                UpdateRenderer();
+                GenerateMateriaSlots(true);
+            }
+        }
+
+        public void UnloadAtlas(MateriaAtlas atlas)
+        {
+            if (atlas != null)
+            {
+                EditMode = EditMode.Nascent;
+
+                ShaderData = atlas.ShaderData;
+                Material = atlas.Material;
+                Textures = atlas.Textures;
+                Mesh = MateriaSetterData.AtlasedMesh;
+
+                Textures.SetTextures(Material, ShaderData);
+                UpdateRenderer();
+                GenerateMateriaSlots(true);
             }
         }
     }

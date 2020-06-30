@@ -1,5 +1,6 @@
-﻿/*using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace Materiator
@@ -8,21 +9,24 @@ namespace Materiator
     {
         public static bool CheckMateriaSetterCompatibility(MateriaSetter ms)
         {
-            if (ms.MateriaPreset != null
-                && ms.MateriaPreset.Material != null
-                && ms.IsMateriaSetterDirty == false)
+            if (ms.MateriaSetterData != null
+                && ms.MateriaSetterData.Material != null
+                && ms.IsDirty == false)
             {
                 return true;
             }
             else
+            {
                 return false;
+            }
         }
 
         public static void CreateAtlas(KeyValuePair<ShaderData, List<MateriaSetter>> group, Material material, string path, bool saveAsNewPrefabs, string newPrefabSuffix)
         {
-            var csCount = 0;
+            var msCount = 0;
             List<GameObject> prefabs = new List<GameObject>();
             List<string> prefabPaths = new List<string>();
+
             foreach (var ms in group.Value)
             {
                 if (CheckMateriaSetterCompatibility(ms))
@@ -34,7 +38,7 @@ namespace Materiator
                         prefabs.Add(prefabGO);
                         prefabPaths.Add(AssetDatabase.GetAssetPath(root));
                     }
-                    csCount++;
+                    msCount++;
                 }
             }
 
@@ -53,11 +57,11 @@ namespace Materiator
             var dir = AssetUtils.GetDirectoryName(path);
             var atlasName = AssetUtils.GetFileName(path);
 
-            var rects = Utils.CalculateRects(csCount);
+            var rects = Utils.CalculateRects(msCount);
             var rectIndex = 0;
-            var gridSize = Utils.CalculateAtlasSize(csCount);
+            var gridSize = Utils.CalculateAtlasSize(msCount);
 
-            var atlas = CreateColorAtlasAsset(dir, atlasName, material, gridSize);
+            var atlas = CreateMateriaAtlasAsset(dir, atlasName, material, gridSize);
 
             var processedPrefabs = new HashSet<GameObject>();
             var skipSavingPrefab = false;
@@ -91,32 +95,37 @@ namespace Materiator
                         }
 
                         atlasedMesh.uv = remappedUVs;
-                        if (ms[j].MeshData == null)
-                        {
-                            var newMeshData = CreateMeshData(ms[j].Mesh.name, ms[j].Mesh, atlasedMesh, rects[rectIndex], gridSize, atlas);
 
-                            atlas.MeshDatas.Add(newMeshData);
-                            atlas.MateriaPresets.Add(ms[j].MateriaPreset);
-                            atlas.ShaderData = group.Key;
+                        //var newMeshData = CreateMeshData(ms[j].Mesh.name, ms[j].Mesh, atlasedMesh, rects[rectIndex], gridSize, atlas);
+                        var data = ms[j].MateriaSetterData;
 
-                            ms[j].MeshData = newMeshData;
-                            ms[j].MateriaAtlas = atlas;
-                            ms[j].Mesh = newMeshData.AtlasedMesh;
-                            ms[j].Textures = atlas.Textures;
-                            //--------------
-                            // This is wrong and needs to be sorted out
-                            //--------------
-                            ms[j].Material = atlas.Material;
-                            ms[j].Renderer.sharedMaterial = atlas.Material;
-                            //------------
-                            ms[j].SetTextures();
-                            AssetDatabase.AddObjectToAsset(newMeshData, prefabs[i]);
-                            AssetDatabase.AddObjectToAsset(atlasedMesh, newMeshData);
-                            AssetDatabase.SaveAssets();
-                        }
+                        atlas.MateriaSetterDatas.Add(data);
+                        atlas.ShaderData = group.Key;
+
+
+                        // does this need to be here?
+                        data.OriginalGridSize = ms[j].GridSize;
+                        //---------------------------
+                        data.MateriaAtlas = atlas;
+                        data.OriginalMesh = ms[j].Mesh;
+                        data.AtlasedMesh = atlasedMesh;
+                        data.AtlasedUVRect = rects[rectIndex];
+                        data.AtlasedGridSize = gridSize;
+                        data.GridSize = gridSize;
+
+                        ms[j].MateriaAtlas = atlas;
+                        ms[j].OriginalMesh = ms[j].Mesh;
+                        ms[j].AtlasedMesh = atlasedMesh;
+                        ms[j].AtlasedUVRect = rects[rectIndex];
+                        data.AtlasedGridSize = gridSize;
+
+                        //AssetDatabase.AddObjectToAsset(newMeshData, prefabs[i]);
+                        AssetDatabase.AddObjectToAsset(atlasedMesh, data);
+                        AssetDatabase.SaveAssets();
+
 
                         ms[j].LoadAtlas(atlas);
-                        PopulateColorAtlas(ms[j], false, atlas, ms[j].MateriaPreset, rects[rectIndex]);
+                        //PopulateMateriaAtlas(ms[j], false, atlas, ms[j].MateriaPreset, rects[rectIndex]);
                         rectIndex++;
                     }
 
@@ -137,13 +146,14 @@ namespace Materiator
                 AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(item));
         }
 
-        private static MateriaAtlas CreateColorAtlasAsset(string directory, string name, Material material, int size)
+        private static MateriaAtlas CreateMateriaAtlasAsset(string directory, string name, Material material, int size)
         {
             var atlas = AssetUtils.CreateScriptableObjectAsset<MateriaAtlas>(directory, name);
 
             atlas.Textures.CreateTextures(size, size);
             atlas.Textures.SetNames(name);
             atlas.Material = Object.Instantiate(material);
+            atlas.Material.name = name;
 
             AssetDatabase.AddObjectToAsset(atlas.Material, atlas);
             atlas.Textures.AddTexturesToAsset(atlas);
@@ -151,13 +161,12 @@ namespace Materiator
             AssetDatabase.SaveAssets();
 
             atlas.Textures.ImportTextureAssets();
-            atlas.MeshDatas = new List<MeshData>();
-            atlas.MateriaPresets = new List<MateriaPreset>();
+            atlas.MateriaSetterDatas = new List<MateriaSetterData>();
 
             return atlas;
         }
 
-        private static void PopulateColorAtlas(MateriaSetter ms, bool copyPixels, MateriaAtlas atlas, MateriaPreset cp, Rect r)
+        private static void PopulateMateriaAtlas(MateriaSetter ms, bool copyPixels, MateriaAtlas atlas, MateriaPreset cp, Rect r)
         {
             if (copyPixels)
             {
@@ -167,7 +176,7 @@ namespace Materiator
                 ms.Refresh();
         }
 
-        private static MeshData CreateMeshData(string name, Mesh originalMesh, Mesh atlasedMesh, Rect uvRect, int gridSize, MateriaAtlas atlas)
+        /*private static MeshData CreateMeshData(string name, Mesh originalMesh, Mesh atlasedMesh, Rect uvRect, int gridSize, MateriaAtlas atlas)
         {
             var md = ScriptableObject.CreateInstance<MeshData>();
 
@@ -179,6 +188,6 @@ namespace Materiator
             md.Atlas = atlas;
 
             return md;
-        }
+        }*/
     }
-}*/
+}

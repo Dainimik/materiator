@@ -26,11 +26,14 @@ namespace Materiator
 
         #endregion
 
+        private ObjectField _materiaAtlasObjectField;
         private ObjectField _materiaPresetObjectField;
         private ObjectField _materiaSetterDataObjectField;
         private ObjectField _shaderDataObjectField;
 
         private Button _reloadButton;
+        private Button _switchEditMode;
+        private Button _reloadMateriaAtlasButton;
         private Button _reloadMateriaPresetButton;
         private Button _newMateriaSetterDataButton;
         private Button _cloneMateriaSetterDataButton;
@@ -68,6 +71,16 @@ namespace Materiator
             DrawIMGUI();
 
             return root;
+        }
+
+        private void Initialize()
+        {
+            _materiaSetter.Initialize();
+
+            /*if (!CheckAllSystems())
+            {
+                return;
+            }*/
         }
 
         private void SetMateriaSetterDirty(bool value)
@@ -128,22 +141,22 @@ namespace Materiator
                 _dataIndicator.style.backgroundColor = new Color(0f, 0.75f, 0f, 1f);
             }
 
-            //DrawDefaultInspector();
-        }
-
-        private void Initialize()
-        {
-            _materiaSetter.Initialize();
-
-            /*if (!CheckAllSystems())
-            {
-                return;
-            }*/
+            DrawDefaultInspector();
         }
 
         private void ResetMateriaSetter()
         {
             _materiaSetter.ResetMateriaSetter();
+        }
+
+        private void DrawAtlasSection()
+        {
+            OnMateriaAtlasChanged();
+
+            _materiaAtlasObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
+            {
+                OnMateriaAtlasChanged();
+            });
         }
 
         private void DrawPresetSection()
@@ -228,7 +241,7 @@ namespace Materiator
                         switch (_uvDisplayModeEnumField.value)
                         {
                             case UVDisplayMode.BaseColor:
-                                color = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.BaseColor;
+                                //color = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.BaseColor;
                                 break;
                             case UVDisplayMode.MetallicSpecularGlossSmoothness:
                                 var metallic = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.Metallic;
@@ -275,6 +288,22 @@ namespace Materiator
             {
                 _overwriteMateriaSetterData.SetEnabled(true);
             }
+        }
+
+        private void LoadAtlas(MateriaAtlas atlas)
+        {
+            if (atlas != null)
+            {
+                // this is necessary because atlas generation
+                //OnMateriaSetterDataChanged();
+
+                _reloadMateriaAtlasButton.SetEnabled(true);
+                _materiaSetter.LoadAtlas(atlas);
+            }
+            else
+            {
+                _reloadMateriaAtlasButton.SetEnabled(false);
+            } 
         }
 
         private void LoadPreset(MateriaPreset preset)
@@ -450,7 +479,7 @@ namespace Materiator
             }
 
             var colors = originalTexture.GetPixels32();
-            var rectInt = Utils.GetRectIntFromRect(Utils.Settings.GridSize, _materiaSetter.FilteredRects[index]);
+            var rectInt = Utils.GetRectIntFromRect(_materiaSetter.GridSize, _materiaSetter.FilteredRects[index]);
 
             for (int i = 0; i < colors.Length; i++)
             {
@@ -478,6 +507,23 @@ namespace Materiator
             _materiaSetter.Refresh();
         }
 
+        private void SwitchEditMode()
+        {
+            if (_materiaSetter.EditMode == EditMode.Nascent)
+            {
+                _materiaSetter.LoadAtlas(_materiaSetter.MateriaAtlas);
+            }
+            if (_materiaSetter.EditMode == EditMode.Atlas)
+            {
+                _materiaSetter.UnloadAtlas(_materiaSetter.MateriaAtlas);
+            }
+        }
+
+        private void ReloadAtlas()
+        {
+            LoadAtlas((MateriaAtlas)_materiaAtlasObjectField.value);
+        }
+
         private void ReloadPreset()
         {
             LoadPreset((MateriaPreset)_materiaPresetObjectField.value);
@@ -498,6 +544,18 @@ namespace Materiator
             OnMateriaSetterDataChanged();
         }
 
+        private void OnMateriaAtlasChanged()
+        {
+            if (_materiaAtlasObjectField.value == null)
+            {
+                _reloadMateriaAtlasButton.SetEnabled(false);
+            }
+            else
+            {
+                _reloadMateriaAtlasButton.SetEnabled(true);
+            }
+        }
+
         private void OnMateriaPresetChanged()
         {
             if (_materiaPresetObjectField.value == null)
@@ -514,18 +572,17 @@ namespace Materiator
         {
             if (_materiaSetterDataObjectField.value != null)
             {
-                //_reloadMateriaSetterDataButton.visible = true;
-
                 _materiaSetterData.objectReferenceValue = _materiaSetterDataObjectField.value;
                 var data = (MateriaSetterData)_materiaSetterDataObjectField.value;
 
                 serializedObject.ApplyModifiedProperties();
 
                 Utils.ShallowCopyFields(data, _materiaSetter);
-
+                
                 serializedObject.Update();
 
                 _materiaSetter.UpdateRenderer();
+                _materiaSetter.GenerateMateriaSlots(true);
 
                 _materiaSetter.UpdateColorsOfAllTextures();
             }
@@ -632,6 +689,9 @@ namespace Materiator
             data.MateriaPreset = (MateriaPreset)_materiaPreset.objectReferenceValue;
             data.Material = mat;
             data.Textures = texs;
+            data.OriginalMesh = _materiaSetter.Mesh;
+            data.OriginalGridSize = _materiaSetter.OriginalGridSize;
+            data.GridSize = _materiaSetter.GridSize;
 
 
 
@@ -728,6 +788,8 @@ namespace Materiator
             _shaderData = serializedObject.FindProperty("ShaderData");
             _material = serializedObject.FindProperty("Material");
 
+            _materiaAtlasObjectField = root.Q<ObjectField>("MateriaAtlasObjectField");
+            _materiaAtlasObjectField.objectType = typeof(MateriaAtlas);
             _materiaPresetObjectField = root.Q<ObjectField>("MateriaPresetObjectField");
             _materiaPresetObjectField.objectType = typeof(MateriaPreset);
             _materiaSetterDataObjectField = root.Q<ObjectField>("MateriaSetterDataObjectField");
@@ -737,6 +799,8 @@ namespace Materiator
 
 
             _reloadButton = root.Q<Button>("ReloadButton");
+            _switchEditMode = root.Q<Button>("SwitchEditMode");
+            _reloadMateriaAtlasButton = root.Q<Button>("ReloadMateriaAtlasButton");
             _reloadMateriaPresetButton = root.Q<Button>("ReloadMateriaPresetButton");
             _newMateriaSetterDataButton = root.Q<Button>("NewMateriaSetterDataButton");
             _cloneMateriaSetterDataButton = root.Q<Button>("CloneMateriaSetterDataButton");
@@ -770,6 +834,8 @@ namespace Materiator
         protected override void RegisterButtons()
         {
             _reloadButton.clicked += Refresh;
+            _switchEditMode.clicked += SwitchEditMode;
+            _reloadMateriaAtlasButton.clicked += ReloadAtlas;
             _reloadMateriaPresetButton.clicked += ReloadPreset;
             _newMateriaSetterDataButton.clicked += NewData;
             _cloneMateriaSetterDataButton.clicked += CloneData;

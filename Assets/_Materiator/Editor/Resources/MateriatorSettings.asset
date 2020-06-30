@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SavePath: Assets/_Materiator/
   GridSize: 4
-  PackAssets: 0
+  PackAssets: 1
   DefaultShaderData: {fileID: 11400000, guid: d2cbf647c709b3a4da4a535dda5cd1dd, type: 2}
   DefaultMateria: {fileID: 11400000, guid: 555ce609e5fd0014b8567f3e49bdf198, type: 2}
   HighlightColor: {r: 1, g: 1, b: 0, a: 1}

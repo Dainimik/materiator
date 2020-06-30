@@ -4,11 +4,22 @@
         <ui:VisualElement name="TitleSectionContainer" style="align-items: flex-end;">
             <ui:Button text="Reload" name="ReloadButton" style="width: 50px; height: 25px; align-items: stretch;" />
         </ui:VisualElement>
+        <ui:VisualElement name="AtlasSectionContainer">
+            <ui:Label text="Materia Atlas" class="section-header" />
+            <ui:VisualElement name="AtlasIndicator" class="status-indicator" />
+            <ui:VisualElement name="ContentContainer" class="content-container">
+                <uie:ObjectField label="Atlas" name="MateriaAtlasObjectField" allow-scene-objects="false" />
+                <ui:VisualElement name="ButtonContainer" style="flex-direction: row; justify-content: flex-end;">
+                    <ui:Button text="Switch Edit Mode" name="SwitchEditMode" />
+                    <ui:Button text="Reload Atlas" name="ReloadMateriaAtlasButton" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:VisualElement name="PresetSectionContainer" class="section-container">
             <ui:Label text="Materia Preset" class="section-header" />
             <ui:VisualElement name="PresetIndicator" class="status-indicator" style="background-color: rgb(166, 166, 166);" />
             <ui:VisualElement name="ContentContainer" class="content-container">
-                <uie:ObjectField label="Active Preset" name="MateriaPresetObjectField" />
+                <uie:ObjectField label="Preset" name="MateriaPresetObjectField" allow-scene-objects="false" />
                 <ui:VisualElement name="ButtonContainer" style="flex-direction: row; justify-content: flex-end;">
                     <ui:Button text="Reload Preset" name="ReloadMateriaPresetButton" />
                 </ui:VisualElement>
@@ -41,7 +52,7 @@
         </ui:VisualElement>
         <ui:VisualElement name="OutputSectionContainer" class="section-container">
             <ui:Label text="Output" class="section-header" />
-            <ui:VisualElement name="OutputIndicator" class="status-indicator" style="background-color: rgba(166, 166, 166, 255);" />
+            <ui:VisualElement name="OutputIndicator" class="status-indicator" style="background-color: rgb(166, 166, 166);" />
             <ui:VisualElement name="ButtonContainer">
                 <ui:Button text="Overwrite" name="OverwriteMateriaSetterDataButton" />
                 <ui:Button text="Save As New" name="SaveAsNewMateriaSetterDataButton" />

@@ -80,11 +80,11 @@ namespace Materiator
             material.SetTexture(shaderData.EmissionTexturePropertyName, Emission);
         }
 
-        public void UpdateColors(SerializableDictionary<int, Rect> rects, List<MateriaSlot> materiaSlots)
+        public void UpdateColors(SerializableDictionary<int, Rect> rects, int gridSize, List<MateriaSlot> materiaSlots)
         {
             foreach (var rect in rects)
             {
-                var rectInt = Utils.GetRectIntFromRect(Utils.Settings.GridSize, rect.Value);
+                var rectInt = Utils.GetRectIntFromRect(gridSize, rect.Value);
                 var numberOfColors = rectInt.width * rectInt.height;
 
                 var baseColors = new Color32[numberOfColors];

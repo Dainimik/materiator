@@ -1,5 +1,4 @@
 ﻿using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Materiator
@@ -8,8 +7,6 @@ namespace Materiator
     public class MateriaTagsEditor : MateriatorEditor
     {
         private MateriaTags _materiaTags;
-
-        //private ReorderableList _tagsList;
 
         private void OnEnable()
         {

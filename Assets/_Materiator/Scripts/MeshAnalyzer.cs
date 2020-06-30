@@ -25,7 +25,7 @@ namespace Materiator
             return filteredRects;
         }
 
-        public static Rect[] CalculateRects(int size)
+        public static Rect[] CalculateRects(int size, Rect offset)
         {
             var rects = new Rect[size * size];
             var rectSize = 1 / (float)size;
@@ -35,7 +35,7 @@ namespace Materiator
                 for (int x = 0; x < size; x++, i++)
                 {
                     if (i >= size * size) break;
-                    rects[i] = new Rect(x / (float)size, y / (float)size, rectSize, rectSize);
+                    rects[i] = new Rect(offset.x + (x / (float)size), offset.y + (y / (float)size), rectSize, rectSize);
                     rects[i].xMin = rects[i].x;
                     rects[i].yMin = rects[i].y;
                     rects[i].xMax = rects[i].x + rectSize;

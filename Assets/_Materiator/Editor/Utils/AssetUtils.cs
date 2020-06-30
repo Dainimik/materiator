@@ -142,9 +142,9 @@ namespace Materiator
         /// <typeparam name="T"></typeparam>
         /// <param name="directory"> Relative prefab directory. If null, scans project Assets folder and deeper.</param>
         /// <returns></returns>
-        public static HashSet<T> FindAllComponentsInPrefabs<T>(string[] searchDirectories = null) where T : MonoBehaviour
+        public static List<T> FindAllComponentsInPrefabs<T>(string[] searchDirectories = null) where T : MonoBehaviour
         {
-            HashSet<T> objects = new HashSet<T>();
+            List<T> objects = new List<T>();
 
             var prefabs = FindAssets<GameObject>(searchDirectories);
             foreach (var prefab in prefabs)
