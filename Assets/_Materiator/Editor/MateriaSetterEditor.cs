@@ -18,6 +18,7 @@ namespace Materiator
 
         #region Serialized Properties
 
+        private SerializedProperty _editMode;
         private SerializedProperty _isDirty;
         private SerializedProperty _materiaPreset;
         private SerializedProperty _materiaSetterData;
@@ -91,7 +92,7 @@ namespace Materiator
                 {
                     _isDirty.boolValue = true;
 
-                    CreateEditModeData();
+                    CreateEditModeData(_editMode.enumValueIndex, true);
                 }
             }
             else
@@ -240,7 +241,7 @@ namespace Materiator
                         switch (_uvDisplayModeEnumField.value)
                         {
                             case UVDisplayMode.BaseColor:
-                                //color = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.BaseColor;
+                                color = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.BaseColor;
                                 break;
                             case UVDisplayMode.MetallicSpecularGlossSmoothness:
                                 var metallic = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.Metallic;
@@ -338,9 +339,40 @@ namespace Materiator
             _materiaReorderableList.DoLayoutList();
         }
 
-        private void CreateEditModeData()
+        private void CreateEditModeData(int editMode, bool clone)
         {
-            CreateEditorMaterialWithTextures(true, _material.name);
+            var newTextures = new Textures();
+
+            Textures textures = null;
+
+            if (editMode == 0)
+            {
+                textures = _materiaSetter.MateriaSetterData.Textures;
+            }
+            else if (editMode == 1)
+            {
+                textures = _materiaSetter.MateriaSetterData.MateriaAtlas.Textures;
+            }
+
+            if (!clone)
+            {
+                _material.objectReferenceValue = Utils.CreateMaterial(_materiaSetter.MateriaSetterData.ShaderData.Shader, name);
+                newTextures.CreateTextures(Utils.Settings.GridSize, Utils.Settings.GridSize);
+            }
+            else
+            {
+                _material.objectReferenceValue = Instantiate(_material.objectReferenceValue);
+                newTextures = textures.CloneTextures(textures.FilterMode, true);
+            }
+
+            if (name != null)
+                _material.objectReferenceValue.name = name;
+
+            serializedObject.ApplyModifiedProperties();
+
+            _materiaSetter.Textures = newTextures;
+            _materiaSetter.SetTextures();
+            //serializedObject.Update();
 
             var newMateriaSlots = new List<MateriaSlot>();
 
@@ -349,7 +381,6 @@ namespace Materiator
                 newMateriaSlots.Add(new MateriaSlot(item.ID, item.Materia, item.Tag));
             }
 
-            serializedObject.Update();
             _materiaSetter.MateriaSlots = newMateriaSlots;
             _materiaSetter.UpdateRenderer();
             serializedObject.Update();
@@ -419,6 +450,7 @@ namespace Materiator
 
                     serializedObject.Update();
                     DrawUVInspector(true);
+
                     _materiaSetter.UpdateColorsOfAllTextures();
 
                     serializedObject.ApplyModifiedProperties();
@@ -712,31 +744,6 @@ namespace Materiator
             SetMateriaSetterDirty(false);
         }
 
-        private void CreateEditorMaterialWithTextures(bool clone = false, string name = null)
-        {
-            var newTextures = new Textures();
-
-            if (!clone)
-            {
-                _material.objectReferenceValue = Utils.CreateMaterial(_materiaSetter.MateriaSetterData.ShaderData.Shader, name);
-                newTextures.CreateTextures(Utils.Settings.GridSize, Utils.Settings.GridSize);
-            }
-            else
-            {
-                _material.objectReferenceValue = Instantiate(_material.objectReferenceValue);
-                newTextures = _materiaSetter.MateriaSetterData.Textures.CloneTextures(_materiaSetter.MateriaSetterData.Textures.FilterMode, true);
-            }
-
-            if (name != null)
-                _material.objectReferenceValue.name = name;
-
-            serializedObject.ApplyModifiedProperties();
-
-            _materiaSetter.Textures = newTextures;
-            _materiaSetter.SetTextures();
-            serializedObject.Update();
-        }
-
         /*private bool CheckAllSystems()
         {
             if (MateriatorSettings.Instance == null)
@@ -783,6 +790,7 @@ namespace Materiator
         }*/
         protected override void GetProperties()
         {
+            _editMode = serializedObject.FindProperty("EditMode");
             _isDirty = serializedObject.FindProperty("IsDirty");
             _materiaPreset = serializedObject.FindProperty("MateriaPreset");
             _materiaSetterData = serializedObject.FindProperty("MateriaSetterData");

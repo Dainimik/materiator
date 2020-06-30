@@ -6,8 +6,8 @@ namespace Materiator
 {
     public enum EditMode
     {
-        Nascent,
-        Atlas
+        Nascent = 0,
+        Atlas = 1
     }
 
     public class MateriaSetter : MonoBehaviour
@@ -174,7 +174,7 @@ namespace Materiator
                 uvPositionRect = AtlasedUVRect;
             }
 
-            Rects = MeshAnalyzer.CalculateRects(GridSize, uvPositionRect);
+            Rects = MeshAnalyzer.CalculateRects(OriginalGridSize, uvPositionRect);
             FilteredRects = MeshAnalyzer.FilterRects(Rects, Mesh.uv);
         }
 
