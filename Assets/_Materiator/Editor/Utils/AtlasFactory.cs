@@ -120,6 +120,16 @@ namespace Materiator
                         ms[j].AtlasedMesh = atlasedMesh;
                         ms[j].AtlasedUVRect = rects[rectIndex];
 
+                        var baseCol = data.Textures.Color.GetPixels32();
+                        var metallic = data.Textures.MetallicSmoothness.GetPixels32();
+                        var emission = data.Textures.Emission.GetPixels32();
+
+                        var rectInt = Utils.GetRectIntFromRect(gridSize, rects[rectIndex]);
+
+                        atlas.Textures.Color.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, baseCol);
+                        atlas.Textures.MetallicSmoothness.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, metallic);
+                        atlas.Textures.Emission.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, emission);
+
                         //AssetDatabase.AddObjectToAsset(newMeshData, prefabs[i]);
                         AssetDatabase.AddObjectToAsset(atlasedMesh, data);
                         AssetDatabase.SaveAssets();
@@ -141,6 +151,9 @@ namespace Materiator
                     PrefabUtility.UnloadPrefabContents(prefab);
                 }
             }
+
+            atlas.Textures.Apply();
+
             AssetDatabase.Refresh();
 
             foreach (var item in prefabs)
@@ -165,16 +178,6 @@ namespace Materiator
             atlas.MateriaSetterDatas = new List<MateriaSetterData>();
 
             return atlas;
-        }
-
-        private static void PopulateMateriaAtlas(MateriaSetter ms, bool copyPixels, MateriaAtlas atlas, MateriaPreset cp, Rect r)
-        {
-            if (copyPixels)
-            {
-                // not yet implemented
-            }
-            else
-                ms.Refresh();
         }
 
         /*private static MeshData CreateMeshData(string name, Mesh originalMesh, Mesh atlasedMesh, Rect uvRect, int gridSize, MateriaAtlas atlas)
