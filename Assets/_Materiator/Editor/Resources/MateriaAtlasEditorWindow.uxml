@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement name="ButtonContainer" style="flex-direction: row; justify-content: center;">
+        <Style src="Materiator.uss" />
+        <ui:Button text="Scan Project" name="ScanProjectButton" />
+    </ui:VisualElement>
+    <ui:VisualElement name="ContentContainer">
+        <Style src="Materiator.uss" />
+        <ui:ListView focusable="True" item-height="16" name="MateriaSetterDataListView" selection-type="Multiple" style="height: 200px;" />
+    </ui:VisualElement>
+    <ui:VisualElement name="OutputSectionContainer" class="section-container">
+        <Style src="Materiator.uss" />
+        <ui:Label text="Output" class="section-header" />
+        <ui:VisualElement name="OutputIndicator" class="status-indicator" />
+        <ui:VisualElement name="ButtonContainer">
+            <ui:Button text="Overwrite" name="OverwriteButton" />
+            <ui:Button text="SaveAsNew" name="SaveAsNewButton" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
