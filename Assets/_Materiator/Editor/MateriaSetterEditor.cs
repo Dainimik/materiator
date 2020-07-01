@@ -698,58 +698,100 @@ namespace Materiator
                 path = dir + name + ".asset";
             }
 
-            Textures texs = new Textures();
+            Material material = null;
+            Textures outputTextures = null;
 
-            bool wasMPExisting;
-            var data = AssetUtils.CreateOrReplaceScriptableObjectAsset(_materiaSetter.MateriaSetterData, path, out wasMPExisting);
+            bool isDataAssetExisting;
+            var data = AssetUtils.CreateOrReplaceScriptableObjectAsset(_materiaSetter.MateriaSetterData, path, out isDataAssetExisting);
 
-            if (wasMPExisting)
-                texs = data.Textures;
+            if (isDataAssetExisting)
+            {
+                if (_editMode.enumValueIndex == 0)
+                {
+                    outputTextures = data.Textures;
+                    material = data.Material;
+                }
+                else if (_editMode.enumValueIndex == 1)
+                {
+                    outputTextures = data.MateriaAtlas.Textures;
+                    material = data.MateriaAtlas.Material;
+                    name = data.MateriaAtlas.name;
+                }
+            }
             else
-                texs.CreateTextures((int)_materiaSetter.Textures.Size.x, (int)_materiaSetter.Textures.Size.y);
-                //texs = _materiaSetter.Textures;
+            {
+                outputTextures = new Textures();
+                outputTextures.CreateTextures(_materiaSetter.Textures.Size.x, _materiaSetter.Textures.Size.y);
 
+                material = Instantiate(_materiaSetter.Material);
+            }
 
+            //texs = _materiaSetter.Textures.CloneTextures(Utils.Settings.FilterMode);
+            
 
+            if (_editMode.enumValueIndex == 0)
+            {
+                outputTextures.CopyPixelColors(_materiaSetter.Textures, _materiaSetter.Textures.Size.x, new Rect(0, 0, 1, 1), outputTextures.Size.x, new Rect(0, 0, 1, 1));
+                outputTextures.SetNames(name);
 
+                if (data.MateriaAtlas != null)
+                {
+                    data.MateriaAtlas.Textures.CopyPixelColors(_materiaSetter.Textures, _materiaSetter.Textures.Size.x, new Rect(0, 0, 1, 1), data.MateriaAtlas.Textures.Size.x, _materiaSetter.AtlasedUVRect);
+                }
+            }
+            else if (_editMode.enumValueIndex == 1)
+            {
+                outputTextures.CopyPixelColors(_materiaSetter.Textures, _materiaSetter.Textures.Size.x, _materiaSetter.AtlasedUVRect, _materiaSetter.Textures.Size.x, _materiaSetter.AtlasedUVRect);
+                outputTextures.SetNames(name);
 
+                data.Textures.CopyPixelColors(_materiaSetter.Textures, _materiaSetter.Textures.Size.x, _materiaSetter.AtlasedUVRect, data.NativeGridSize, new Rect(0, 0, 1, 1));
+            }
 
-            var mat = Instantiate(_materiaSetter.Material);
-
-            texs = _materiaSetter.Textures.CloneTextures(Utils.Settings.FilterMode);
-            texs.SetNames(name);
+            
 
             if (packAssets)
             {
-                mat.name = name + "_Material";
+                material.name = name + "_Material";
 
-                AssetDatabase.AddObjectToAsset(mat, data);
-                texs.AddTexturesToAsset(data);
+                if (!isDataAssetExisting)
+                {
+                    AssetDatabase.AddObjectToAsset(material, data);
+                    outputTextures.AddTexturesToAsset(data);
+                }
             }
             else
             {
                 AssetUtils.CheckDirAndCreate(dir, name);
                 var folderDir = dir + "/" + name + "/";
 
-                AssetDatabase.CreateAsset(mat, folderDir + name + "_Material.mat");
-                mat = (Material)AssetDatabase.LoadAssetAtPath(folderDir + name + "_Material.mat", typeof(Material));
-
-                texs.WriteTexturesToDisk(folderDir);
+                if (!isDataAssetExisting)
+                {
+                    AssetDatabase.CreateAsset(material, folderDir + name + "_Material.mat");
+                    material = (Material)AssetDatabase.LoadAssetAtPath(folderDir + name + "_Material.mat", typeof(Material));
+                    outputTextures.WriteTexturesToDisk(folderDir);
+                }
             }
 
-            _materiaSetter.Material = mat;
-            _materiaSetter.Textures = texs;
+            _materiaSetter.Material = material;
+            _materiaSetter.Textures = outputTextures;
+
+            if (_editMode.enumValueIndex == 0)
+            {
+                data.Material = material;
+                data.Textures = outputTextures;
+                data.NativeMesh = _materiaSetter.Mesh;
+                data.NativeGridSize = _materiaSetter.NativeGridSize;
+            }
+            else if (_editMode.enumValueIndex == 1)
+            {
+                //data.Material = material;
+                //data.Textures = outputTextures;
+            }
 
             data.MateriaSlots = _materiaSetter.MateriaSlots;
             data.ShaderData = (ShaderData)_shaderData.objectReferenceValue;
             data.MateriaPreset = (MateriaPreset)_materiaPreset.objectReferenceValue;
-            data.Material = mat;
-            data.Textures = texs;
-            data.NativeMesh = _materiaSetter.Mesh;
-            data.NativeGridSize = _materiaSetter.NativeGridSize;
-
-
-
+           
 
 
 

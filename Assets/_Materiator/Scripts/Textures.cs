@@ -165,6 +165,22 @@ namespace Materiator
             return texs;
         }
 
+        public void CopyPixelColors(Textures source, int sourceGridSize, Rect sourceRect, int destinationGridSize, Rect destinationRect)
+        {
+            var destinationRectInt = new RectInt((int)(destinationRect.x * destinationGridSize), (int)(destinationRect.y * destinationGridSize), (int)(destinationRect.width * destinationGridSize), (int)(destinationRect.height * destinationGridSize));
+            var sourceRectInt = new RectInt((int)(sourceRect.x * sourceGridSize), (int)(sourceRect.y * sourceGridSize), (int)(sourceRect.width * sourceGridSize), (int)(sourceRect.height * sourceGridSize));
+
+            var baseColors = Utils.ColorToColor32Array(source.Color.GetPixels(sourceRectInt.x, sourceRectInt.y, sourceRectInt.width, sourceRectInt.height));
+            var metallicColors = Utils.ColorToColor32Array(source.MetallicSmoothness.GetPixels(sourceRectInt.x, sourceRectInt.y, sourceRectInt.width, sourceRectInt.height));
+            var emissionColors = Utils.ColorToColor32Array(source.Emission.GetPixels(sourceRectInt.x, sourceRectInt.y, sourceRectInt.width, sourceRectInt.height));
+
+            Color.SetPixels32(destinationRectInt.x, destinationRectInt.y, destinationRectInt.width, destinationRectInt.height, baseColors);
+            MetallicSmoothness.SetPixels32(destinationRectInt.x, destinationRectInt.y, destinationRectInt.width, destinationRectInt.height, metallicColors);
+            Emission.SetPixels32(destinationRectInt.x, destinationRectInt.y, destinationRectInt.width, destinationRectInt.height, emissionColors);
+
+            Apply();
+        }
+
         public void CopySerialized(Textures source)
         {
             EditorUtility.CopySerialized(source.Color, Color);
