@@ -21,11 +21,115 @@ MonoBehaviour:
   Renderer: {fileID: 913835864439850043}
   MeshRenderer: {fileID: 913835864439850043}
   SkinnedMeshRenderer: {fileID: 0}
-  MateriaSlots: []
+  MateriaSlots:
+  - ID: 1
+    Materia: {fileID: 11400000, guid: 2bf52f2715bfa4d48a7bfe6d265ba1d0, type: 2}
+    Tag: Plastic
+  - ID: 0
+    Materia: {fileID: 11400000, guid: 555ce609e5fd0014b8567f3e49bdf198, type: 2}
+    Tag: '-'
+  - ID: 4
+    Materia: {fileID: 11400000, guid: 555ce609e5fd0014b8567f3e49bdf198, type: 2}
+    Tag: '-'
   FilteredRects:
-    _keys: 
-    _values: []
-  Rects: []
+    _keys: 010000000000000004000000
+    _values:
+    - serializedVersion: 2
+      x: 0.25
+      y: 0
+      width: 0.25
+      height: 0.25
+    - serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0.25
+      height: 0.25
+    - serializedVersion: 2
+      x: 0
+      y: 0.25
+      width: 0.25
+      height: 0.25
+  Rects:
+  - serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.25
+    y: 0
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.5
+    y: 0
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.75
+    y: 0
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0
+    y: 0.25
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.25
+    y: 0.25
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.5
+    y: 0.25
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.75
+    y: 0.25
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0
+    y: 0.5
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.25
+    y: 0.5
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.5
+    y: 0.5
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.75
+    y: 0.5
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0
+    y: 0.75
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.25
+    y: 0.75
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.5
+    y: 0.75
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.75
+    y: 0.75
+    width: 0.25
+    height: 0.25
   MateriaAtlas: {fileID: 0}
   MateriaPreset: {fileID: 0}
   ShaderData: {fileID: 11400000, guid: d2cbf647c709b3a4da4a535dda5cd1dd, type: 2}
@@ -37,7 +141,7 @@ MonoBehaviour:
   OriginalMesh: {fileID: 0}
   AtlasedMesh: {fileID: 0}
   NativeGridSize: 4
-  GridSize: 0
+  GridSize: 4
   AtlasedUVRect:
     serializedVersion: 2
     x: 0

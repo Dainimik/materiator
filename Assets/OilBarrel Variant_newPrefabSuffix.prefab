@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsInitialized: 1
   IsDirty: 0
-  EditMode: 0
+  EditMode: 1
   MateriaSetterData: {fileID: 11400000, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
-  Mesh: {fileID: 2750013030952444713, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
+  Mesh: {fileID: 4171410860000979920, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
   MeshFilter: {fileID: 8774137254707306212}
   Renderer: {fileID: 6784400234631490094}
   MeshRenderer: {fileID: 6784400234631490094}
@@ -130,24 +130,24 @@ MonoBehaviour:
     y: 0.75
     width: 0.25
     height: 0.25
-  MateriaAtlas: {fileID: 0}
+  MateriaAtlas: {fileID: 11400000, guid: 4fa7409af5448e8499cb5ab7665f7299, type: 2}
   MateriaPreset: {fileID: 0}
   ShaderData: {fileID: 11400000, guid: d2cbf647c709b3a4da4a535dda5cd1dd, type: 2}
-  Material: {fileID: -5914938977817029695, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
+  Material: {fileID: 7237715160893355228, guid: 4fa7409af5448e8499cb5ab7665f7299, type: 2}
   Textures:
-    Color: {fileID: -8945241735410499290, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
-    MetallicSmoothness: {fileID: -5066688091537240320, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
-    Emission: {fileID: 8558548604577358918, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
-  OriginalMesh: {fileID: 0}
-  AtlasedMesh: {fileID: 0}
+    Color: {fileID: 7098537981654113527, guid: 4fa7409af5448e8499cb5ab7665f7299, type: 2}
+    MetallicSmoothness: {fileID: 7645429240234191046, guid: 4fa7409af5448e8499cb5ab7665f7299, type: 2}
+    Emission: {fileID: 2133940621917640786, guid: 4fa7409af5448e8499cb5ab7665f7299, type: 2}
+  OriginalMesh: {fileID: 2750013030952444713, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
+  AtlasedMesh: {fileID: 4171410860000979920, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
   NativeGridSize: 4
-  GridSize: 4
+  GridSize: 8
   AtlasedUVRect:
     serializedVersion: 2
-    x: 0
+    x: 0.5
     y: 0
-    width: 0
-    height: 0
+    width: 0.5
+    height: 0.5
 --- !u!1001 &5325116991838353066
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -202,10 +202,14 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: -5914938977817029695, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
+      objectReference: {fileID: 7237715160893355228, guid: 4fa7409af5448e8499cb5ab7665f7299, type: 2}
+    - target: {fileID: -5754084199372789682, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4171410860000979920, guid: ef4bc52f0eabdcb459e7dff68bc4bae1, type: 2}
     - target: {fileID: 919132149155446097, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
       propertyPath: m_Name
-      value: OilBarrel Variant
+      value: OilBarrel Variant_newPrefabSuffix
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
       propertyPath: m_IsActive

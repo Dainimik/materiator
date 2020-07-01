@@ -35,7 +35,7 @@ namespace Materiator
 
         public Textures Textures;
 
-        public Mesh OriginalMesh;
+        public Mesh NativeMesh;
         public Mesh AtlasedMesh;
         public int NativeGridSize;
         public int GridSize;
@@ -159,7 +159,7 @@ namespace Materiator
             Textures.SetTextures(Material, ShaderData);
         }
 
-        private void AnalyzeMesh()
+        public void AnalyzeMesh()
         {
             var uvPositionRect = new Rect(0f, 0f, 1f, 1f);
 
@@ -299,7 +299,6 @@ namespace Materiator
                 Textures = atlas.Textures;
                 Mesh = MateriaSetterData.AtlasedMesh;
                 GridSize = MateriaSetterData.AtlasedGridSize;
-                Debug.Log(GridSize + "                   " + MateriaSetterData.AtlasedGridSize);
 
                 Textures.SetTextures(Material, ShaderData);
                 UpdateRenderer();

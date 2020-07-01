@@ -111,7 +111,7 @@ namespace Materiator
                         ms[j].MateriaSetterData = data;
 
                         ms[j].MateriaAtlas = atlas;
-                        ms[j].OriginalMesh = ms[j].Mesh;
+                        ms[j].NativeMesh = ms[j].Mesh;
                         ms[j].AtlasedMesh = atlasedMesh;
                         ms[j].AtlasedUVRect = rects[rectIndex];
 

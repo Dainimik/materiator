@@ -20,6 +20,7 @@ namespace Materiator
 
         private SerializedProperty _editMode;
         private SerializedProperty _isDirty;
+        private SerializedProperty _materiaAtlas;
         private SerializedProperty _materiaPreset;
         private SerializedProperty _materiaSetterData;
         private SerializedProperty _shaderData;
@@ -373,7 +374,6 @@ namespace Materiator
 
             _materiaSetter.Textures = newTextures;
             _materiaSetter.SetTextures();
-            //serializedObject.Update();
 
             var newMateriaSlots = new List<MateriaSlot>();
 
@@ -551,6 +551,12 @@ namespace Materiator
             {
                 _materiaSetter.UnloadAtlas();
             }
+
+            //SetMateriaSetterDirty(true);
+            //_materiaSetter.AnalyzeMesh();
+            //_materiaSetter.UpdateColorsOfAllTextures();
+
+            //_materiaSetter.MateriaSlots = _materiaSetter.MateriaSetterData.MateriaSlots;
         }
 
         private void ReloadAtlas()
@@ -617,19 +623,24 @@ namespace Materiator
         {
             if (_materiaSetterDataObjectField.value != null)
             {
+                _editMode.enumValueIndex = 0;
+
                 _materiaSetterData.objectReferenceValue = _materiaSetterDataObjectField.value;
                 var data = (MateriaSetterData)_materiaSetterDataObjectField.value;
 
                 serializedObject.ApplyModifiedProperties();
 
                 Utils.ShallowCopyFields(data, _materiaSetter);
+                _materiaSetter.Mesh = data.NativeMesh;
+                //_materiaSetter.GridSize = data.NativeGridSize;
+
                 
                 serializedObject.Update();
 
                 _materiaSetter.UpdateRenderer();
                 _materiaSetter.GenerateMateriaSlots();
 
-                _materiaSetter.UpdateColorsOfAllTextures();
+                //_materiaSetter.UpdateColorsOfAllTextures();
             }
             else
             {
@@ -803,6 +814,7 @@ namespace Materiator
         {
             _editMode = serializedObject.FindProperty("EditMode");
             _isDirty = serializedObject.FindProperty("IsDirty");
+            _materiaAtlas = serializedObject.FindProperty("MateriaAtlas");
             _materiaPreset = serializedObject.FindProperty("MateriaPreset");
             _materiaSetterData = serializedObject.FindProperty("MateriaSetterData");
             _shaderData = serializedObject.FindProperty("ShaderData");
@@ -844,6 +856,7 @@ namespace Materiator
 
         protected override void BindProperties()
         {
+            _materiaAtlasObjectField.BindProperty(_materiaAtlas);
             _materiaPresetObjectField.BindProperty(_materiaPreset);
             _materiaSetterDataObjectField.BindProperty(_materiaSetterData);
             _shaderDataObjectField.BindProperty(_shaderData);
