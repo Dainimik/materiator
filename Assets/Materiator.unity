@@ -135,6 +135,7 @@ GameObject:
   - component: {fileID: 447498731}
   - component: {fileID: 447498730}
   - component: {fileID: 447498733}
+  - component: {fileID: 447498734}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -229,7 +230,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -238,17 +239,35 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+--- !u!114 &447498734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 447498729}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 014a6f00e31fd494195a54151b2ed089, type: 2}
 --- !u!1 &542620415
 GameObject:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 4983220211666045947, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-  m_PrefabInstance: {fileID: 8478772971217523137}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
   - component: {fileID: 542620418}
   - component: {fileID: 542620417}
   - component: {fileID: 542620416}
+  - component: {fileID: 542620419}
   m_Layer: 0
   m_Name: OilBarrel Variant
   m_TagString: Untagged
@@ -259,8 +278,8 @@ GameObject:
 --- !u!23 &542620416
 MeshRenderer:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 6784400234631490094, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-  m_PrefabInstance: {fileID: 8478772971217523137}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 542620415}
   m_Enabled: 1
@@ -275,7 +294,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: -3305694501409945873, guid: 09913e1de6021524faff2781400e3f80, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -300,25 +319,173 @@ MeshRenderer:
 --- !u!33 &542620417
 MeshFilter:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 8774137254707306212, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-  m_PrefabInstance: {fileID: 8478772971217523137}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 542620415}
   m_Mesh: {fileID: 2750013030952444713, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
 --- !u!4 &542620418
 Transform:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 5650932098607255873, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-  m_PrefabInstance: {fileID: 8478772971217523137}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 542620415}
-  m_LocalRotation: {x: 0.5354583, y: 0, z: 0, w: 0.84456164}
-  m_LocalPosition: {x: -0.088, y: 0.4, z: -8.65}
+  m_LocalRotation: {x: 0.5354583, y: -0, z: -0, w: 0.84456164}
+  m_LocalPosition: {x: -0.707, y: 0.4, z: -8.65}
   m_LocalScale: {x: 0.6428136, y: 0.6428136, z: 0.6428136}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 64.75, y: 0, z: 0}
+--- !u!114 &542620419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 542620415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cc8b14ac3fd0804585ec453092f7071, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsInitialized: 1
+  IsDirty: 0
+  EditMode: 0
+  MateriaSetterData: {fileID: 11400000, guid: 09913e1de6021524faff2781400e3f80, type: 2}
+  Mesh: {fileID: 2750013030952444713, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
+  MeshFilter: {fileID: 542620417}
+  Renderer: {fileID: 542620416}
+  MeshRenderer: {fileID: 542620416}
+  SkinnedMeshRenderer: {fileID: 0}
+  MateriaSlots:
+  - ID: 1
+    Materia: {fileID: 11400000, guid: 2bf52f2715bfa4d48a7bfe6d265ba1d0, type: 2}
+    Tag: '-'
+  - ID: 0
+    Materia: {fileID: 11400000, guid: 555ce609e5fd0014b8567f3e49bdf198, type: 2}
+    Tag: '-'
+  - ID: 4
+    Materia: {fileID: 11400000, guid: 555ce609e5fd0014b8567f3e49bdf198, type: 2}
+    Tag: '-'
+  FilteredRects:
+    _keys: 010000000000000004000000
+    _values:
+    - serializedVersion: 2
+      x: 0.25
+      y: 0
+      width: 0.25
+      height: 0.25
+    - serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0.25
+      height: 0.25
+    - serializedVersion: 2
+      x: 0
+      y: 0.25
+      width: 0.25
+      height: 0.25
+  Rects:
+  - serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.25
+    y: 0
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.5
+    y: 0
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.75
+    y: 0
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0
+    y: 0.25
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.25
+    y: 0.25
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.5
+    y: 0.25
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.75
+    y: 0.25
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0
+    y: 0.5
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.25
+    y: 0.5
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.5
+    y: 0.5
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.75
+    y: 0.5
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0
+    y: 0.75
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.25
+    y: 0.75
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.5
+    y: 0.75
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.75
+    y: 0.75
+    width: 0.25
+    height: 0.25
+  MateriaAtlas: {fileID: 0}
+  MateriaPreset: {fileID: 0}
+  ShaderData: {fileID: 11400000, guid: d2cbf647c709b3a4da4a535dda5cd1dd, type: 2}
+  Material: {fileID: -3305694501409945873, guid: 09913e1de6021524faff2781400e3f80, type: 2}
+  Textures:
+    Color: {fileID: 2032915374388194332, guid: 09913e1de6021524faff2781400e3f80, type: 2}
+    MetallicSmoothness: {fileID: -377719321058461873, guid: 09913e1de6021524faff2781400e3f80, type: 2}
+    Emission: {fileID: 5969022923764454556, guid: 09913e1de6021524faff2781400e3f80, type: 2}
+  NativeMesh: {fileID: 2750013030952444713, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
+  AtlasedMesh: {fileID: 0}
+  NativeGridSize: 4
+  GridSize: 4
+  AtlasedUVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
 --- !u!1 &1032660775
 GameObject:
   m_ObjectHideFlags: 0
@@ -412,189 +579,88 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!1001 &8478772971217523137
+--- !u!1001 &1760827547
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: MateriaSetterData
-      value: 
-      objectReference: {fileID: 11400000, guid: 4fa7409af5448e8499cb5ab7665f7299, type: 2}
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: MateriaSlots.Array.data[0].Materia
-      value: 
-      objectReference: {fileID: 11400000, guid: 79e496399a7542c48a52cbceb68b872d, type: 2}
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: MateriaSlots.Array.data[0].Tag
-      value: Metal
+    - target: {fileID: 7628732444015903770, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+      propertyPath: m_Name
+      value: OilBarrel Variant (1)
       objectReference: {fileID: 0}
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: MateriaSlots.Array.data[1].Materia
+    - target: {fileID: 7628732444015904229, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+      propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 11400000, guid: 35303a3f5c117584b99fd840c725fcfc, type: 2}
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: MateriaSlots.Array.data[1].Tag
-      value: Plastic
-      objectReference: {fileID: 0}
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: MateriaSlots.Array.data[2].Materia
-      value: 
-      objectReference: {fileID: 11400000, guid: 35303a3f5c117584b99fd840c725fcfc, type: 2}
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: MateriaSlots.Array.data[2].Tag
-      value: Lights
-      objectReference: {fileID: 0}
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: MateriaPreset
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: Material
-      value: 
-      objectReference: {fileID: -1537262518569227688, guid: 4fa7409af5448e8499cb5ab7665f7299, type: 2}
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: Textures.Color
-      value: 
-      objectReference: {fileID: -4267276023665573304, guid: 4fa7409af5448e8499cb5ab7665f7299, type: 2}
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: Textures.MetallicSmoothness
-      value: 
-      objectReference: {fileID: 6403214869799830241, guid: 4fa7409af5448e8499cb5ab7665f7299, type: 2}
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: Textures.Emission
-      value: 
-      objectReference: {fileID: 7549435027647170211, guid: 4fa7409af5448e8499cb5ab7665f7299, type: 2}
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+      objectReference: {fileID: 5177555818354950867, guid: c37f09c8bf5940d40835e99541965d3d, type: 2}
+    - target: {fileID: 7628732444015904230, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
       propertyPath: IsDirty
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: MateriaAtlas
+    - target: {fileID: 7628732444015904230, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+      propertyPath: Material
       value: 
-      objectReference: {fileID: 11400000, guid: 31a19f7a03d5c3a47a3d6b89b1d1b8bd, type: 2}
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: AtlasedMesh
+      objectReference: {fileID: 5177555818354950867, guid: c37f09c8bf5940d40835e99541965d3d, type: 2}
+    - target: {fileID: 7628732444015904230, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+      propertyPath: MateriaSlots.Array.data[2].Materia
       value: 
-      objectReference: {fileID: 3308007299452699051, guid: 4fa7409af5448e8499cb5ab7665f7299, type: 2}
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: AtlasedUVRect.width
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 234560565977637670, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: AtlasedUVRect.height
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 976755991836982910, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      objectReference: {fileID: 11400000, guid: 2bf52f2715bfa4d48a7bfe6d265ba1d0, type: 2}
+    - target: {fileID: 7628732444015904230, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+      propertyPath: Textures.Color
       value: 
-      objectReference: {fileID: -1537262518569227688, guid: 4fa7409af5448e8499cb5ab7665f7299, type: 2}
-    - target: {fileID: 1625480703527542699, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: m_Name
-      value: OilBarrel
-      objectReference: {fileID: 0}
-    - target: {fileID: 2145136993459406097, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+      objectReference: {fileID: -859985890595689140, guid: c37f09c8bf5940d40835e99541965d3d, type: 2}
+    - target: {fileID: 7628732444015904230, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+      propertyPath: Textures.MetallicSmoothness
+      value: 
+      objectReference: {fileID: 2282245970897929560, guid: c37f09c8bf5940d40835e99541965d3d, type: 2}
+    - target: {fileID: 7628732444015904230, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+      propertyPath: Textures.Emission
+      value: 
+      objectReference: {fileID: -2944308843765335847, guid: c37f09c8bf5940d40835e99541965d3d, type: 2}
+    - target: {fileID: 7628732444015904231, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.088
+      value: 0.806
       objectReference: {fileID: 0}
-    - target: {fileID: 2145136993459406097, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+    - target: {fileID: 7628732444015904231, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.4
       objectReference: {fileID: 0}
-    - target: {fileID: 2145136993459406097, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+    - target: {fileID: 7628732444015904231, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
       propertyPath: m_LocalPosition.z
       value: -8.65
       objectReference: {fileID: 0}
-    - target: {fileID: 2145136993459406097, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+    - target: {fileID: 7628732444015904231, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
       propertyPath: m_LocalRotation.x
       value: 0.5354583
       objectReference: {fileID: 0}
-    - target: {fileID: 2145136993459406097, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+    - target: {fileID: 7628732444015904231, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 2145136993459406097, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+    - target: {fileID: 7628732444015904231, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 2145136993459406097, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+    - target: {fileID: 7628732444015904231, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.84456164
       objectReference: {fileID: 0}
-    - target: {fileID: 2145136993459406097, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+    - target: {fileID: 7628732444015904231, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
-    - target: {fileID: 2145136993459406097, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+    - target: {fileID: 7628732444015904231, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 64.75
       objectReference: {fileID: 0}
-    - target: {fileID: 2145136993459406097, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+    - target: {fileID: 7628732444015904231, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2145136993459406097, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
+    - target: {fileID: 7628732444015904231, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5650932098607255873, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: m_RootOrder
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6784400234631490094, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: -2310788368463818092, guid: ff0a046e9c000d14bb44ec9df1563de4, type: 2}
-    - target: {fileID: 8062869261591606079, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: MateriaSetterData
-      value: 
-      objectReference: {fileID: 11400000, guid: ff0a046e9c000d14bb44ec9df1563de4, type: 2}
-    - target: {fileID: 8062869261591606079, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: MateriaSlots.Array.data[0].Materia
-      value: 
-      objectReference: {fileID: 11400000, guid: 2bf52f2715bfa4d48a7bfe6d265ba1d0, type: 2}
-    - target: {fileID: 8062869261591606079, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: MateriaSlots.Array.data[0].Tag
-      value: Plastic
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062869261591606079, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: MateriaAtlas
-      value: 
-      objectReference: {fileID: 11400000, guid: 4fa7409af5448e8499cb5ab7665f7299, type: 2}
-    - target: {fileID: 8062869261591606079, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: Material
-      value: 
-      objectReference: {fileID: -2310788368463818092, guid: ff0a046e9c000d14bb44ec9df1563de4, type: 2}
-    - target: {fileID: 8062869261591606079, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: Textures.Color
-      value: 
-      objectReference: {fileID: -4447392675392878711, guid: ff0a046e9c000d14bb44ec9df1563de4, type: 2}
-    - target: {fileID: 8062869261591606079, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: Textures.MetallicSmoothness
-      value: 
-      objectReference: {fileID: -5010004520890223953, guid: ff0a046e9c000d14bb44ec9df1563de4, type: 2}
-    - target: {fileID: 8062869261591606079, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: Textures.Emission
-      value: 
-      objectReference: {fileID: 7428816457249633214, guid: ff0a046e9c000d14bb44ec9df1563de4, type: 2}
-    - target: {fileID: 8062869261591606079, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: NativeMesh
-      value: 
-      objectReference: {fileID: 2750013030952444713, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
-    - target: {fileID: 8062869261591606079, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: AtlasedMesh
-      value: 
-      objectReference: {fileID: 2337047924079674846, guid: ff0a046e9c000d14bb44ec9df1563de4, type: 2}
-    - target: {fileID: 8062869261591606079, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: AtlasedUVRect.width
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8062869261591606079, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}
-      propertyPath: AtlasedUVRect.height
-      value: 0.5
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 0}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1bfe43e731554214ea46dc9039ef9134, type: 3}

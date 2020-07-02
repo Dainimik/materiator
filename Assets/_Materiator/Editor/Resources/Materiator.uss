@@ -39,3 +39,10 @@
     flex-wrap: nowrap;
     flex-basis: 0;
 }
+
+.title-header {
+    font-size: 18px;
+    -unity-text-align: upper-center;
+    height: 29px;
+}
+
