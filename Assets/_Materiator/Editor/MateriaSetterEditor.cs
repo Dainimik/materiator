@@ -770,6 +770,12 @@ namespace Materiator
                     material = (Material)AssetDatabase.LoadAssetAtPath(folderDir + name + "_Material.mat", typeof(Material));
                     outputTextures.WriteTexturesToDisk(folderDir);
                 }
+                else
+                {
+                    //AssetDatabase.CreateAsset(material, folderDir + name + "_Material.mat");
+                    //material = (Material)AssetDatabase.LoadAssetAtPath(folderDir + name + "_Material.mat", typeof(Material));
+                    outputTextures.WriteTexturesToDisk(folderDir);
+                }
             }
 
             _materiaSetter.Material = material;

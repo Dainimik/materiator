@@ -194,6 +194,28 @@ namespace Materiator
             AssetDatabase.AddObjectToAsset(Color, objectToAddTo);
             AssetDatabase.AddObjectToAsset(MetallicSmoothness, objectToAddTo);
             AssetDatabase.AddObjectToAsset(Emission, objectToAddTo);
+
+            //Color = AddTextureToAsset(Color, objectToAddTo);
+            //MetallicSmoothness = AddTextureToAsset(MetallicSmoothness, objectToAddTo);
+            //Emission = AddTextureToAsset(Emission, objectToAddTo);
+        }
+
+        private Texture2D AddTextureToAsset(Texture2D texture, Object objectToAddTo)
+        {
+            AssetDatabase.AddObjectToAsset(texture, objectToAddTo);
+
+            var assets = AssetDatabase.LoadAllAssetRepresentationsAtPath(AssetDatabase.GetAssetPath(objectToAddTo));
+
+            foreach (var item in assets)
+            {
+                Debug.Log(item + "                 " + texture);
+                if (item == texture)
+                {
+                    texture = (Texture2D)item;
+                }
+            }
+
+            return texture;
         }
 
         public Textures WriteTexturesToDisk(string dirName)
