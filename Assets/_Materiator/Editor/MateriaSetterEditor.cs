@@ -86,6 +86,7 @@ namespace Materiator
 
         private void SetMateriaSetterDirty(bool value)
         {
+            serializedObject.Update();
             if (value)
             {
                 if (!_isDirty.boolValue)
@@ -147,6 +148,8 @@ namespace Materiator
         private void ResetMateriaSetter()
         {
             _materiaSetter.ResetMateriaSetter();
+
+            SetMateriaSetterDirty(true);
         }
 
         private void DrawAtlasSection()
