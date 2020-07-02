@@ -93,7 +93,7 @@ namespace Materiator
                 {
                     _isDirty.boolValue = true;
 
-                    CreateEditModeData(_editMode.enumValueIndex, true);
+                    CreateEditModeData(_editMode.enumValueIndex);
                 }
             }
             else
@@ -309,7 +309,16 @@ namespace Materiator
 
         private void LoadPreset(MateriaPreset preset)
         {
-            var same = AreMateriasSameAsPreset(preset, _materiaSetter.MateriaSetterData?.MateriaSlots);
+            List<MateriaSlot> materiaSlots;
+            if (_materiaSetter.MateriaSetterData != null)
+            {
+                materiaSlots = _materiaSetter.MateriaSetterData.MateriaSlots;
+            }
+            else
+            {
+                materiaSlots = _materiaSetter.MateriaSlots;
+            }
+            var same = AreMateriasSameAsPreset(preset, _materiaSetter.MateriaSlots);
 
             if (!same)
             {
@@ -333,6 +342,8 @@ namespace Materiator
             {
                 SetMateriaSetterDirty(false);
             }
+
+            DrawUVInspector(true);
         }
 
         private void MateriaReorderableList()
@@ -340,51 +351,47 @@ namespace Materiator
             _materiaReorderableList.DoLayoutList();
         }
 
-        private void CreateEditModeData(int editMode, bool clone)
+        private void CreateEditModeData(int editMode)
         {
-            var newTextures = new Textures();
+            if (_materiaSetterData.objectReferenceValue != null)
+            {
+                var newTextures = new Textures();
 
-            Textures textures = null;
+                Textures textures = null;
 
-            if (editMode == 0)
-            {
-                textures = _materiaSetter.MateriaSetterData.Textures;
-            }
-            else if (editMode == 1)
-            {
-                textures = _materiaSetter.MateriaSetterData.MateriaAtlas.Textures;
-            }
+                if (editMode == 0)
+                {
+                    textures = _materiaSetter.MateriaSetterData.Textures;
+                }
+                else if (editMode == 1)
+                {
+                    textures = _materiaSetter.MateriaSetterData.MateriaAtlas.Textures;
+                }
 
-            if (!clone)
-            {
-                _material.objectReferenceValue = Utils.CreateMaterial(_materiaSetter.MateriaSetterData.ShaderData.Shader, name);
-                newTextures.CreateTextures(Utils.Settings.GridSize, Utils.Settings.GridSize);
-            }
-            else
-            {
+                newTextures.CreateTextures(textures.Size.x, textures.Size.y);
                 _material.objectReferenceValue = Instantiate(_material.objectReferenceValue);
-                newTextures = textures.CloneTextures(textures.FilterMode, true);
+                newTextures.CopyPixelColors(textures, textures.Size.x, new Rect(0, 0, 1, 1), newTextures.Size.x, new Rect(0, 0, 1, 1));
+
+                if (name != null)
+                    _material.objectReferenceValue.name = name;
+
+                serializedObject.ApplyModifiedProperties();
+
+                _materiaSetter.Textures = newTextures;
+                _materiaSetter.SetTextures();
+
+                var newMateriaSlots = new List<MateriaSlot>();
+
+                foreach (var item in _materiaSetter.MateriaSetterData.MateriaSlots)
+                {
+                    newMateriaSlots.Add(new MateriaSlot(item.ID, item.Materia, item.Tag));
+                }
+
+                _materiaSetter.MateriaSlots = newMateriaSlots;
+                serializedObject.Update();
+                _materiaSetter.UpdateRenderer();
+                serializedObject.Update();
             }
-
-            if (name != null)
-                _material.objectReferenceValue.name = name;
-
-            serializedObject.ApplyModifiedProperties();
-
-            _materiaSetter.Textures = newTextures;
-            _materiaSetter.SetTextures();
-
-            var newMateriaSlots = new List<MateriaSlot>();
-
-            foreach (var item in _materiaSetter.MateriaSetterData.MateriaSlots)
-            {
-                newMateriaSlots.Add(new MateriaSlot(item.ID, item.Materia, item.Tag));
-            }
-
-            _materiaSetter.MateriaSlots = newMateriaSlots;
-            serializedObject.Update();
-            _materiaSetter.UpdateRenderer();
-            serializedObject.Update();
         }
 
         private void DrawMateriaReorderableList()

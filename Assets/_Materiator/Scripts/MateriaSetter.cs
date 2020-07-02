@@ -57,6 +57,8 @@ namespace Materiator
             if (_instanceID == 0)
                 _instanceID = GetInstanceID();
 
+            UpdateColorsOfAllTextures();
+
             IsInitialized = true;
         }
 
