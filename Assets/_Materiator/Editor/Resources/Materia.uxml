@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:Label text="Materia" class="title-header">
+        <Style src="Materiator.uss" />
+    </ui:Label>
+    <uie:ColorField label="Color" value="RGBA(0.000, 1.000, 1.000, 1.000)" name="BaseColorField">
+        <Style src="Materiator.uss" />
+    </uie:ColorField>
+    <ui:VisualElement name="IMGUIContainer" style="margin-left: 3px; margin-top: 3px; margin-bottom: 3px;">
+        <Style src="Materiator.uss" />
+    </ui:VisualElement>
+    <ui:Toggle label="Is Emissive" name="IsEmissiveToggle">
+        <Style src="Materiator.uss" />
+    </ui:Toggle>
+    <uie:ColorField label="Emission" value="RGBA(0.000, 1.000, 1.000, 1.000)" name="EmissionColorField" show-alpha="false">
+        <Style src="Materiator.uss" />
+    </uie:ColorField>
+</ui:UXML>

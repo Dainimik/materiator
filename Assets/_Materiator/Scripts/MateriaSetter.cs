@@ -79,7 +79,7 @@ namespace Materiator
             IsDirty = true;
         }
 
-        private void GetMeshReferences()
+        public void GetMeshReferences()
         {
             Renderer = GetComponent<Renderer>();
             MeshFilter = GetComponent<MeshFilter>();

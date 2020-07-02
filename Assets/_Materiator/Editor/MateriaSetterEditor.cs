@@ -411,7 +411,7 @@ namespace Materiator
                 var emission = elementMateria.EmissionColor;
 
                 color.a = 255;
-                emission.a = 1f;
+                emission.a = 255;
 
                 if (elementMateria.IsEmissive)
                 {
@@ -723,7 +723,7 @@ namespace Materiator
                 outputTextures = new Textures();
                 outputTextures.CreateTextures(_materiaSetter.Textures.Size.x, _materiaSetter.Textures.Size.y);
 
-                material = Instantiate(_materiaSetter.Material);
+                material = _materiaSetter.Material;
             }
 
             //texs = _materiaSetter.Textures.CloneTextures(Utils.Settings.FilterMode);

@@ -6,9 +6,11 @@ namespace Materiator
     public class Materia : ScriptableObject
     {
         public Color32 BaseColor;
+        [Range(0f, 1f)]
         public float Metallic;
+        [Range(0f, 1f)]
         public float Smoothness;
-        public Color EmissionColor;
         public bool IsEmissive;
+        public Color32 EmissionColor;
     }
 }

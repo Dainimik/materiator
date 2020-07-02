@@ -94,9 +94,10 @@ namespace Materiator
                 for (int i = 0; i < numberOfColors; i++)
                 {
                     var metallic32 = (byte)(materiaSlots.Where(ms => ms.ID == rect.Key).First().Materia.Metallic * 255);
+                    var smoothness32 = (byte)(materiaSlots.Where(ms => ms.ID == rect.Key).First().Materia.Smoothness * 255);
 
                     baseColors[i] = materiaSlots.Where(ms => ms.ID == rect.Key).First().Materia.BaseColor;
-                    metallic[i] = new Color32(metallic32, metallic32, metallic32, metallic32);
+                    metallic[i] = new Color32(metallic32, 0, 0, smoothness32);
                     emissionColors[i] = materiaSlots.Where(ms => ms.ID == rect.Key).First().Materia.EmissionColor;
                 }
 
