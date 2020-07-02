@@ -12,6 +12,8 @@ namespace Materiator
 
     public class MateriaSetter : MonoBehaviour
     {
+        public int InstanceID { get { return _instanceID; } }
+        [SerializeField] private int _instanceID;
         public bool IsInitialized = false;
         public bool IsDirty = true;
         public EditMode EditMode;
@@ -51,6 +53,9 @@ namespace Materiator
             InitializeTextures();
             AnalyzeMesh();
             GenerateMateriaSlots();
+
+            if (_instanceID == 0)
+                _instanceID = GetInstanceID();
 
             IsInitialized = true;
         }
@@ -241,9 +246,8 @@ namespace Materiator
             Textures.UpdateColors(FilteredRects, GridSize, MateriaSlots);
         }
 
-        public void LoadPreset(MateriaPreset preset, out int numberOfSameMateria)
+        public void LoadPreset(MateriaPreset preset)
         {
-            numberOfSameMateria = 0;
             Materia materia;
 
             if (preset != null)
@@ -263,11 +267,7 @@ namespace Materiator
                                 materia = MateriaSlots[i].Materia;
                             }
 
-                            if (materia == preset.MateriaPresetItemList[j].Materia)
-                            {
-                                numberOfSameMateria++;
-                            }
-                            else
+                            if (materia != preset.MateriaPresetItemList[j].Materia)
                             {
                                 MateriaSlots[i].Materia = preset.MateriaPresetItemList[j].Materia;
                             }

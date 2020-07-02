@@ -1,7 +1,14 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <ui:VisualElement name="ButtonContainer" style="flex-direction: row; justify-content: center;">
+    <ui:VisualElement name="ButtonContainer" style="flex-direction: row; justify-content: center; visibility: visible;">
         <Style src="Materiator.uss" />
         <ui:Button text="Scan Project" name="ScanProjectButton" />
+        <ui:Button text="Select Atlas" name="SelectAtlasButton" />
+    </ui:VisualElement>
+    <ui:VisualElement name="AtlasSectionContainer">
+        <Style src="Materiator.uss" />
+        <uie:ObjectField label="Atlas" name="AtlasObjectField" allow-scene-objects="false">
+            <ui:Button text="Load Atlas" name="LoadAtlasButton" />
+        </uie:ObjectField>
     </ui:VisualElement>
     <ui:VisualElement name="ContentContainer">
         <Style src="Materiator.uss" />

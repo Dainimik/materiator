@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -98,7 +99,8 @@ namespace Materiator
                         //var newMeshData = CreateMeshData(ms[j].Mesh.name, ms[j].Mesh, atlasedMesh, rects[rectIndex], gridSize, atlas);
                         var data = ms[j].MateriaSetterData;
 
-                        atlas.MateriaSetterDatas.Add(data);
+                        var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.InstanceID == ms[j].InstanceID).First();
+                        atlas.AtlasEntries.Add(prefabMS, data);
                         atlas.ShaderData = group.Key;
 
 
@@ -170,7 +172,7 @@ namespace Materiator
             AssetDatabase.SaveAssets();
 
             atlas.Textures.ImportTextureAssets();
-            atlas.MateriaSetterDatas = new List<MateriaSetterData>();
+            atlas.AtlasEntries = new SerializableDictionary<MateriaSetter, MateriaSetterData>();
 
             return atlas;
         }

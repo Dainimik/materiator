@@ -4,19 +4,25 @@ using System.Collections.Generic;
 using System;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
+using System.Linq;
 
 namespace Materiator
 {
     public class MateriaAtlasEditorWindow : MateriatorEditorWindow
     {
         private ListView _materiaSetterDataListView;
+        private ObjectField _atlasObjectField;
+
+        private VisualElement _atlasSectionContainer;
 
         private Button _scanProjectButton;
+        private Button _selectAtlasButton;
+        private Button _loadAtlasButton;
         private Button _overwriteButton;
         private Button _saveAsNewButton;
 
         private List<MateriaSetter> _materiaSetters;
-        private List<MateriaSetterData> _materiaSetterDataList;
+        private SerializableDictionary<MateriaSetter, MateriaSetterData> _atlasEntries;
 
         [MenuItem("Tools/Materiator/Atlas Editor")]
 
@@ -29,10 +35,13 @@ namespace Materiator
         {
             InitializeEditorWindow<MateriaAtlasEditorWindow>();
             serializedObject = new SerializedObject(this);
+
+            _atlasSectionContainer.visible = false;
         }
 
         private void GenerateListView()
         {
+            _materiaSetterDataListView.Clear();
             // The "makeItem" function will be called as needed
             // when the ListView needs more items to render
             Func<VisualElement> makeItem = () => new Label();
@@ -56,9 +65,19 @@ namespace Materiator
 
         private void Scan()
         {
-            LoadPrefabs();
+            LoadPrefabs((MateriaAtlas)_atlasObjectField.value);
 
             GenerateListView();
+        }
+
+        private void SelectAtlas()
+        {
+            _atlasSectionContainer.visible = true;
+        }
+
+        private void LoadAtlas()
+        {
+            Scan();
         }
 
         private void LoadPrefabs(MateriaAtlas atlas = null)
@@ -71,15 +90,20 @@ namespace Materiator
             }
             else
             {
-                //ResetAtlasGenerator(false);
-                foreach (var msd in atlas.MateriaSetterDatas)
-                {
-                    if (msd == null) return;
 
-                    var go = (GameObject)AssetDatabase.LoadMainAssetAtPath(AssetDatabase.GetAssetPath(msd));
-                    var colorSetters = go.GetComponentsInChildren<MateriaSetter>();
-                    //CheckMateriaSettersCompatibility(colorSetters);
+
+                //_materiaSetters = new List<MateriaSetter>();
+                _materiaSetters = atlas.AtlasEntries.Keys.ToList();
+                //foreach (var msd in atlas.AtlasEntry.Keys)
+                //{
+                //   _materiaSetters.Add(msd);
+                //}
+                foreach (var item in _materiaSetters)
+                {
+                    Debug.Log(item.MateriaSetterData.name);
                 }
+
+                //_materiaSetters = AssetUtils.FindAllComponentsInPrefabs<MateriaSetter>().Where(d => d.MateriaSetterData == msd);
             }
         }
 
@@ -127,7 +151,7 @@ namespace Materiator
                 //foreach (var kvp in _groupsList)
                 //{
                     //AtlasFactory.CreateAtlas(kvp, _shaderMaterialGroups[kvp.Key], path, _saveAsNewPrefabs.value, _newPrefabSuffix);
-                    AtlasFactory.CreateAtlas(new KeyValuePair<ShaderData, List<MateriaSetter>>(Utils.Settings.DefaultShaderData, _materiaSetters), new Material(Utils.Settings.DefaultShaderData.Shader), path, true, "_newPrefabSuffix");
+                    AtlasFactory.CreateAtlas(new KeyValuePair<ShaderData, List<MateriaSetter>>(Utils.Settings.DefaultShaderData, _materiaSetters), new Material(Utils.Settings.DefaultShaderData.Shader), path, false, "_newPrefabSuffix");
                 //i++;
                 //}
             }
@@ -137,7 +161,14 @@ namespace Materiator
         {
             _materiaSetterDataListView = root.Q<ListView>("MateriaSetterDataListView");
 
+            _atlasSectionContainer = root.Q<VisualElement>("AtlasSectionContainer");
+
+            _atlasObjectField = root.Q<ObjectField>("AtlasObjectField");
+            _atlasObjectField.objectType = typeof(MateriaAtlas);
+
             _scanProjectButton = root.Q<Button>("ScanProjectButton");
+            _selectAtlasButton = root.Q<Button>("SelectAtlasButton");
+            _loadAtlasButton = root.Q<Button>("LoadAtlasButton");
             _overwriteButton = root.Q<Button>("OverwriteButton");
             _saveAsNewButton = root.Q<Button>("SaveAsNewButton");
         }
@@ -150,6 +181,8 @@ namespace Materiator
         protected override void RegisterButtons()
         {
             _scanProjectButton.clicked += Scan;
+            _selectAtlasButton.clicked += SelectAtlas;
+            _loadAtlasButton.clicked += LoadAtlas;
             _overwriteButton.clicked += Overwrite;
             _saveAsNewButton.clicked += SaveAsNew;
         }
