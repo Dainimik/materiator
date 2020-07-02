@@ -38,7 +38,6 @@ namespace Materiator
         private Button _reloadMateriaAtlasButton;
         private Button _reloadMateriaPresetButton;
         private Button _newMateriaSetterDataButton;
-        private Button _cloneMateriaSetterDataButton;
         private Button _reloadMateriaSetterDataButton;
         private Button _overwriteMateriaSetterData;
         private Button _saveAsNewMateriaSetterData;
@@ -310,30 +309,30 @@ namespace Materiator
 
         private void LoadPreset(MateriaPreset preset)
         {
-            var numberOfSameMateria = 0;
+            var same = AreMateriasSameAsPreset(preset, _materiaSetter.MateriaSetterData?.MateriaSlots);
 
-            if (preset != null)
+            if (!same)
             {
-                _reloadMateriaPresetButton.visible = true;
-                _materiaSetter.LoadPreset(preset, out numberOfSameMateria);
+                SetMateriaSetterDirty(true);
+
+                if (preset != null)
+                {
+                    _reloadMateriaPresetButton.visible = true;
+                    _materiaSetter.LoadPreset(preset);
+                }
+                else
+                {
+                    _reloadMateriaPresetButton.visible = false;
+                    _materiaSetter.LoadPreset(null);
+                }
+                serializedObject.Update();
+
+                _materiaSetter.UpdateColorsOfAllTextures();
             }
             else
-            {
-                _reloadMateriaPresetButton.visible = false;
-                _materiaSetter.LoadPreset(null, out numberOfSameMateria);
-            }
-            serializedObject.Update();
-
-            if (numberOfSameMateria == _materiaSetter.MateriaSetterData?.MateriaSlots.Count)
             {
                 SetMateriaSetterDirty(false);
             }
-            else
-            {
-                SetMateriaSetterDirty(true);
-            }
-
-            _materiaSetter.UpdateColorsOfAllTextures();
         }
 
         private void MateriaReorderableList()
@@ -383,6 +382,7 @@ namespace Materiator
             }
 
             _materiaSetter.MateriaSlots = newMateriaSlots;
+            serializedObject.Update();
             _materiaSetter.UpdateRenderer();
             serializedObject.Update();
         }
@@ -567,16 +567,13 @@ namespace Materiator
         private void ReloadPreset()
         {
             LoadPreset((MateriaPreset)_materiaPresetObjectField.value);
+
+            OnMateriaPresetChanged();
         }
 
         private void NewData()
         {
             ResetMateriaSetter();
-        }
-
-        private void CloneData()
-        {
-
         }
 
         private void ReloadData()
@@ -612,11 +609,52 @@ namespace Materiator
             if (_materiaPresetObjectField.value == null)
             {
                 _reloadMateriaPresetButton.SetEnabled(false);
+                _presetIndicator.style.backgroundColor = new Color(0.75f, 0.75f, 0.75f, 1f);
             }
             else
             {
                 _reloadMateriaPresetButton.SetEnabled(true);
+                
+                if (AreMateriasSameAsPreset((MateriaPreset)_materiaPresetObjectField.value, _materiaSetter.MateriaSlots))
+                {
+                    _presetIndicator.style.backgroundColor = new Color(0f, 0.75f, 0f, 1f);
+                }
+                else
+                {
+                    _presetIndicator.style.backgroundColor = new Color(0.75f, 0f, 0f, 1f);
+                }
             }
+        }
+
+        public bool AreMateriasSameAsPreset(MateriaPreset preset, List<MateriaSlot> materiaSlots)
+        {
+            var numberOfDifferentMateria = 0;
+
+            if (preset != null)
+            {
+                for (int i = 0; i < materiaSlots.Count; i++)
+                {
+                    for (int j = 0; j < preset.MateriaPresetItemList.Count; j++)
+                    {
+                        if (materiaSlots[i].Tag == preset.MateriaPresetItemList[j].Tag)
+                        {
+                            if (materiaSlots[i].Materia != preset.MateriaPresetItemList[j].Materia)
+                            {
+                                numberOfDifferentMateria++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            var same = false;
+
+            if (numberOfDifferentMateria == 0)
+            {
+                same = true;
+            }
+
+            return same;
         }
 
         private void OnMateriaSetterDataChanged()
@@ -723,7 +761,7 @@ namespace Materiator
                 outputTextures = new Textures();
                 outputTextures.CreateTextures(_materiaSetter.Textures.Size.x, _materiaSetter.Textures.Size.y);
 
-                material = _materiaSetter.Material;
+                material = Instantiate(_materiaSetter.Material); // I'm instantiating here because Unity can't add an object to asset if it is already a part of an asset
             }
 
             //texs = _materiaSetter.Textures.CloneTextures(Utils.Settings.FilterMode);
@@ -883,11 +921,11 @@ namespace Materiator
             _reloadMateriaAtlasButton = root.Q<Button>("ReloadMateriaAtlasButton");
             _reloadMateriaPresetButton = root.Q<Button>("ReloadMateriaPresetButton");
             _newMateriaSetterDataButton = root.Q<Button>("NewMateriaSetterDataButton");
-            _cloneMateriaSetterDataButton = root.Q<Button>("CloneMateriaSetterDataButton");
             _reloadMateriaSetterDataButton = root.Q<Button>("ReloadMateriaSetterDataButton");
             _overwriteMateriaSetterData = root.Q<Button>("OverwriteMateriaSetterDataButton");
             _saveAsNewMateriaSetterData = root.Q<Button>("SaveAsNewMateriaSetterDataButton");
 
+            _presetIndicator = root.Q<VisualElement>("PresetIndicator");
             _outputIndicator = root.Q<VisualElement>("OutputIndicator");
             _dataIndicator = root.Q<VisualElement>("DataIndicator");
 
@@ -919,7 +957,6 @@ namespace Materiator
             _reloadMateriaAtlasButton.clicked += ReloadAtlas;
             _reloadMateriaPresetButton.clicked += ReloadPreset;
             _newMateriaSetterDataButton.clicked += NewData;
-            _cloneMateriaSetterDataButton.clicked += CloneData;
             _reloadMateriaSetterDataButton.clicked += ReloadData;
             _overwriteMateriaSetterData.clicked += OverwriteMateriaSetterData;
             _saveAsNewMateriaSetterData.clicked += SaveAsNewMateriaSetterData;
