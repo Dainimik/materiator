@@ -2,7 +2,7 @@
     <ui:Label text="Materia" class="title-header">
         <Style src="Materiator.uss" />
     </ui:Label>
-    <uie:ColorField label="Color" value="RGBA(0.000, 1.000, 1.000, 1.000)" name="BaseColorField">
+    <uie:ColorField label="Base Color" value="RGBA(0.000, 1.000, 1.000, 1.000)" name="BaseColorField">
         <Style src="Materiator.uss" />
     </uie:ColorField>
     <ui:VisualElement name="IMGUIContainer" style="margin-left: 3px; margin-top: 3px; margin-bottom: 3px;">
@@ -11,7 +11,7 @@
     <ui:Toggle label="Is Emissive" name="IsEmissiveToggle">
         <Style src="Materiator.uss" />
     </ui:Toggle>
-    <uie:ColorField label="Emission" value="RGBA(0.000, 1.000, 1.000, 1.000)" name="EmissionColorField" show-alpha="false">
+    <uie:ColorField label="Emission Color" value="RGBA(0.000, 1.000, 1.000, 1.000)" name="EmissionColorField" show-alpha="false">
         <Style src="Materiator.uss" />
     </uie:ColorField>
 </ui:UXML>

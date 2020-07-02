@@ -11,6 +11,6 @@ namespace Materiator
         [Range(0f, 1f)]
         public float Smoothness;
         public bool IsEmissive;
-        public Color32 EmissionColor;
+        public Color32 EmissionColor = new Color32(0, 0, 0, 255);
     }
 }
