@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BaseColor:
     serializedVersion: 2
-    rgba: 4278190335
+    rgba: 4278255360
   Metallic: 0
   Smoothness: 0
-  IsEmissive: 1
+  IsEmissive: 0
   EmissionColor:
     serializedVersion: 2
-    rgba: 8487423
+    rgba: 0
