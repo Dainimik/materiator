@@ -196,7 +196,14 @@ namespace Materiator
                 {
                     if (FilteredRects.ContainsKey(ms.ID))
                     {
-                        newMateriaSlots.Add(new MateriaSlot(ms.ID, ms.Materia, ms.Tag));
+                        if (ms.Materia != null)
+                        {
+                            newMateriaSlots.Add(new MateriaSlot(ms.ID, ms.Materia, ms.Tag));
+                        }
+                        else
+                        {
+                            newMateriaSlots.Add(new MateriaSlot(ms.ID, Utils.Settings.DefaultMateria, ms.Tag));
+                        }
                     }
                 }
 

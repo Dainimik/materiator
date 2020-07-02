@@ -49,7 +49,6 @@ namespace Materiator
         private VisualElement _IMGUIContainer;
 
         private VisualElement _uvIslandContainer;
-        private VisualElement _uvGridItem;
         private EnumField _uvDisplayModeEnumField;
 
         private Label _currentShaderLabel;
@@ -939,7 +938,6 @@ namespace Materiator
             _IMGUIContainer = root.Q<VisualElement>("IMGUIContainer");
 
             _uvIslandContainer = root.Q<VisualElement>("UVIslandContainer");
-            _uvGridItem = root.Q<VisualElement>("UVGridItem");
 
             _uvDisplayModeEnumField = root.Q<EnumField>("UVDisplayMode");
             _uvDisplayModeEnumField.Init(UVDisplayMode.BaseColor);
