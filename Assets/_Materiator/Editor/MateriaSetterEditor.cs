@@ -194,7 +194,8 @@ namespace Materiator
 
             _materiaSetterDataObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
             {
-                OnMateriaSetterDataChanged();
+                Debug.Log(e.newValue);
+                OnMateriaSetterDataChanged((MateriaSetterData)e.newValue);
             });
 
             _uvDisplayModeEnumField.RegisterCallback<ChangeEvent<System.Enum>>(e =>
@@ -591,9 +592,9 @@ namespace Materiator
             ResetMateriaSetter();
         }
 
-        private void ReloadData()
+        private void ReloadData(MateriaSetterData data)
         {
-            OnMateriaSetterDataChanged();
+            OnMateriaSetterDataChanged(data);
         }
 
         private void OnMateriaAtlasChanged()
@@ -672,14 +673,13 @@ namespace Materiator
             return same;
         }
 
-        private void OnMateriaSetterDataChanged()
+        private void OnMateriaSetterDataChanged(MateriaSetterData data)
         {
             if (_materiaSetterDataObjectField.value != null)
             {
                 _editMode.enumValueIndex = 0;
 
-                _materiaSetterData.objectReferenceValue = _materiaSetterDataObjectField.value;
-                var data = (MateriaSetterData)_materiaSetterDataObjectField.value;
+                _materiaSetterData.objectReferenceValue = data;
 
                 serializedObject.ApplyModifiedProperties();
 
@@ -847,7 +847,15 @@ namespace Materiator
                 //data.Textures = outputTextures;
             }
 
-            data.MateriaSlots.Clear();
+            if (data.MateriaSlots != null)
+            {
+                data.MateriaSlots.Clear();
+            }
+            else
+            {
+                data.MateriaSlots = new List<MateriaSlot>();
+            }
+            
             data.MateriaSlots.AddRange(_materiaSetter.MateriaSlots);
 
             data.ShaderData = (ShaderData)_shaderData.objectReferenceValue;
@@ -867,7 +875,7 @@ namespace Materiator
 
             if (_editMode.enumValueIndex == 0)
             {
-                ReloadData();
+                ReloadData(data);
             }
             else if (_editMode.enumValueIndex == 1)
             {
@@ -980,7 +988,7 @@ namespace Materiator
             _reloadMateriaAtlasButton.clicked += ReloadAtlas;
             _reloadMateriaPresetButton.clicked += ReloadPreset;
             _newMateriaSetterDataButton.clicked += NewData;
-            _reloadMateriaSetterDataButton.clicked += ReloadData;
+            _reloadMateriaSetterDataButton.clicked += () => { ReloadData((MateriaSetterData)_materiaSetterDataObjectField.value); };
             _overwriteMateriaSetterData.clicked += OverwriteMateriaSetterData;
             _saveAsNewMateriaSetterData.clicked += SaveAsNewMateriaSetterData;
         }
