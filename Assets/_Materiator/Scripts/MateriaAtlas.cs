@@ -8,6 +8,7 @@ namespace Materiator
         public ShaderData ShaderData;
         public Material Material;
         public Textures Textures = new Textures();
-        public SerializableDictionary<MateriaSetter, MateriaSetterData> AtlasEntries; // Materua Setter prefab instance
+        public SerializableDictionary<MateriaSetter, MateriaSetterData> AtlasEntries; // Materia Setter prefab instance
+        public int GridSize;
     }
 }

@@ -82,6 +82,11 @@ namespace Materiator
             {
                 return;
             }*/
+
+            /*if (!_materiaSetter.IsDirty && _materiaSetter.MateriaSetterData != null)
+            {
+                ReloadData();
+            }*/
         }
 
         private void SetMateriaSetterDirty(bool value)
@@ -123,7 +128,7 @@ namespace Materiator
             IMGUIContainer defaultInspector = new IMGUIContainer(() => IMGUI());
             root.Add(defaultInspector);
 
-            _materiaReorderableList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaSlots"), false, true, false, false);
+            _materiaReorderableList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaSlots"), true, true, false, false);
             DrawMateriaReorderableList();
             IMGUIContainer materiaReorderableList = new IMGUIContainer(() => MateriaReorderableList());
             _IMGUIContainer.Add(materiaReorderableList);
@@ -297,8 +302,7 @@ namespace Materiator
         {
             if (atlas != null)
             {
-                // this is necessary because atlas generation
-                //OnMateriaSetterDataChanged();
+                _materiaSetter.MateriaSlots = _materiaSetter.MateriaSetterData.MateriaSlots;
 
                 _reloadMateriaAtlasButton.SetEnabled(true);
                 _materiaSetter.LoadAtlas(atlas);
@@ -306,7 +310,9 @@ namespace Materiator
             else
             {
                 _reloadMateriaAtlasButton.SetEnabled(false);
-            } 
+            }
+
+            SetMateriaSetterDirty(false);
         }
 
         private void LoadPreset(MateriaPreset preset)
@@ -685,8 +691,8 @@ namespace Materiator
                 serializedObject.Update();
 
                 _materiaSetter.UpdateRenderer();
-                _materiaSetter.GenerateMateriaSlots();
 
+                //_materiaSetter.GenerateMateriaSlots();
                 //_materiaSetter.UpdateColorsOfAllTextures();
             }
             else
@@ -783,15 +789,15 @@ namespace Materiator
 
                 if (data.MateriaAtlas != null)
                 {
-                    data.MateriaAtlas.Textures.CopyPixelColors(_materiaSetter.Textures, _materiaSetter.Textures.Size.x, new Rect(0, 0, 1, 1), data.MateriaAtlas.Textures.Size.x, _materiaSetter.AtlasedUVRect);
+                    data.MateriaAtlas.Textures.CopyPixelColors(_materiaSetter.Textures, _materiaSetter.Textures.Size.x, new Rect(0, 0, 1, 1), data.MateriaAtlas.Textures.Size.x, _materiaSetter.MateriaSetterData.AtlasedUVRect);
                 }
             }
             else if (_editMode.enumValueIndex == 1)
             {
-                outputTextures.CopyPixelColors(_materiaSetter.Textures, _materiaSetter.Textures.Size.x, _materiaSetter.AtlasedUVRect, _materiaSetter.Textures.Size.x, _materiaSetter.AtlasedUVRect);
+                outputTextures.CopyPixelColors(_materiaSetter.Textures, _materiaSetter.Textures.Size.x, _materiaSetter.UVRect, _materiaSetter.Textures.Size.x, _materiaSetter.UVRect);
                 outputTextures.SetNames(name);
 
-                data.Textures.CopyPixelColors(_materiaSetter.Textures, _materiaSetter.Textures.Size.x, _materiaSetter.AtlasedUVRect, data.NativeGridSize, new Rect(0, 0, 1, 1));
+                data.Textures.CopyPixelColors(_materiaSetter.Textures, _materiaSetter.Textures.Size.x, _materiaSetter.UVRect, data.NativeGridSize, new Rect(0, 0, 1, 1));
             }
 
             
@@ -833,7 +839,7 @@ namespace Materiator
                 data.Material = material;
                 data.Textures = outputTextures;
                 data.NativeMesh = _materiaSetter.Mesh;
-                data.NativeGridSize = _materiaSetter.NativeGridSize;
+                data.NativeGridSize = _materiaSetter.GridSize;
             }
             else if (_editMode.enumValueIndex == 1)
             {
@@ -841,12 +847,12 @@ namespace Materiator
                 //data.Textures = outputTextures;
             }
 
-            data.MateriaSlots = _materiaSetter.MateriaSlots;
+            data.MateriaSlots.Clear();
+            data.MateriaSlots.AddRange(_materiaSetter.MateriaSlots);
+
             data.ShaderData = (ShaderData)_shaderData.objectReferenceValue;
             data.MateriaPreset = (MateriaPreset)_materiaPreset.objectReferenceValue;
            
-
-
 
             _materiaSetter.SetTextures();
             _materiaSetter.MateriaSetterData = data;
@@ -858,7 +864,16 @@ namespace Materiator
             EditorUtils.MarkOpenPrefabSceneDirty();
 
             _materiaSetter.UpdateRenderer(false);
-            SetMateriaSetterDirty(false);
+
+            if (_editMode.enumValueIndex == 0)
+            {
+                ReloadData();
+            }
+            else if (_editMode.enumValueIndex == 1)
+            {
+                ReloadAtlas();
+            }
+            
         }
 
         /*private bool CheckAllSystems()

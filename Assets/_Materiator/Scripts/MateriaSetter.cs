@@ -39,20 +39,16 @@ namespace Materiator
 
         public Mesh NativeMesh;
         public Mesh AtlasedMesh;
-        public int NativeGridSize;
+
         public int GridSize;
-        public Rect AtlasedUVRect;
+        public Rect UVRect;
 
 
         public void Initialize()
         {
             IsInitialized = false;
 
-            GetMeshReferences();
-            SetUpRenderer();
-            InitializeTextures();
-            AnalyzeMesh();
-            GenerateMateriaSlots();
+            Refresh();
 
             if (_instanceID == 0)
                 _instanceID = GetInstanceID();
@@ -66,6 +62,7 @@ namespace Materiator
         {
             GetMeshReferences();
             SetUpRenderer();
+            SetUpGridSize();
             InitializeTextures();
             AnalyzeMesh();
             GenerateMateriaSlots();
@@ -137,6 +134,20 @@ namespace Materiator
                 Renderer.sharedMaterial = Material;
         }
 
+        private void SetUpGridSize()
+        {
+            if (EditMode == EditMode.Native)
+            {
+                GridSize = Utils.Settings.GridSize;
+                UVRect = new Rect(0f, 0f, 1f, 1f);
+            }
+            else if (EditMode == EditMode.Atlas)
+            {
+                GridSize = MateriaSetterData.AtlasedGridSize;
+                UVRect = MateriaSetterData.AtlasedUVRect;
+            }
+        }
+
         private void InitializeTextures()
         {
             if (Textures == null)
@@ -146,13 +157,6 @@ namespace Materiator
 
             if (Textures.Color == null || Textures.MetallicSmoothness == null || Textures.Emission == null)
             {
-                if (NativeGridSize == 0)
-                {
-                    // why do i need this many gridSize variables?
-                    NativeGridSize = Utils.Settings.GridSize;
-                    GridSize = NativeGridSize;
-                }
-
                 Textures.CreateTextures(GridSize, GridSize);
             }
 
@@ -168,19 +172,14 @@ namespace Materiator
 
         public void AnalyzeMesh()
         {
-            var uvPositionRect = new Rect(0f, 0f, 1f, 1f);
+            var gridSize = Utils.Settings.GridSize;
 
-            if (EditMode == EditMode.Native)
+            if (MateriaSetterData != null)
             {
-                GridSize = NativeGridSize;
-            }
-            if (EditMode == EditMode.Atlas)
-            {
-                GridSize = MateriaSetterData.AtlasedGridSize;
-                uvPositionRect = AtlasedUVRect;
+                gridSize = MateriaSetterData.NativeGridSize;
             }
 
-            Rects = MeshAnalyzer.CalculateRects(NativeGridSize, uvPositionRect);
+            Rects = MeshAnalyzer.CalculateRects(gridSize, UVRect);
             FilteredRects = MeshAnalyzer.FilterRects(Rects, Mesh.uv);
         }
 
@@ -308,6 +307,7 @@ namespace Materiator
                 Textures = atlas.Textures;
                 Mesh = MateriaSetterData.AtlasedMesh;
                 GridSize = MateriaSetterData.AtlasedGridSize;
+                UVRect = MateriaSetterData.AtlasedUVRect;
 
                 Textures.SetTextures(Material, ShaderData);
                 UpdateRenderer();

@@ -65,7 +65,7 @@ namespace Materiator
 
             var processedPrefabs = new HashSet<GameObject>();
             var skipSavingPrefab = false;
-
+            
             for (var i = 0; i < prefabs.Count; i++)
             {
                 var prefab = PrefabUtility.LoadPrefabContents(AssetDatabase.GetAssetPath(prefabs[i]));
@@ -75,11 +75,11 @@ namespace Materiator
                 {
                     for (int j = 0; j < ms.Length; j++)
                     {
-                        var nearestPrefabInstanceRoot = PrefabUtility.GetNearestPrefabInstanceRoot(ms[j]);
-                        if (processedPrefabs.Contains(nearestPrefabInstanceRoot))
-                            continue;
+                        //var nearestPrefabInstanceRoot = PrefabUtility.GetNearestPrefabInstanceRoot(ms[j]);
+                        //if (processedPrefabs.Contains(nearestPrefabInstanceRoot))
+                            //continue;
 
-                        processedPrefabs.Add(nearestPrefabInstanceRoot);
+                        //processedPrefabs.Add(nearestPrefabInstanceRoot);
 
                         var atlasedMesh = Utils.CopyMesh(ms[j].Mesh);
                         var remappedUVs = atlasedMesh.uv;
@@ -99,9 +99,11 @@ namespace Materiator
                         //var newMeshData = CreateMeshData(ms[j].Mesh.name, ms[j].Mesh, atlasedMesh, rects[rectIndex], gridSize, atlas);
                         var data = ms[j].MateriaSetterData;
 
-                        var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.InstanceID == ms[j].InstanceID).First();
+                        var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.MateriaSetterData == ms[j].MateriaSetterData).FirstOrDefault();
                         atlas.AtlasEntries.Add(prefabMS, data);
+                        
                         atlas.ShaderData = group.Key;
+                        atlas.GridSize = gridSize;
 
 
                         data.MateriaAtlas = atlas;
@@ -115,7 +117,6 @@ namespace Materiator
                         ms[j].MateriaAtlas = atlas;
                         ms[j].NativeMesh = ms[j].Mesh;
                         ms[j].AtlasedMesh = atlasedMesh;
-                        ms[j].AtlasedUVRect = rects[rectIndex];
 
                         var baseCol = data.Textures.Color.GetPixels32();
                         var metallic = data.Textures.MetallicSmoothness.GetPixels32();

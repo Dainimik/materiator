@@ -8,6 +8,7 @@ namespace Materiator
     {
         protected VisualElement root;
         protected VisualTreeAsset tree;
+        protected StyleSheet styleSheet;
 
         protected SerializedObject serializedObject;
 
@@ -16,7 +17,8 @@ namespace Materiator
             root = rootVisualElement;
 
             tree = Resources.Load<VisualTreeAsset>(typeof(T).Name);
-            root.styleSheets.Add(Resources.Load<StyleSheet>("Materiator"));
+            styleSheet = Resources.Load<StyleSheet>("Materiator");
+            root.styleSheets.Add(styleSheet);
             tree.CloneTree(root);
 
             GetProperties();
