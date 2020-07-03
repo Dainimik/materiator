@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Materiator
 {
     [Serializable]
-    public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
+    public class SerializableDictionary<TKey, TValue> : SortedDictionary<TKey, TValue>, ISerializationCallbackReceiver
     {
         [SerializeField]
         private List<TKey> _keys = new List<TKey>();
@@ -26,13 +26,13 @@ namespace Materiator
 
         public void OnAfterDeserialize()
         {
-            this.Clear();
+            Clear();
 
             if (_keys.Count != _values.Count)
                 throw new System.Exception(string.Format("there are {0} keys and {1} values after deserialization. Make sure that both key and value types are serializable."));
 
             for (int i = 0; i < _keys.Count; i++)
-                this.Add(_keys[i], _values[i]);
+                Add(_keys[i], _values[i]);
         }
     }
 }
