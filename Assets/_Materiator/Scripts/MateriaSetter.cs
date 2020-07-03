@@ -32,7 +32,7 @@ namespace Materiator
 
         public MateriaAtlas MateriaAtlas;
         public MateriaPreset MateriaPreset;
-        public ShaderData ShaderData;
+        public MaterialData MaterialData;
         public Material Material;
 
         public Textures Textures;
@@ -105,12 +105,13 @@ namespace Materiator
 
         private void SetUpRenderer()
         {
-            if (ShaderData == null)
-                ShaderData = Utils.Settings.DefaultShaderData;
+            if (MaterialData == null)
+                MaterialData = Utils.Settings.DefaultMaterialData;
 
             if (Renderer.sharedMaterial == null)
             {
-                Material = Utils.CreateMaterial(ShaderData.Shader, gameObject.name);
+                Material = Instantiate(Utils.Settings.DefaultMaterialData.Material);
+                Material.name = gameObject.name;
                 UpdateRenderer(false);
             }
             else
@@ -167,7 +168,7 @@ namespace Materiator
         {
             if (Material == null) return;
 
-            Textures.SetTextures(Material, ShaderData);
+            Textures.SetTextures(Material, MaterialData.ShaderData);
         }
 
         public void AnalyzeMesh()
@@ -302,14 +303,14 @@ namespace Materiator
 
                 MateriaAtlas = atlas;
 
-                ShaderData = atlas.ShaderData;
-                Material = atlas.Material;
+                MaterialData = atlas.MaterialData;
+                Material = atlas.MaterialData.Material;
                 Textures = atlas.Textures;
                 Mesh = MateriaSetterData.AtlasedMesh;
                 GridSize = MateriaSetterData.AtlasedGridSize;
                 UVRect = MateriaSetterData.AtlasedUVRect;
 
-                Textures.SetTextures(Material, ShaderData);
+                Textures.SetTextures(Material, MaterialData.ShaderData);
                 UpdateRenderer();
             }
         }
@@ -318,13 +319,13 @@ namespace Materiator
         {
             EditMode = EditMode.Native;
 
-            ShaderData = MateriaSetterData.ShaderData;
-            Material = MateriaSetterData.Material;
+            MaterialData = MateriaSetterData.MaterialData;
+            Material = MateriaSetterData.MaterialData.Material;
             Textures = MateriaSetterData.Textures;
             Mesh = MateriaSetterData.NativeMesh;
             GridSize = MateriaSetterData.NativeGridSize;
 
-            Textures.SetTextures(Material, ShaderData);
+            Textures.SetTextures(Material, MaterialData.ShaderData);
             UpdateRenderer();
         }
     }

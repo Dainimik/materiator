@@ -23,7 +23,7 @@ namespace Materiator
         private SerializedProperty _materiaAtlas;
         private SerializedProperty _materiaPreset;
         private SerializedProperty _materiaSetterData;
-        private SerializedProperty _shaderData;
+        private SerializedProperty _materialData;
         private SerializedProperty _material;
 
         #endregion
@@ -31,7 +31,7 @@ namespace Materiator
         private ObjectField _materiaAtlasObjectField;
         private ObjectField _materiaPresetObjectField;
         private ObjectField _materiaSetterDataObjectField;
-        private ObjectField _shaderDataObjectField;
+        private ObjectField _materialDataObjectField;
 
         private Button _reloadButton;
         private Button _switchEditModeButton;
@@ -181,7 +181,7 @@ namespace Materiator
         {
             DrawUVInspector(false);
 
-            _currentShaderLabel.text = _materiaSetter.ShaderData.Shader.name;
+            _currentShaderLabel.text = _materiaSetter.MaterialData.ShaderData.Shader.name;
 
             if (_materiaSetterDataObjectField.value == null)
             {
@@ -194,7 +194,6 @@ namespace Materiator
 
             _materiaSetterDataObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
             {
-                Debug.Log(e.newValue);
                 OnMateriaSetterDataChanged((MateriaSetterData)e.newValue);
             });
 
@@ -204,9 +203,9 @@ namespace Materiator
                 DrawUVInspector(true);
             });
 
-            _shaderDataObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
+            _materialDataObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
             {
-                OnShaderDataChanged();
+                OnMaterialDataChanged((MaterialData)e.newValue);
             });
         }
 
@@ -540,14 +539,14 @@ namespace Materiator
                 _highlightedTexture.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, colors);
                 _highlightedTexture.Apply();
 
-                _materiaSetter.Renderer.sharedMaterial.SetTexture(_materiaSetter.ShaderData.MainTexturePropertyName, _highlightedTexture);
+                _materiaSetter.Renderer.sharedMaterial.SetTexture(_materiaSetter.MaterialData.ShaderData.MainTexturePropertyName, _highlightedTexture);
             }
             else
             {
                 _highlightedTexture.SetPixels32(originalTexture.GetPixels32());
                 _highlightedTexture.Apply();
 
-                _materiaSetter.Renderer.sharedMaterial.SetTexture(_materiaSetter.ShaderData.MainTexturePropertyName, originalTexture);
+                _materiaSetter.Renderer.sharedMaterial.SetTexture(_materiaSetter.MaterialData.ShaderData.MainTexturePropertyName, originalTexture);
             }
         }
 
@@ -705,16 +704,26 @@ namespace Materiator
             SetMateriaSetterDirty(false);
         }
 
-        private void OnShaderDataChanged()
+        private void OnMaterialDataChanged(MaterialData materialData)
         {
             SetMateriaSetterDirty(true);
 
-            var shader = ((ShaderData)_shaderDataObjectField.value).Shader;
+            if (materialData.Material.shader != materialData.ShaderData.Shader)
+            {
+                materialData.Material.shader = materialData.ShaderData.Shader;
+            }
 
-            _materiaSetter.Renderer.sharedMaterial.shader = shader;
-            _currentShaderLabel.text = shader.name;
+            _currentShaderLabel.text = materialData.ShaderData.Shader.name;
+
+            _material.objectReferenceValue = Instantiate(materialData.Material);
 
             serializedObject.ApplyModifiedProperties();
+
+            _materiaSetter.Material.name = _materiaSetter.gameObject.name;
+            _materiaSetter.Material.shader = materialData.ShaderData.Shader;
+
+            _materiaSetter.SetTextures();
+            _materiaSetter.UpdateRenderer(false);
         }
 
         private void OverwriteMateriaSetterData()
@@ -736,6 +745,8 @@ namespace Materiator
 
         public void WriteAssetsToDisk(string path, bool packAssets)
         {
+            if (!_isDirty.boolValue) return;
+
             string name;
             string dir;
 
@@ -763,6 +774,31 @@ namespace Materiator
                 {
                     outputTextures = data.Textures;
                     material = data.Material;
+
+                    if (data.MaterialData != _materiaSetter.MaterialData)
+                    {
+                        var mat = Instantiate(_materiaSetter.Material);
+                        mat.name = material.name;
+
+                        if (packAssets)
+                        {
+                            AssetDatabase.RemoveObjectFromAsset(material);
+                            AssetDatabase.SaveAssets();
+                            AssetDatabase.AddObjectToAsset(mat, data);
+                            //AssetDatabase.SaveAssets();
+                            AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(mat));
+                            material = mat;
+                        }
+                        else
+                        {
+                            AssetUtils.CheckDirAndCreate(dir, name);
+                            var folderDir = dir + "/" + name + "/";
+                            AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(material));
+                            AssetDatabase.CreateAsset(mat, folderDir + name + "_Material.mat");
+                            material = (Material)AssetDatabase.LoadAssetAtPath(folderDir + name + "_Material.mat", typeof(Material));
+                        }
+                        
+                    }
                 }
                 else if (_editMode.enumValueIndex == 1)
                 {
@@ -779,7 +815,6 @@ namespace Materiator
                 material = Instantiate(_materiaSetter.Material); // I'm instantiating here because Unity can't add an object to asset if it is already a part of an asset
             }
 
-            //texs = _materiaSetter.Textures.CloneTextures(Utils.Settings.FilterMode);
             
 
             if (_editMode.enumValueIndex == 0)
@@ -858,7 +893,7 @@ namespace Materiator
             
             data.MateriaSlots.AddRange(_materiaSetter.MateriaSlots);
 
-            data.ShaderData = (ShaderData)_shaderData.objectReferenceValue;
+            data.MaterialData = (MaterialData)_materialData.objectReferenceValue;
             data.MateriaPreset = (MateriaPreset)_materiaPreset.objectReferenceValue;
            
 
@@ -935,7 +970,7 @@ namespace Materiator
             _materiaAtlas = serializedObject.FindProperty("MateriaAtlas");
             _materiaPreset = serializedObject.FindProperty("MateriaPreset");
             _materiaSetterData = serializedObject.FindProperty("MateriaSetterData");
-            _shaderData = serializedObject.FindProperty("ShaderData");
+            _materialData = serializedObject.FindProperty("MaterialData");
             _material = serializedObject.FindProperty("Material");
 
             _materiaAtlasObjectField = root.Q<ObjectField>("MateriaAtlasObjectField");
@@ -944,8 +979,8 @@ namespace Materiator
             _materiaPresetObjectField.objectType = typeof(MateriaPreset);
             _materiaSetterDataObjectField = root.Q<ObjectField>("MateriaSetterDataObjectField");
             _materiaSetterDataObjectField.objectType = typeof(MateriaSetterData);
-            _shaderDataObjectField = root.Q<ObjectField>("ShaderDataObjectField");
-            _shaderDataObjectField.objectType = typeof(ShaderData);
+            _materialDataObjectField = root.Q<ObjectField>("MaterialDataObjectField");
+            _materialDataObjectField.objectType = typeof(MaterialData);
 
 
             _reloadButton = root.Q<Button>("ReloadButton");
@@ -976,7 +1011,7 @@ namespace Materiator
             _materiaAtlasObjectField.BindProperty(_materiaAtlas);
             _materiaPresetObjectField.BindProperty(_materiaPreset);
             _materiaSetterDataObjectField.BindProperty(_materiaSetterData);
-            _shaderDataObjectField.BindProperty(_shaderData);
+            _materialDataObjectField.BindProperty(_materialData);
 
             //_uvDisplayModeEnumField.
         }

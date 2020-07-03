@@ -13,6 +13,7 @@ namespace Materiator
         public string SavePath;
         public int GridSize = 4;
         public bool PackAssets;
+        public MaterialData DefaultMaterialData;
         public ShaderData DefaultShaderData;
         public Materia DefaultMateria;
         //public MaterialGlobalIlluminationFlags GlobalIlluminationFlag;

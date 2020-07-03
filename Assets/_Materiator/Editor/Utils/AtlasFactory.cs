@@ -21,7 +21,7 @@ namespace Materiator
             }
         }
 
-        public static void CreateAtlas(KeyValuePair<ShaderData, List<MateriaSetter>> group, Material material, string path, bool saveAsNewPrefabs, string newPrefabSuffix)
+        public static void CreateAtlas(KeyValuePair<MaterialData, List<MateriaSetter>> group, Material material, string path, bool saveAsNewPrefabs, string newPrefabSuffix)
         {
             var msCount = 0;
             List<GameObject> prefabs = new List<GameObject>();
@@ -102,7 +102,7 @@ namespace Materiator
                         var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.MateriaSetterData == ms[j].MateriaSetterData).FirstOrDefault();
                         atlas.AtlasEntries.Add(prefabMS, data);
                         
-                        atlas.ShaderData = group.Key;
+                        atlas.MaterialData = group.Key;
                         atlas.GridSize = gridSize;
 
 

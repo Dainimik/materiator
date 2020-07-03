@@ -48,6 +48,9 @@ namespace Materiator
             {
                 _settings.DefaultShaderData = AssetDatabase.LoadAssetAtPath<ShaderData>(shaderDataPath + "Standard_BuiltInRenderPipeline.asset");
             }
+
+            CreateMaterialData("DefaultMaterial");
+
             return;
         }
 
@@ -76,6 +79,21 @@ namespace Materiator
             shaderData.MetallicSmoothnessKeywordName = metallicSmoothnessKeywordName;
             shaderData.EmissionKeywordName = emissionKeywordName;
             shaderData.IsEditable = false;
+        }
+
+        private void CreateMaterialData(string name)
+        {
+            string path = AssetUtils.GetEditorScriptDirectory(this);
+            AssetUtils.CheckDirAndCreate(path + "/Resources", "MaterialData");
+            path += "/Resources/MaterialData/";
+
+            var materialData = AssetUtils.CreateScriptableObjectAsset<MaterialData>(AssetUtils.AbsoluteToRelativePath(path), name);
+            materialData.ShaderData = Utils.Settings.DefaultShaderData;
+
+            var material = Utils.CreateMaterial(materialData.ShaderData.Shader, name);
+            materialData.Material = material;
+
+            AssetDatabase.AddObjectToAsset(material, materialData);
         }
     }
 }

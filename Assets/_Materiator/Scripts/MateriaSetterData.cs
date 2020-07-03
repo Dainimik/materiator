@@ -7,7 +7,7 @@ namespace Materiator
     {
         public List<MateriaSlot> MateriaSlots;
         public MateriaPreset MateriaPreset;
-        public ShaderData ShaderData;
+        public MaterialData MaterialData;
         public Material Material;
         public Textures Textures;
 
