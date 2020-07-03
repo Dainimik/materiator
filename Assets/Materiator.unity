@@ -267,6 +267,7 @@ GameObject:
   - component: {fileID: 542620418}
   - component: {fileID: 542620417}
   - component: {fileID: 542620416}
+  - component: {fileID: 6602569657865862037}
   m_Layer: 0
   m_Name: OilBarrel Variant
   m_TagString: Untagged
@@ -293,7 +294,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 4958347273294886248, guid: 7eae935477188b843a74164be52a3eb2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -430,3 +431,151 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &6602569657865862037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 542620415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cc8b14ac3fd0804585ec453092f7071, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _instanceID: -8365528
+  IsInitialized: 1
+  IsDirty: 0
+  EditMode: 0
+  MateriaSetterData: {fileID: 11400000, guid: 7eae935477188b843a74164be52a3eb2, type: 2}
+  Mesh: {fileID: 2750013030952444713, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
+  MeshFilter: {fileID: 542620417}
+  Renderer: {fileID: 542620416}
+  MeshRenderer: {fileID: 542620416}
+  SkinnedMeshRenderer: {fileID: 0}
+  MateriaSlots:
+  - ID: 1
+    Materia: {fileID: 11400000, guid: 79e496399a7542c48a52cbceb68b872d, type: 2}
+    Tag: '-'
+  - ID: 0
+    Materia: {fileID: 11400000, guid: 555ce609e5fd0014b8567f3e49bdf198, type: 2}
+    Tag: '-'
+  - ID: 4
+    Materia: {fileID: 11400000, guid: 555ce609e5fd0014b8567f3e49bdf198, type: 2}
+    Tag: '-'
+  FilteredRects:
+    _keys: 010000000000000004000000
+    _values:
+    - serializedVersion: 2
+      x: 0.25
+      y: 0
+      width: 0.25
+      height: 0.25
+    - serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0.25
+      height: 0.25
+    - serializedVersion: 2
+      x: 0
+      y: 0.25
+      width: 0.25
+      height: 0.25
+  Rects:
+  - serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.25
+    y: 0
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.5
+    y: 0
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.75
+    y: 0
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0
+    y: 0.25
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.25
+    y: 0.25
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.5
+    y: 0.25
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.75
+    y: 0.25
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0
+    y: 0.5
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.25
+    y: 0.5
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.5
+    y: 0.5
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.75
+    y: 0.5
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0
+    y: 0.75
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.25
+    y: 0.75
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.5
+    y: 0.75
+    width: 0.25
+    height: 0.25
+  - serializedVersion: 2
+    x: 0.75
+    y: 0.75
+    width: 0.25
+    height: 0.25
+  MateriaAtlas: {fileID: 0}
+  MateriaPreset: {fileID: 0}
+  ShaderData: {fileID: 11400000, guid: d2cbf647c709b3a4da4a535dda5cd1dd, type: 2}
+  Material: {fileID: 4958347273294886248, guid: 7eae935477188b843a74164be52a3eb2, type: 2}
+  Textures:
+    Color: {fileID: -5230122365977961944, guid: 7eae935477188b843a74164be52a3eb2, type: 2}
+    MetallicSmoothness: {fileID: 3396312482911906782, guid: 7eae935477188b843a74164be52a3eb2, type: 2}
+    Emission: {fileID: 1996871158981626208, guid: 7eae935477188b843a74164be52a3eb2, type: 2}
+  NativeMesh: {fileID: 2750013030952444713, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
+  AtlasedMesh: {fileID: 0}
+  GridSize: 4
+  UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
