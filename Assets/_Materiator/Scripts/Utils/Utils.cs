@@ -4,16 +4,14 @@ namespace Materiator
 {
     public static class Utils
     {
-        public static MateriatorSettings Settings = LoadSettings();
-        public static MateriaTags MateriaTags = LoadMateriaTags();
         public static Material CreateMaterial(Shader shader, string name = null)
         {
             var mat = new Material(shader);
             if (name != null)
                 mat.name = name;
 
-            mat.SetColor(Settings.DefaultShaderData.BaseColorPropertyName, Color.white);
-            mat.EnableKeyword(Settings.DefaultShaderData.MetallicSmoothnessKeywordName);
+            mat.SetColor(SystemData.Settings.DefaultShaderData.BaseColorPropertyName, Color.white);
+            mat.EnableKeyword(SystemData.Settings.DefaultShaderData.MetallicSmoothnessKeywordName);
             return mat;
         }
 
@@ -115,15 +113,6 @@ namespace Materiator
             RuntimePreviewGenerator.Padding = -0.20f;
             var tex = RuntimePreviewGenerator.GenerateMaterialPreview(material, PrimitiveType.Sphere, 128, 128);
             return tex;
-        }
-
-        public static MateriatorSettings LoadSettings()
-        {
-            return Resources.Load<MateriatorSettings>("MateriatorSettings");
-        }
-        public static MateriaTags LoadMateriaTags()
-        {
-            return Resources.Load<MateriaTags>("MateriaTags");
         }
 
         public static void ShallowCopyFields<P, C>(P source, C destination) where P : class where C : class

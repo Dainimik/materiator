@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace Materiator
@@ -31,44 +32,63 @@ namespace Materiator
             var editorScriptPath = AssetUtils.GetEditorScriptDirectory(this);
             AssetUtils.CheckDirAndCreate(editorScriptPath, "Resources");
             var path = editorScriptPath + "/Resources";
+
             _settings = AssetUtils.CreateScriptableObjectAsset<MateriatorSettings>(path, "MateriatorSettings");
             _settings.PackAssets = true;
-            _settings.DefaultMateria = AssetUtils.CreateScriptableObjectAsset<Materia>(path, "DefaultMateria");
-            _settings.DefaultMateria.BaseColor = Color.gray;
             _settings.HighlightColor = new Color(1f, 1f, 0f, 1f);
             //_settings.GlobalIlluminationFlag = MaterialGlobalIlluminationFlags.None;
+
             var shaderDataPath = CreateDefaultShaderDataAssets();
+            var shaderDatas = AssetDatabase.LoadAllAssetsAtPath(shaderDataPath).Where(asset => asset.GetType() == typeof(ShaderData)).Cast<ShaderData>().ToArray();
 
             var renderPipelineType = RenderPipelineUtils.GetActivePipelineType();
             if (renderPipelineType == RenderPipelineUtils.PipelineType.Universal)
             {
-                _settings.DefaultShaderData = AssetDatabase.LoadAssetAtPath<ShaderData>(shaderDataPath + "Lit_UniversalRenderPipeline.asset");
+                //_settings.DefaultShaderData = AssetDatabase.LoadAssetAtPath<ShaderData>(shaderDataPath + "Lit_UniversalRenderPipeline");
+                _settings.DefaultShaderData = shaderDatas.Where(sd => sd.Shader == Shader.Find("Universal Render Pipeline/Lit")).FirstOrDefault();
             }
             else if (renderPipelineType == RenderPipelineUtils.PipelineType.BuiltIn)
             {
                 _settings.DefaultShaderData = AssetDatabase.LoadAssetAtPath<ShaderData>(shaderDataPath + "Standard_BuiltInRenderPipeline.asset");
             }
 
-            CreateMaterialData("DefaultMaterial");
+            _settings.DefaultMateria = CreateDefaultMateria("DefaultMateria");
+            _settings.DefaultMaterialData = CreateMaterialData("DefaultMaterialData");
+            _settings.MateriaTags = CreateDefaultTagsData("MateriaTags");
+
+            AssetDatabase.SaveAssets();
 
             return;
         }
 
-        private string CreateDefaultShaderDataAssets()
+        private Materia CreateDefaultMateria(string name)
         {
-            string path = AssetUtils.GetEditorScriptDirectory(this);
-            AssetUtils.CheckDirAndCreate(path + "/Resources", "ShaderData");
-            path += "/Resources/ShaderData/";
-            CreateShaderData("Universal Render Pipeline/Lit", "_BaseColor", "_BaseMap", "_MetallicGlossMap", "_SpecGlossMap", "_EmissionColor", "_EmissionMap", "_METALLICSPECGLOSSMAP", "_EMISSION", path, "Lit_UniversalRenderPipeline");
-            CreateShaderData("Universal Render Pipeline/Simple Lit", "_BaseColor", "_BaseMap", null, "_SpecGlossMap", "_EmissionColor", "_EmissionMap", "_METALLICSPECGLOSSMAP", "_EMISSION", path, "SimpleLit_UniversalRenderPipeline");
-            CreateShaderData("Standard", "_Color", "_MainTex", "_MetallicGlossMap", null, "_EmissionColor", "_EmissionMap", "_METALLICGLOSSMAP", "_EMISSION", path, "Standard_BuiltInRenderPipeline");
-            CreateShaderData("Standard (Specular setup)", "_Color", "_MainTex", null, "_SpecGlossMap", "_EmissionColor", "_EmissionMap", "_METALLICGLOSSMAP", "_EMISSION", path, "StandardSpecular_BuiltInRenderPipeline");
-            return path;
+            var materia = CreateInstance<Materia>();
+            materia.name = name;
+            materia.BaseColor = Color.gray;
+
+            AssetDatabase.AddObjectToAsset(materia, _settings);
+
+            return materia;
         }
 
-        private void CreateShaderData(string shaderName, string mainColorPropertyName, string mainTexturePropertyName, string metallicSmoothnessTexturePropertyName, string specularGlossTExturePropertyName, string emissionColorPropertyName, string emissionTexturePropertyName, string metallicSmoothnessKeywordName, string emissionKeywordName, string absolutePath, string shaderDataName)
+        private string CreateDefaultShaderDataAssets()
         {
-            var shaderData = AssetUtils.CreateScriptableObjectAsset<ShaderData>(AssetUtils.AbsoluteToRelativePath(absolutePath), shaderDataName);
+            CreateShaderData("Universal Render Pipeline/Lit", "_BaseColor", "_BaseMap", "_MetallicGlossMap", "_SpecGlossMap", "_EmissionColor", "_EmissionMap", "_METALLICSPECGLOSSMAP", "_EMISSION", "Lit_UniversalRenderPipeline");
+            CreateShaderData("Universal Render Pipeline/Simple Lit", "_BaseColor", "_BaseMap", null, "_SpecGlossMap", "_EmissionColor", "_EmissionMap", "_METALLICSPECGLOSSMAP", "_EMISSION", "SimpleLit_UniversalRenderPipeline");
+            CreateShaderData("Standard", "_Color", "_MainTex", "_MetallicGlossMap", null, "_EmissionColor", "_EmissionMap", "_METALLICGLOSSMAP", "_EMISSION", "Standard_BuiltInRenderPipeline");
+            CreateShaderData("Standard (Specular setup)", "_Color", "_MainTex", null, "_SpecGlossMap", "_EmissionColor", "_EmissionMap", "_METALLICGLOSSMAP", "_EMISSION", "StandardSpecular_BuiltInRenderPipeline");
+
+            AssetDatabase.SaveAssets();
+
+            return AssetDatabase.GetAssetPath(_settings);
+        }
+
+        private void CreateShaderData(string shaderName, string mainColorPropertyName, string mainTexturePropertyName, string metallicSmoothnessTexturePropertyName, string specularGlossTExturePropertyName, string emissionColorPropertyName, string emissionTexturePropertyName, string metallicSmoothnessKeywordName, string emissionKeywordName, string shaderDataName)
+        {
+            var shaderData = CreateInstance<ShaderData>();
+            shaderData.name = shaderDataName;
+
             shaderData.Shader = Shader.Find(shaderName);
             shaderData.BaseColorPropertyName = mainColorPropertyName;
             shaderData.MainTexturePropertyName = mainTexturePropertyName;
@@ -79,21 +99,39 @@ namespace Materiator
             shaderData.MetallicSmoothnessKeywordName = metallicSmoothnessKeywordName;
             shaderData.EmissionKeywordName = emissionKeywordName;
             shaderData.IsEditable = false;
+
+            AssetDatabase.AddObjectToAsset(shaderData, _settings);
         }
 
-        private void CreateMaterialData(string name)
+        private MaterialData CreateMaterialData(string name)
         {
-            string path = AssetUtils.GetEditorScriptDirectory(this);
-            AssetUtils.CheckDirAndCreate(path + "/Resources", "MaterialData");
-            path += "/Resources/MaterialData/";
+            var materialData = CreateInstance<MaterialData>();
+            materialData.name = name;
 
-            var materialData = AssetUtils.CreateScriptableObjectAsset<MaterialData>(AssetUtils.AbsoluteToRelativePath(path), name);
-            materialData.ShaderData = Utils.Settings.DefaultShaderData;
+            materialData.ShaderData = _settings.DefaultShaderData;
 
-            var material = Utils.CreateMaterial(materialData.ShaderData.Shader, name);
+            var material = Utils.CreateMaterial(_settings.DefaultShaderData.Shader);
+            material.name = "DefaultMaterial";
             materialData.Material = material;
 
-            AssetDatabase.AddObjectToAsset(material, materialData);
+            AssetDatabase.AddObjectToAsset(materialData, _settings);
+            AssetDatabase.AddObjectToAsset(material, _settings);
+
+            return materialData;
+        }
+
+        private MateriaTags CreateDefaultTagsData(string name)
+        {
+            var materiaTags = CreateInstance<MateriaTags>();
+            materiaTags.name = name;
+
+            materiaTags.MateriaTagsList.Add("-");
+            materiaTags.MateriaTagsList.Add("Metal");
+            materiaTags.MateriaTagsList.Add("Plastic");
+
+            AssetDatabase.AddObjectToAsset(materiaTags, _settings);
+
+            return materiaTags;
         }
     }
 }

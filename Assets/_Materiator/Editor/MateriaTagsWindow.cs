@@ -15,28 +15,13 @@ namespace Materiator
 
         private void OnEnable()
         {
-            _materiaTags = Utils.LoadMateriaTags();
-            if (_materiaTags == null) CreateDefaultTagsData();
+            _materiaTags = SystemData.Settings.MateriaTags;
             if (!_editor) Editor.CreateCachedEditor(_materiaTags, null, ref _editor);
         }
 
         private void OnGUI()
         {
             if (_editor) _editor.OnInspectorGUI();
-        }
-
-        private void CreateDefaultTagsData()
-        {
-            var editorScriptPath = AssetUtils.GetEditorScriptDirectory(this);
-            AssetUtils.CheckDirAndCreate(editorScriptPath, "Resources");
-            var path = editorScriptPath + "/Resources";
-            _materiaTags = AssetUtils.CreateScriptableObjectAsset<MateriaTags>(path, "MateriaTags");
-
-            _materiaTags.MateriaTagsList.Add("-");
-            _materiaTags.MateriaTagsList.Add("Metal");
-            _materiaTags.MateriaTagsList.Add("Plastic");
-
-            return;
         }
     }
 }

@@ -151,7 +151,7 @@ namespace Materiator
                 //foreach (var kvp in _groupsList)
                 //{
                     //AtlasFactory.CreateAtlas(kvp, _shaderMaterialGroups[kvp.Key], path, _saveAsNewPrefabs.value, _newPrefabSuffix);
-                    AtlasFactory.CreateAtlas(new KeyValuePair<MaterialData, List<MateriaSetter>>(Utils.Settings.DefaultMaterialData, _materiaSetters), new Material(Utils.Settings.DefaultShaderData.Shader), path, false, "_newPrefabSuffix");
+                    AtlasFactory.CreateAtlas(new KeyValuePair<MaterialData, List<MateriaSetter>>(SystemData.Settings.DefaultMaterialData, _materiaSetters), new Material(SystemData.Settings.DefaultShaderData.Shader), path, false, "_newPrefabSuffix");
                 //i++;
                 //}
             }

@@ -49,7 +49,7 @@ namespace Materiator
 
         public void CreateTextures(int width, int height)
         {
-            FilterMode = Utils.Settings.FilterMode;
+            FilterMode = SystemData.Settings.FilterMode;
 
             Color = CreateTexture2D(width, height, TextureFormat.RGBA32, FilterMode);
             MetallicSmoothness = CreateTexture2D(width, height, TextureFormat.RGBA32, FilterMode);
@@ -220,9 +220,9 @@ namespace Materiator
 
         public Textures WriteTexturesToDisk(string dirName)
         {
-            Color = WriteTextureToDisk(Color, dirName + Color.name + ".png", Utils.Settings.FilterMode);
-            MetallicSmoothness = WriteTextureToDisk(MetallicSmoothness, dirName + MetallicSmoothness.name + ".png", Utils.Settings.FilterMode);
-            Emission = WriteTextureToDisk(Emission, dirName + Emission.name + ".png", Utils.Settings.FilterMode);
+            Color = WriteTextureToDisk(Color, dirName + Color.name + ".png", SystemData.Settings.FilterMode);
+            MetallicSmoothness = WriteTextureToDisk(MetallicSmoothness, dirName + MetallicSmoothness.name + ".png", SystemData.Settings.FilterMode);
+            Emission = WriteTextureToDisk(Emission, dirName + Emission.name + ".png", SystemData.Settings.FilterMode);
             return this;
         }
 

@@ -245,7 +245,7 @@ namespace Materiator
 
                     if (_materiaSetter.FilteredRects.ContainsKey(i))
                     {
-                        Color color = Utils.Settings.DefaultMateria.BaseColor;
+                        Color color = SystemData.Settings.DefaultMateria.BaseColor;
                         switch (_uvDisplayModeEnumField.value)
                         {
                             case UVDisplayMode.BaseColor:
@@ -443,11 +443,11 @@ namespace Materiator
 
                 int _materiaTagIndex = 0;
                 EditorGUI.BeginChangeCheck();
-                _materiaTagIndex = EditorGUI.Popup(new Rect(rect.x + 25f, rect.y, 95f, rect.height), Utils.MateriaTags.MateriaTagsList.IndexOf(materiaTag.stringValue), Utils.MateriaTags.MateriaTagsArray, EditorStyles.popup);
+                _materiaTagIndex = EditorGUI.Popup(new Rect(rect.x + 25f, rect.y, 95f, rect.height), SystemData.Settings.MateriaTags.MateriaTagsList.IndexOf(materiaTag.stringValue), SystemData.Settings.MateriaTags.MateriaTagsArray, EditorStyles.popup);
                 if (EditorGUI.EndChangeCheck())
                 {
                     SetMateriaSetterDirty(true);
-                    var newTag = Utils.MateriaTags.MateriaTagsList[_materiaTagIndex];
+                    var newTag = SystemData.Settings.MateriaTags.MateriaTagsList[_materiaTagIndex];
                     Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Materia Tag");
                     _materiaSetter.MateriaSlots[index].Tag = newTag;
                 }
@@ -460,7 +460,7 @@ namespace Materiator
                     SetMateriaSetterDirty(true);
 
                     if (elementMateria == null)
-                        elementMateria = Utils.Settings.DefaultMateria;
+                        elementMateria = SystemData.Settings.DefaultMateria;
                     else
                         _materiaSetter.MateriaSlots[index].Materia = elementMateria;
 
@@ -523,7 +523,7 @@ namespace Materiator
             {
                 _highlightedTexture = new Texture2D(_materiaSetter.Textures.Color.width, _materiaSetter.Textures.Color.height, TextureFormat.RGBA32, false);
                 EditorUtility.CopySerialized(originalTexture, _highlightedTexture);
-                _highlightedTexture.filterMode = Utils.Settings.FilterMode;
+                _highlightedTexture.filterMode = SystemData.Settings.FilterMode;
             }
 
             var colors = originalTexture.GetPixels32();
@@ -531,7 +531,7 @@ namespace Materiator
 
             for (int i = 0; i < colors.Length; i++)
             {
-                colors[i] = Utils.Settings.HighlightColor;
+                colors[i] = SystemData.Settings.HighlightColor;
             }
 
             if (selected)
@@ -730,7 +730,7 @@ namespace Materiator
         {
             if (EditorUtility.DisplayDialog("Overwrite current data?", "Are you sure you want to overwrite " + _materiaSetterData.objectReferenceValue.name + " with current settings?", "Yes", "No"))
             {
-                WriteAssetsToDisk(AssetDatabase.GetAssetPath(_materiaSetter.MateriaSetterData), Utils.Settings.PackAssets);
+                WriteAssetsToDisk(AssetDatabase.GetAssetPath(_materiaSetter.MateriaSetterData), SystemData.Settings.PackAssets);
                 
             }
         }
@@ -739,7 +739,7 @@ namespace Materiator
             var path = EditorUtility.SaveFilePanelInProject("Save data", _materiaSetter.gameObject.name, "asset", "asset");
             if (path.Length != 0)
             {
-                WriteAssetsToDisk(path, Utils.Settings.PackAssets);
+                WriteAssetsToDisk(path, SystemData.Settings.PackAssets);
             }    
         }
 
@@ -757,7 +757,7 @@ namespace Materiator
             }
             else
             {
-                dir = Utils.Settings.SavePath;
+                dir = SystemData.Settings.SavePath;
                 name = _materiaSetter.gameObject.name;
                 path = dir + name + ".asset";
             }

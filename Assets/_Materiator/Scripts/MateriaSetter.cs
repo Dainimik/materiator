@@ -106,11 +106,11 @@ namespace Materiator
         private void SetUpRenderer()
         {
             if (MaterialData == null)
-                MaterialData = Utils.Settings.DefaultMaterialData;
+                MaterialData = SystemData.Settings.DefaultMaterialData;
 
             if (Renderer.sharedMaterial == null)
             {
-                Material = Instantiate(Utils.Settings.DefaultMaterialData.Material);
+                Material = Instantiate(SystemData.Settings.DefaultMaterialData.Material);
                 Material.name = gameObject.name;
                 UpdateRenderer(false);
             }
@@ -139,7 +139,7 @@ namespace Materiator
         {
             if (EditMode == EditMode.Native)
             {
-                GridSize = Utils.Settings.GridSize;
+                GridSize = SystemData.Settings.GridSize;
                 UVRect = new Rect(0f, 0f, 1f, 1f);
             }
             else if (EditMode == EditMode.Atlas)
@@ -173,7 +173,7 @@ namespace Materiator
 
         public void AnalyzeMesh()
         {
-            var gridSize = Utils.Settings.GridSize;
+            var gridSize = SystemData.Settings.GridSize;
 
             if (MateriaSetterData != null)
             {
@@ -202,7 +202,7 @@ namespace Materiator
                         }
                         else
                         {
-                            newMateriaSlots.Add(new MateriaSlot(ms.ID, Utils.Settings.DefaultMateria, ms.Tag));
+                            newMateriaSlots.Add(new MateriaSlot(ms.ID, SystemData.Settings.DefaultMateria, ms.Tag));
                         }
                     }
                 }
@@ -288,7 +288,7 @@ namespace Materiator
             {
                 for (int i = 0; i < MateriaSlots.Count; i++)
                 {
-                    MateriaSlots[i].Materia = Utils.Settings.DefaultMateria;
+                    MateriaSlots[i].Materia = SystemData.Settings.DefaultMateria;
                 }
             }
         }

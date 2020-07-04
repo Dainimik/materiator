@@ -19,7 +19,7 @@ namespace Materiator
             }
             else
             {
-                Materia = Utils.Settings.DefaultMateria;
+                Materia = SystemData.Settings.DefaultMateria;
             }
             
             if (tag != null)
@@ -28,7 +28,7 @@ namespace Materiator
             }
             else
             {
-                Tag = Utils.Settings.DefaultTag;
+                Tag = SystemData.Settings.DefaultTag;
             }
             
         }
