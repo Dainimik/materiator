@@ -15,7 +15,15 @@
     </ui:VisualElement>
     <ui:VisualElement name="ContentContainer">
         <Style src="Materiator.uss" />
-        <ui:ListView focusable="True" item-height="16" name="MateriaSetterDataListView" selection-type="Multiple" style="height: 200px;" />
+        <ui:VisualElement style="flex-direction: row;">
+            <ui:Label text="Selected Materia Setters" />
+            <ui:Label name="SelectedMateriaSettersValue" />
+        </ui:VisualElement>
+        <ui:VisualElement name="LabelContainer" style="flex-direction: row; justify-content: space-around;">
+            <ui:Label text="Prefab" name="PrefabLabel" />
+            <ui:Label text="Target" name="TargetLabel" />
+        </ui:VisualElement>
+        <ui:ListView focusable="True" item-height="20" name="MateriaSetterDataListView" selection-type="Multiple" style="height: 200px;" />
     </ui:VisualElement>
     <ui:VisualElement name="OutputSectionContainer" class="section-container">
         <Style src="Materiator.uss" />

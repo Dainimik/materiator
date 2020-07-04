@@ -10,6 +10,9 @@ namespace Materiator
 {
     public class MateriaAtlasEditorWindow : MateriatorEditorWindow
     {
+        private static MateriaAtlasEditorWindow _window;
+
+        private Label _selectedMateriaSettersValue;
         private ListView _materiaSetterDataListView;
         private ObjectField _atlasObjectField;
 
@@ -28,7 +31,8 @@ namespace Materiator
 
         public static void OpenWindow()
         {
-            GetWindow<MateriaAtlasEditorWindow>("Atlas Editor");
+            _window = GetWindow<MateriaAtlasEditorWindow>("Atlas Editor");
+            _window.minSize = new Vector2(400f, 600f);
         }
 
         private void OnEnable()
@@ -50,17 +54,41 @@ namespace Materiator
             // will recycle elements created by the "makeItem"
             // and invoke the "bindItem" callback to associate
             // the element with the matching data item (specified as an index in the list)
-            Action<VisualElement, int> bindItem = (e, i) => (e as Label).text = (i + 1) + ". " + _materiaSetters[i].name;
+            Action<VisualElement, int> bindItem = (e, i) =>
+            {
+                var go = _materiaSetters[i].transform.root.gameObject;
+                var prefabGUIContent = EditorGUIUtility.ObjectContent(go, go.GetType());
+                // BUG?: If I cache materiaSetter GUIContent here and use it in the same manner as prefabGUIContent, materiaSetter's GUICOntent replaces prefabGUIContent icon and text in list view
+                //----------------------------------------------------------------------------------------
+
+                var item = new AtlasEditorListEntry((i + 1).ToString(), prefabGUIContent.image as Texture2D, prefabGUIContent.text, EditorGUIUtility.ObjectContent(_materiaSetters[i], _materiaSetters[i].GetType()).image as Texture2D, EditorGUIUtility.ObjectContent(_materiaSetters[i], _materiaSetters[i].GetType()).text);
+                item.RemoveListEntryButton.clicked += () => RemoveListEntry(_materiaSetters[i]);
+
+                e.Add(item);
+            }; 
 
             _materiaSetterDataListView.makeItem = makeItem;
             _materiaSetterDataListView.bindItem = bindItem;
             _materiaSetterDataListView.itemsSource = _materiaSetters;
 
             // Callback invoked when the user double clicks an item
-            _materiaSetterDataListView.onItemsChosen += Debug.Log;
+            _materiaSetterDataListView.onItemsChosen += (items) => FocusListEntry((MateriaSetter)items.FirstOrDefault());
+        }
 
-            // Callback invoked when the user changes the selection inside the ListView
-            _materiaSetterDataListView.onSelectionChange += Debug.Log;
+        private void FocusListEntry(MateriaSetter ms)
+        {
+            var go = ms.gameObject;
+
+            Selection.activeObject = go;
+            EditorGUIUtility.PingObject(go);
+        }
+
+        private void RemoveListEntry(MateriaSetter item)
+        {
+            _materiaSetters.Remove(item);
+
+            _selectedMateriaSettersValue.text = _materiaSetters.Count.ToString();
+            _materiaSetterDataListView.Refresh();
         }
 
         private void Scan()
@@ -68,6 +96,8 @@ namespace Materiator
             LoadPrefabs((MateriaAtlas)_atlasObjectField.value);
 
             GenerateListView();
+
+            _atlasSectionContainer.visible = false;
         }
 
         private void SelectAtlas()
@@ -77,7 +107,9 @@ namespace Materiator
 
         private void LoadAtlas()
         {
-            Scan();
+            LoadPrefabs((MateriaAtlas)_atlasObjectField.value);
+
+            GenerateListView();
         }
 
         private void LoadPrefabs(MateriaAtlas atlas = null)
@@ -105,6 +137,8 @@ namespace Materiator
 
                 //_materiaSetters = AssetUtils.FindAllComponentsInPrefabs<MateriaSetter>().Where(d => d.MateriaSetterData == msd);
             }
+
+            _selectedMateriaSettersValue.text = _materiaSetters.Count.ToString();
         }
 
         private void CheckMateriaSettersCompatibility(ICollection<MateriaSetter> colorSetters)
@@ -160,6 +194,8 @@ namespace Materiator
         protected override void GetProperties()
         {
             _materiaSetterDataListView = root.Q<ListView>("MateriaSetterDataListView");
+
+            _selectedMateriaSettersValue = root.Q<Label>("SelectedMateriaSettersValue");
 
             _atlasSectionContainer = root.Q<VisualElement>("AtlasSectionContainer");
 
