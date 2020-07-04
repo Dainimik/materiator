@@ -13,11 +13,13 @@ namespace Materiator
         public Label PrefabLabel;
         public VisualElement MateriaSetterIcon;
         public Label MateriaSetterLabel;
+        public VisualElement MaterialDataIcon;
+        public Label MaterialDataLabel;
 
         public Button FocusListEntryButton;
         public Button RemoveListEntryButton;
 
-        public AtlasEditorListEntry(string index, Texture2D prefabIcon, string prefabName, Texture2D materiaSetterIcon, string materiaSetterName)
+        public AtlasEditorListEntry(string index, Texture2D prefabIcon, string prefabName, Texture2D materiaSetterIcon, string materiaSetterName, Texture2D materialDataIcon, string materialDataName)
         {
             _root = new VisualElement();
             _tree = Resources.Load<VisualTreeAsset>("VisualElements/AtlasEditorListEntry");
@@ -30,6 +32,8 @@ namespace Materiator
             PrefabLabel.text = prefabName;
             MateriaSetterIcon.style.backgroundImage = materiaSetterIcon;
             MateriaSetterLabel.text = materiaSetterName;
+            MaterialDataIcon.style.backgroundImage = materialDataIcon;
+            MaterialDataLabel.text = materialDataName;
 
             Add(_root);
         }
@@ -41,6 +45,8 @@ namespace Materiator
             PrefabLabel = _root.Q<Label>("PrefabLabel");
             MateriaSetterIcon = _root.Q<VisualElement>("MateriaSetterIcon");
             MateriaSetterLabel = _root.Q<Label>("MateriaSetterLabel");
+            MaterialDataIcon = _root.Q<VisualElement>("MaterialDataIcon");
+            MaterialDataLabel = _root.Q<Label>("MaterialDataLabel");
 
             FocusListEntryButton = _root.Q<Button>("FocusListEntryButton");
             RemoveListEntryButton = _root.Q<Button>("RemoveListEntryButton");

@@ -15,13 +15,17 @@
     </ui:VisualElement>
     <ui:VisualElement name="ContentContainer">
         <Style src="Materiator.uss" />
-        <ui:VisualElement style="flex-direction: row;">
-            <ui:Label text="Selected Materia Setters" />
-            <ui:Label name="SelectedMateriaSettersValue" />
+        <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
+            <ui:VisualElement name="SelectedMateriaSettersContainer" style="flex-direction: row;">
+                <ui:Label text="Selected Materia Setters" />
+                <ui:Label name="SelectedMateriaSettersValue" />
+            </ui:VisualElement>
+            <uie:ToolbarSearchField focusable="True" name="MateriaSetterSearchToolbar" style="width: 40%;" />
         </ui:VisualElement>
         <ui:VisualElement name="LabelContainer" style="flex-direction: row; justify-content: space-around;">
+            <ui:Label text="Materia Setter" name="MateriaSetterLabel" />
             <ui:Label text="Prefab" name="PrefabLabel" />
-            <ui:Label text="Target" name="TargetLabel" />
+            <ui:Label text="Material Data" name="MaterialDataLabel" />
         </ui:VisualElement>
         <ui:ListView focusable="True" item-height="20" name="MateriaSetterDataListView" selection-type="Multiple" style="height: 200px;" />
     </ui:VisualElement>

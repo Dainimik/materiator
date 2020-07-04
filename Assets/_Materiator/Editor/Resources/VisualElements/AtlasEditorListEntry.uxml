@@ -1,17 +1,21 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <ui:VisualElement style="flex-direction: row;">
-        <ui:VisualElement name="IndexContainer" style="width: 50px;">
+    <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: space-between;">
+        <ui:VisualElement name="IndexContainer" style="width: 10%; flex-direction: row;">
             <ui:Label text="Index" name="IndexLabel" style="margin-left: 5px;" />
         </ui:VisualElement>
-        <ui:VisualElement name="PrefabContainer" style="flex-direction: row; flex-grow: 1;">
-            <ui:VisualElement name="PrefabIcon" style="width: 16px; height: 16px;" />
-            <ui:Label text="Prefab" name="PrefabLabel" />
-        </ui:VisualElement>
-        <ui:VisualElement name="MateriaSetterContainer" style="flex-direction: row; flex-grow: 1;">
+        <ui:VisualElement name="MateriaSetterContainer" style="flex-direction: row; width: 25%;">
             <ui:VisualElement name="MateriaSetterIcon" style="width: 16px; height: 16px;" />
             <ui:Label text="Setter" name="MateriaSetterLabel" />
         </ui:VisualElement>
-        <ui:VisualElement name="ButtonContainer" style="flex-direction: row;">
+        <ui:VisualElement name="PrefabContainer" style="flex-direction: row; width: 25%;">
+            <ui:VisualElement name="PrefabIcon" style="width: 16px; height: 16px;" />
+            <ui:Label text="Prefab" name="PrefabLabel" />
+        </ui:VisualElement>
+        <ui:VisualElement name="MaterialDataContainer" style="flex-direction: row; width: 20%;">
+            <ui:VisualElement name="MaterialDataIcon" style="width: 16px; height: 16px;" />
+            <ui:Label text="Material Data" name="MaterialDataLabel" />
+        </ui:VisualElement>
+        <ui:VisualElement name="ButtonContainer" style="flex-direction: row; width: 20%; justify-content: flex-end;">
             <ui:Button text="Focus" name="FocusListEntryButton" />
             <ui:Button text="X" name="RemoveListEntryButton" />
         </ui:VisualElement>

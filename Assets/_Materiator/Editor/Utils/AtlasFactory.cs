@@ -9,9 +9,9 @@ namespace Materiator
     {
         public static bool CheckMateriaSetterCompatibility(MateriaSetter ms)
         {
-            if (ms.MateriaSetterData != null
-                && ms.MateriaSetterData.Material != null
-                && ms.IsDirty == false)
+            if (ms.IsDirty == false
+                && ms.MateriaSetterData != null
+                && ms.MateriaSetterData.Material != null)
             {
                 return true;
             }
