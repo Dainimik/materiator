@@ -27,7 +27,9 @@
             <ui:Label text="Prefab" name="PrefabLabel" />
             <ui:Label text="Material Data" name="MaterialDataLabel" />
         </ui:VisualElement>
-        <ui:ListView focusable="True" item-height="20" name="MateriaSetterDataListView" selection-type="Multiple" style="height: 200px;" />
+        <ui:VisualElement name="MateriaSetterListViewDropArea" style="height: 200px;">
+            <ui:ListView focusable="True" item-height="20" name="MateriaSetterDataListView" selection-type="Multiple" style="flex-grow: 1;" />
+        </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="OutputSectionContainer" class="section-container">
         <Style src="Materiator.uss" />

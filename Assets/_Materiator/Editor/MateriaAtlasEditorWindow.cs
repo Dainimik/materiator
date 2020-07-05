@@ -12,6 +12,7 @@ namespace Materiator
     {
         private static MateriaAtlasEditorWindow _window;
 
+        private VisualElement _materiaSetterListViewDropArea;
         private Label _selectedMateriaSettersValue;
         private ListView _materiaSetterDataListView;
         private ObjectField _atlasObjectField;
@@ -28,7 +29,7 @@ namespace Materiator
         private Button _overwriteButton;
         private Button _saveAsNewButton;
 
-        private List<MateriaSetter> _materiaSetters;
+        private List<MateriaSetter> _materiaSetters = new List<MateriaSetter>();
         private List<MateriaSetter> _compatibleMateriaSetters = new List<MateriaSetter>();
         private List<MateriaSetter> _incompatibleMateriaSetters = new List<MateriaSetter>();
         private Dictionary<MaterialData, List<MateriaSetter>> _groupsList = new Dictionary<MaterialData, List<MateriaSetter>>();
@@ -152,11 +153,11 @@ namespace Materiator
             FilterMateriaSetterListView(_searchString);
         }
 
-        private void Scan()
+        private void ScanForPrefabs()
         {
             LoadPrefabs((MateriaAtlas)_atlasObjectField.value);
 
-            GenerateListView(_materiaSetters);
+            GenerateListView(_compatibleMateriaSetters);
 
             _atlasSectionContainer.visible = false;
         }
@@ -170,7 +171,7 @@ namespace Materiator
         {
             LoadPrefabs((MateriaAtlas)_atlasObjectField.value);
 
-            GenerateListView(_materiaSetters);
+            GenerateListView(_compatibleMateriaSetters);
         }
 
         private void LoadPrefabs(MateriaAtlas atlas = null)
@@ -179,12 +180,9 @@ namespace Materiator
             {
                 //ResetAtlasGenerator(true);
                 _materiaSetters = AssetUtils.FindAllComponentsInPrefabs<MateriaSetter>();
-                CheckMateriaSettersCompatibility(_materiaSetters);
             }
             else
             {
-
-
                 //_materiaSetters = new List<MateriaSetter>();
                 _materiaSetters = atlas.AtlasEntries.Keys.ToList();
                 //foreach (var msd in atlas.AtlasEntry.Keys)
@@ -198,6 +196,8 @@ namespace Materiator
 
                 //_materiaSetters = AssetUtils.FindAllComponentsInPrefabs<MateriaSetter>().Where(d => d.MateriaSetterData == msd);
             }
+
+            CheckMateriaSettersCompatibility(_materiaSetters);
 
             _selectedMateriaSettersValue.text = _materiaSetters.Count.ToString();
         }
@@ -213,20 +213,28 @@ namespace Materiator
                     if (PrefabUtility.IsPartOfPrefabAsset(ms)
                     && !PrefabUtility.IsPartOfPrefabInstance(ms) || PrefabUtility.IsPartOfVariantPrefab(ms))
                     {
-                        _compatibleMateriaSetters.Add(ms);
-
-                        if (!_groupsList.ContainsKey(ms.MateriaSetterData.MaterialData))
+                        if (!_compatibleMateriaSetters.Contains(ms))
                         {
-                            _groupsList.Add(ms.MateriaSetterData.MaterialData, groupMembers);
-                        }
-                        _groupsList[ms.MateriaSetterData.MaterialData].Add(ms);
+                            _compatibleMateriaSetters.Add(ms);
 
-                        if (!_materialDataMaterialGroups.ContainsKey(ms.MateriaSetterData.MaterialData))
-                            _materialDataMaterialGroups.Add(ms.MateriaSetterData.MaterialData, ms.MateriaSetterData.Material);
+                            if (!_groupsList.ContainsKey(ms.MateriaSetterData.MaterialData))
+                            {
+                                _groupsList.Add(ms.MateriaSetterData.MaterialData, groupMembers);
+                            }
+                            _groupsList[ms.MateriaSetterData.MaterialData].Add(ms);
+
+                            if (!_materialDataMaterialGroups.ContainsKey(ms.MateriaSetterData.MaterialData))
+                                _materialDataMaterialGroups.Add(ms.MateriaSetterData.MaterialData, ms.MateriaSetterData.Material);
+                        }
                     }
                 }
                 else
-                    _incompatibleMateriaSetters.Add(ms);
+                {
+                    if (!_incompatibleMateriaSetters.Contains(ms))
+                    {
+                        _incompatibleMateriaSetters.Add(ms);
+                    }
+                }
             }
         }
 
@@ -255,10 +263,78 @@ namespace Materiator
             {
                 FilterMateriaSetterListView(e.newValue);
             });
+
+            RegisterDropAreaCallbacks();
+        }
+
+        private void RegisterDropAreaCallbacks()
+        {
+            _materiaSetterListViewDropArea.RegisterCallback<MouseDownEvent>(evt =>
+            {
+                DragAndDrop.PrepareStartDrag();
+                DragAndDrop.SetGenericData("GameObject", this);
+                DragAndDrop.StartDrag("Dragging");
+                //DragAndDrop.objectReferences = new Object[] { prefab };
+            });
+
+            _materiaSetterListViewDropArea.RegisterCallback<DragUpdatedEvent>(evt =>
+            {
+                DragAndDrop.visualMode = DragAndDropVisualMode.Move;
+                Debug.Log("aaa");
+            });
+
+            _materiaSetterListViewDropArea.RegisterCallback<DragPerformEvent>(evt =>
+            {
+                DragAndDrop.visualMode = DragAndDropVisualMode.Move;
+
+                var objs = new List<GameObject>();
+
+                DragAndDrop.AcceptDrag();
+
+                foreach (GameObject draggedObject in DragAndDrop.objectReferences)
+                    if (draggedObject.GetType() == typeof(GameObject))
+                        objs.Add((GameObject)draggedObject);
+
+                HandleDraggedInGameObjects(objs);
+                GenerateListView(_compatibleMateriaSetters);
+                //Action(objs);
+
+            });
+
+            //_materiaSetterListViewDropArea.RegisterCallback<DragEnterEvent>(OnDragEnterEvent);
+            //_materiaSetterListViewDropArea.RegisterCallback<DragLeaveEvent>(OnDragLeaveEvent);
+            //_materiaSetterListViewDropArea.RegisterCallback<DragUpdatedEvent>(OnDragUpdatedEvent);
+            //_materiaSetterListViewDropArea.RegisterCallback<DragPerformEvent>(OnDragPerformEvent);
+            //_materiaSetterListViewDropArea.RegisterCallback<DragExitedEvent>(OnDragExitedEvent);
+
+
+
+            EditorUtils.DrawDropArea<GameObject>(_materiaSetterListViewDropArea, HandleDraggedInGameObjects);
+        }
+
+
+        private void HandleDraggedInGameObjects(List<GameObject> gameObjects)
+        {
+            foreach (var go in gameObjects)
+            {
+                var materiaSetters = go.GetComponentsInChildren<MateriaSetter>();
+
+                for (int i = 0; i < materiaSetters.Length; i++)
+                {
+                    if (!_materiaSetters.Contains(materiaSetters[i]))
+                    {
+                        _materiaSetters.Add(materiaSetters[i]);
+                    }
+                }
+
+                CheckMateriaSettersCompatibility(materiaSetters);
+            }
         }
 
         protected override void GetProperties()
         {
+            _materiaSetterListViewDropArea = root.Q<VisualElement>("MateriaSetterListViewDropArea");
+
             _materiaSetterDataListView = root.Q<ListView>("MateriaSetterDataListView");
 
             _materiaSetterSearchToolbar = root.Q<ToolbarSearchField>("MateriaSetterSearchToolbar");
@@ -285,7 +361,7 @@ namespace Materiator
 
         protected override void RegisterButtons()
         {
-            _scanProjectButton.clicked += Scan;
+            _scanProjectButton.clicked += ScanForPrefabs;
             _selectAtlasButton.clicked += SelectAtlas;
             _loadAtlasButton.clicked += LoadAtlas;
             _overwriteButton.clicked += Overwrite;

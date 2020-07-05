@@ -4,6 +4,8 @@ using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.UIElements;
+using UnityEngine.VFX;
 
 namespace Materiator
 {
@@ -38,7 +40,7 @@ namespace Materiator
         }
 
         public delegate void DrawDropAreaAction<T>(List<T> obj);
-        public static ICollection<T> DrawDropArea<T>(Rect dropAreaRect, DrawDropAreaAction<T> Action) where T : Object
+        public static ICollection<T> DrawDropArea<T>(VisualElement dropArea, DrawDropAreaAction<T> Action) where T : Object
         {
             var objs = new List<T>();
             Event evt = Event.current;
@@ -46,7 +48,7 @@ namespace Materiator
             {
                 case EventType.DragUpdated:
                 case EventType.DragPerform:
-                    if (!dropAreaRect.Contains(evt.mousePosition))
+                    if (!dropArea.contentRect.Contains(evt.mousePosition))
                         return null;
 
                     DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
