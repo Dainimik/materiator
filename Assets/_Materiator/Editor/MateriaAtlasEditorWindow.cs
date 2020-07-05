@@ -75,7 +75,7 @@ namespace Materiator
                 var item = new AtlasEditorListEntry((i + 1).ToString(), prefabGUIContent.image as Texture2D, prefabGUIContent.text,
                     EditorGUIUtility.ObjectContent(ms[i], ms[i].GetType()).image as Texture2D, ms[i].name,
                     EditorGUIUtility.ObjectContent(ms[i].MaterialData, ms[i].MaterialData.GetType()).image as Texture2D, ms[i].MaterialData.name);
-                item.RemoveListEntryButton.clicked += () => RemoveListEntry(ms[i]);
+                item.RemoveListEntryButton.clicked += () => RemoveListEntry(ms[i], materiaSettersList);
 
                 e.Add(item);
             }; 
@@ -88,9 +88,9 @@ namespace Materiator
             _materiaSetterDataListView.onItemsChosen += (items) => FocusListEntry((MateriaSetter)items.FirstOrDefault());
         }
 
-        private void FilterMateriaSetterListView(ChangeEvent<string> e)
+        private void FilterMateriaSetterListView(string e)
         {
-            _searchString = e.newValue.ToLower();
+            _searchString = e.ToLower();
 
             var filteredList = new List<MateriaSetter>();
 
@@ -102,7 +102,15 @@ namespace Materiator
                 }
             }
 
-            _materiaSetterDataListView.itemsSource = filteredList;
+            if (filteredList.Count != _materiaSetters.Count)
+            {
+                _materiaSetterDataListView.itemsSource = filteredList;
+            }
+            else
+            {
+                _materiaSetterDataListView.itemsSource = _materiaSetters;
+            }
+            
             _materiaSetterDataListView.Refresh();
         }
 
@@ -134,12 +142,14 @@ namespace Materiator
             EditorGUIUtility.PingObject(go);
         }
 
-        private void RemoveListEntry(MateriaSetter item)
+        private void RemoveListEntry(MateriaSetter item, List<MateriaSetter> list)
         {
+            list.Remove(item);
             _materiaSetters.Remove(item);
 
             _selectedMateriaSettersValue.text = _materiaSetters.Count.ToString();
-            _materiaSetterDataListView.Refresh();
+
+            FilterMateriaSetterListView(_searchString);
         }
 
         private void Scan()
@@ -243,7 +253,7 @@ namespace Materiator
         {
             _materiaSetterSearchToolbarTextField.RegisterCallback<ChangeEvent<string>>(e =>
             {
-                FilterMateriaSetterListView(e);
+                FilterMateriaSetterListView(e.newValue);
             });
         }
 
