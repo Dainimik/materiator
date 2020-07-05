@@ -12,8 +12,6 @@ namespace Materiator
 
     public class MateriaSetter : MonoBehaviour
     {
-        public int InstanceID { get { return _instanceID; } }
-        [SerializeField] private int _instanceID;
         public bool IsInitialized = false;
         public bool IsDirty = true;
         public EditMode EditMode;
@@ -49,9 +47,6 @@ namespace Materiator
             IsInitialized = false;
 
             Refresh();
-
-            if (_instanceID == 0)
-                _instanceID = GetInstanceID();
 
             UpdateColorsOfAllTextures();
 
