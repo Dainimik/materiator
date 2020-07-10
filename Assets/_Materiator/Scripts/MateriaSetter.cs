@@ -215,6 +215,11 @@ namespace Materiator
                 }
 
                 materiaSlotsCount = MateriaSlots.Count;
+
+                if (!IsDirty)
+                {
+                    MateriaSlots = MateriaSetterData.MateriaSlots;
+                }
             }
 
             if (reset || refresh || materiaSlotsCount == 0 || FilteredRects.Count != materiaSlotsCount)

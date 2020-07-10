@@ -377,11 +377,13 @@ namespace Materiator
                 }
 
                 newTextures.CreateTextures(textures.Size.x, textures.Size.y);
-                _material.objectReferenceValue = Instantiate(_material.objectReferenceValue);
-                newTextures.CopyPixelColors(textures, textures.Size.x, new Rect(0, 0, 1, 1), newTextures.Size.x, new Rect(0, 0, 1, 1));
+                var mat = Instantiate(_material.objectReferenceValue);
+                newTextures.CopyPixelColors(textures, textures.Size.x, new Rect(0, 0, 1, 1), newTextures.Size.x, new Rect(0, 0, 1, 1));          
 
                 if (name != null)
-                    _material.objectReferenceValue.name = name;
+                    mat.name = name;
+
+                _material.objectReferenceValue = mat;
 
                 serializedObject.ApplyModifiedProperties();
 
