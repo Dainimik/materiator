@@ -113,7 +113,7 @@ namespace Materiator
             if (MaterialData == null)
                 MaterialData = SystemData.Settings.DefaultMaterialData;
 
-            if (Renderer.sharedMaterial == null)
+            if (Renderer.sharedMaterial == null || (Renderer.sharedMaterial != null && Material == null))
             {
                 Material = Instantiate(SystemData.Settings.DefaultMaterialData.Material);
                 Material.name = gameObject.name;
