@@ -63,6 +63,9 @@ namespace Materiator
             InitializeTextures();
             AnalyzeMesh();
             GenerateMateriaSlots();
+
+            if (IsDirty)
+                UpdateColorsOfAllTextures();
         }
 
         public void ResetMateriaSetter()
@@ -216,7 +219,7 @@ namespace Materiator
 
                 materiaSlotsCount = MateriaSlots.Count;
 
-                if (!IsDirty)
+                if (!IsDirty && MateriaSetterData != null)
                 {
                     MateriaSlots = MateriaSetterData.MateriaSlots;
                 }
