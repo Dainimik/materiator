@@ -93,6 +93,19 @@ namespace Materiator
             }*/
         }
 
+        private void Refresh()
+        {
+            _materiaSetter.Refresh();
+            DrawUVInspector(true);
+        }
+
+        private void ResetMateriaSetter()
+        {
+            _materiaSetter.ResetMateriaSetter();
+
+            SetMateriaSetterDirty(true);
+        }
+
         private void SetMateriaSetterDirty(bool value)
         {
             serializedObject.Update();
@@ -116,6 +129,18 @@ namespace Materiator
             DrawUVInspector(true);
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private void SwitchEditMode()
+        {
+            if (_materiaSetter.EditMode == EditMode.Native)
+            {
+                LoadAtlas(_materiaSetter.MateriaSetterData.MateriaAtlas);
+            }
+            else if (_materiaSetter.EditMode == EditMode.Atlas)
+            {
+                UnloadAtlas();
+            }
         }
 
         private void DrawIMGUI()
@@ -143,13 +168,6 @@ namespace Materiator
             }
 
             DrawDefaultInspector();
-        }
-
-        private void ResetMateriaSetter()
-        {
-            _materiaSetter.ResetMateriaSetter();
-
-            SetMateriaSetterDirty(true);
         }
 
         private void DrawAtlasSection()
@@ -354,51 +372,6 @@ namespace Materiator
             _materiaReorderableList.DoLayoutList();
         }
 
-        private void CreateEditModeData(int editMode)
-        {
-            if (_materiaSetterData.objectReferenceValue != null)
-            {
-                var newTextures = new Textures();
-
-                Textures textures = null;
-
-                if (editMode == 0)
-                {
-                    textures = _materiaSetter.MateriaSetterData.Textures;
-                }
-                else if (editMode == 1)
-                {
-                    textures = _materiaSetter.MateriaSetterData.MateriaAtlas.Textures;
-                }
-
-                newTextures.CreateTextures(textures.Size.x, textures.Size.y);
-                var mat = Instantiate(_material.objectReferenceValue);
-                newTextures.CopyPixelColors(textures, textures.Size.x, new Rect(0, 0, 1, 1), newTextures.Size.x, new Rect(0, 0, 1, 1));          
-
-                if (name != null)
-                    mat.name = name;
-
-                _material.objectReferenceValue = mat;
-
-                serializedObject.ApplyModifiedProperties();
-
-                _materiaSetter.Textures = newTextures;
-                _materiaSetter.SetTextures();
-
-                var newMateriaSlots = new List<MateriaSlot>();
-
-                foreach (var item in _materiaSetter.MateriaSetterData.MateriaSlots)
-                {
-                    newMateriaSlots.Add(new MateriaSlot(item.ID, item.Materia, item.Tag));
-                }
-
-                _materiaSetter.MateriaSlots = newMateriaSlots;
-                serializedObject.Update();
-                _materiaSetter.UpdateRenderer();
-                serializedObject.Update();
-            }
-        }
-
         private void DrawMateriaReorderableList()
         {
             _materiaReorderableList.drawHeaderCallback = (Rect rect) =>
@@ -547,28 +520,49 @@ namespace Materiator
             }
         }
 
-        private void Refresh()
+        private void CreateEditModeData(int editMode)
         {
-            _materiaSetter.Refresh();
-            DrawUVInspector(true);
-        }
-
-        private void SwitchEditMode()
-        {
-            if (_materiaSetter.EditMode == EditMode.Native)
+            if (_materiaSetterData.objectReferenceValue != null)
             {
-                LoadAtlas(_materiaSetter.MateriaSetterData.MateriaAtlas);
-            }
-            else if (_materiaSetter.EditMode == EditMode.Atlas)
-            {
-                UnloadAtlas();
-            }
+                var newTextures = new Textures();
 
-            //SetMateriaSetterDirty(true);
-            //_materiaSetter.AnalyzeMesh();
-            //_materiaSetter.UpdateColorsOfAllTextures();
+                Textures textures = null;
 
-            //_materiaSetter.MateriaSlots = _materiaSetter.MateriaSetterData.MateriaSlots;
+                if (editMode == 0)
+                {
+                    textures = _materiaSetter.MateriaSetterData.Textures;
+                }
+                else if (editMode == 1)
+                {
+                    textures = _materiaSetter.MateriaSetterData.MateriaAtlas.Textures;
+                }
+
+                newTextures.CreateTextures(textures.Size.x, textures.Size.y);
+                var mat = Instantiate(_material.objectReferenceValue);
+                newTextures.CopyPixelColors(textures, textures.Size.x, new Rect(0, 0, 1, 1), newTextures.Size.x, new Rect(0, 0, 1, 1));
+
+                if (name != null)
+                    mat.name = name;
+
+                _material.objectReferenceValue = mat;
+
+                serializedObject.ApplyModifiedProperties();
+
+                _materiaSetter.Textures = newTextures;
+                _materiaSetter.SetTextures();
+
+                var newMateriaSlots = new List<MateriaSlot>();
+
+                foreach (var item in _materiaSetter.MateriaSetterData.MateriaSlots)
+                {
+                    newMateriaSlots.Add(new MateriaSlot(item.ID, item.Materia, item.Tag));
+                }
+
+                _materiaSetter.MateriaSlots = newMateriaSlots;
+                serializedObject.Update();
+                _materiaSetter.UpdateRenderer();
+                serializedObject.Update();
+            }
         }
 
         private void ReloadPreset()
