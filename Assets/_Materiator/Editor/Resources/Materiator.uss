@@ -45,3 +45,7 @@
     -unity-text-align: upper-center;
     height: 29px;
 }
+
+.space {
+    height: 15px;
+}

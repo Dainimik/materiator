@@ -23,6 +23,10 @@ namespace Materiator
         public FilterMode FilterMode;
 
         public string DefaultTag { get { return "-"; } }
+
+        [HideInInspector] public Color GUIGray = new Color(0.75f, 0.75f, 0.75f, 1f);
+        [HideInInspector] public Color GUIGreen = new Color(0f, 0.75f, 0f, 1f);
+        [HideInInspector] public Color GUIRed = new Color(0.75f, 0f, 0f, 1f);
     }
 }
 

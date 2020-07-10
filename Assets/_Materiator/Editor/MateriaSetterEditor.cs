@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEditorInternal;
@@ -35,13 +34,13 @@ namespace Materiator
 
         private Button _reloadButton;
         private Button _switchEditModeButton;
-        private Button _reloadMateriaAtlasButton;
         private Button _reloadMateriaPresetButton;
         private Button _newMateriaSetterDataButton;
         private Button _reloadMateriaSetterDataButton;
         private Button _overwriteMateriaSetterData;
         private Button _saveAsNewMateriaSetterData;
 
+        private VisualElement _atlasIndicator;
         private VisualElement _presetIndicator;
         private VisualElement _outputIndicator;
         private VisualElement _dataIndicator;
@@ -119,15 +118,6 @@ namespace Materiator
             serializedObject.ApplyModifiedProperties();
         }
 
-        private void DiscardChanges()
-        {
-            FieldInfo[] fields = typeof(MateriaSetter).GetFields(BindingFlags.Public | BindingFlags.Instance);
-            foreach (var item in fields)
-            {
-                Debug.Log(item);
-            }
-        }
-
         private void DrawIMGUI()
         {
             IMGUIContainer defaultInspector = new IMGUIContainer(() => IMGUI());
@@ -143,13 +133,13 @@ namespace Materiator
         {
             if (_isDirty.boolValue == true)
             {
-                _outputIndicator.style.backgroundColor = new Color(0.75f, 0f, 0f, 1f);
-                _dataIndicator.style.backgroundColor = new Color(0.75f, 0f, 0f, 1f);
+                _outputIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
+                _dataIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
             }
             else
             {
-                _outputIndicator.style.backgroundColor = new Color(0f, 0.75f, 0f, 1f);
-                _dataIndicator.style.backgroundColor = new Color(0f, 0.75f, 0f, 1f);
+                _outputIndicator.style.backgroundColor = SystemData.Settings.GUIGreen;
+                _dataIndicator.style.backgroundColor = SystemData.Settings.GUIGreen;
             }
 
             DrawDefaultInspector();
@@ -309,15 +299,15 @@ namespace Materiator
             {
                 _materiaSetter.MateriaSlots = _materiaSetter.MateriaSetterData.MateriaSlots;
 
-                _reloadMateriaAtlasButton.SetEnabled(true);
                 _materiaSetter.LoadAtlas(atlas);
-            }
-            else
-            {
-                _reloadMateriaAtlasButton.SetEnabled(false);
             }
 
             SetMateriaSetterDirty(false);
+        }
+
+        private void UnloadAtlas()
+        {
+            _materiaSetter.UnloadAtlas();
         }
 
         private void LoadPreset(MateriaPreset preset)
@@ -567,11 +557,11 @@ namespace Materiator
         {
             if (_materiaSetter.EditMode == EditMode.Native)
             {
-                _materiaSetter.LoadAtlas(_materiaSetter.MateriaSetterData.MateriaAtlas);
+                LoadAtlas(_materiaSetter.MateriaSetterData.MateriaAtlas);
             }
             else if (_materiaSetter.EditMode == EditMode.Atlas)
             {
-                _materiaSetter.UnloadAtlas();
+                UnloadAtlas();
             }
 
             //SetMateriaSetterDirty(true);
@@ -579,11 +569,6 @@ namespace Materiator
             //_materiaSetter.UpdateColorsOfAllTextures();
 
             //_materiaSetter.MateriaSlots = _materiaSetter.MateriaSetterData.MateriaSlots;
-        }
-
-        private void ReloadAtlas()
-        {
-            LoadAtlas((MateriaAtlas)_materiaAtlasObjectField.value);
         }
 
         private void ReloadPreset()
@@ -605,16 +590,23 @@ namespace Materiator
 
         private void OnMateriaAtlasChanged()
         {
-            if (_materiaAtlasObjectField.value == null)
+            if (_materiaSetter.MateriaSetterData != null)
             {
-                _reloadMateriaAtlasButton.SetEnabled(false);
+                if (_materiaSetter.MateriaAtlas != null)
+                {
+                    _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIGreen;
+                }
+                else
+                {
+                    _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
+                }
             }
             else
             {
-                _reloadMateriaAtlasButton.SetEnabled(true);
+                _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
             }
 
-            if (_materiaSetter.MateriaAtlas  == null)
+            if (_materiaSetter.MateriaAtlas == null)
             {
                 _switchEditModeButton.SetEnabled(false);
             }
@@ -631,7 +623,7 @@ namespace Materiator
             if (_materiaPresetObjectField.value == null)
             {
                 _reloadMateriaPresetButton.SetEnabled(false);
-                _presetIndicator.style.backgroundColor = new Color(0.75f, 0.75f, 0.75f, 1f);
+                _presetIndicator.style.backgroundColor = SystemData.Settings.GUIGray;
             }
             else
             {
@@ -639,16 +631,16 @@ namespace Materiator
                 
                 if (AreMateriasSameAsPreset((MateriaPreset)_materiaPresetObjectField.value, _materiaSetter.MateriaSlots))
                 {
-                    _presetIndicator.style.backgroundColor = new Color(0f, 0.75f, 0f, 1f);
+                    _presetIndicator.style.backgroundColor = SystemData.Settings.GUIGreen;
                 }
                 else
                 {
-                    _presetIndicator.style.backgroundColor = new Color(0.75f, 0f, 0f, 1f);
+                    _presetIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
                 }
             }
         }
 
-        public bool AreMateriasSameAsPreset(MateriaPreset preset, List<MateriaSlot> materiaSlots)
+        private bool AreMateriasSameAsPreset(MateriaPreset preset, List<MateriaSlot> materiaSlots)
         {
             var numberOfDifferentMateria = 0;
 
@@ -921,7 +913,7 @@ namespace Materiator
             }
             else if (_editMode.enumValueIndex == 1)
             {
-                ReloadAtlas();
+                LoadAtlas(data.MateriaAtlas);
             }
             
         }
@@ -982,6 +974,7 @@ namespace Materiator
 
             _materiaAtlasObjectField = root.Q<ObjectField>("MateriaAtlasObjectField");
             _materiaAtlasObjectField.objectType = typeof(MateriaAtlas);
+            _materiaAtlasObjectField.SetEnabled(false);
             _materiaPresetObjectField = root.Q<ObjectField>("MateriaPresetObjectField");
             _materiaPresetObjectField.objectType = typeof(MateriaPreset);
             _materiaSetterDataObjectField = root.Q<ObjectField>("MateriaSetterDataObjectField");
@@ -992,13 +985,13 @@ namespace Materiator
 
             _reloadButton = root.Q<Button>("ReloadButton");
             _switchEditModeButton = root.Q<Button>("SwitchEditMode");
-            _reloadMateriaAtlasButton = root.Q<Button>("ReloadMateriaAtlasButton");
             _reloadMateriaPresetButton = root.Q<Button>("ReloadMateriaPresetButton");
             _newMateriaSetterDataButton = root.Q<Button>("NewMateriaSetterDataButton");
             _reloadMateriaSetterDataButton = root.Q<Button>("ReloadMateriaSetterDataButton");
             _overwriteMateriaSetterData = root.Q<Button>("OverwriteMateriaSetterDataButton");
             _saveAsNewMateriaSetterData = root.Q<Button>("SaveAsNewMateriaSetterDataButton");
 
+            _atlasIndicator = root.Q<VisualElement>("AtlasIndicator");
             _presetIndicator = root.Q<VisualElement>("PresetIndicator");
             _outputIndicator = root.Q<VisualElement>("OutputIndicator");
             _dataIndicator = root.Q<VisualElement>("DataIndicator");
@@ -1027,7 +1020,6 @@ namespace Materiator
         {
             _reloadButton.clicked += Refresh;
             _switchEditModeButton.clicked += SwitchEditMode;
-            _reloadMateriaAtlasButton.clicked += ReloadAtlas;
             _reloadMateriaPresetButton.clicked += ReloadPreset;
             _newMateriaSetterDataButton.clicked += NewData;
             _reloadMateriaSetterDataButton.clicked += () => { ReloadData((MateriaSetterData)_materiaSetterDataObjectField.value); };

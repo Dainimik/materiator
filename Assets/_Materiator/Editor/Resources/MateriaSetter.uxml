@@ -8,12 +8,10 @@
         <ui:VisualElement name="AtlasSectionContainer">
             <ui:Label text="Materia Atlas" class="section-header" />
             <ui:VisualElement name="AtlasIndicator" class="status-indicator" />
-            <ui:VisualElement name="ContentContainer" class="content-container">
+            <ui:VisualElement name="AtlasContentContainer" class="content-container">
                 <uie:ObjectField label="Atlas" name="MateriaAtlasObjectField" allow-scene-objects="false" />
-                <ui:VisualElement name="ButtonContainer" style="flex-direction: row; justify-content: flex-end;">
-                    <ui:Button text="Reload Atlas" name="ReloadMateriaAtlasButton" />
-                </ui:VisualElement>
             </ui:VisualElement>
+            <ui:VisualElement name="Space" class="space" />
         </ui:VisualElement>
         <ui:VisualElement name="PresetSectionContainer" class="section-container">
             <ui:Label text="Materia Preset" class="section-header" />
