@@ -675,23 +675,22 @@ namespace Materiator
         {
             if (_materiaSetterDataObjectField.value != null)
             {
-                _editMode.enumValueIndex = 0;
-
                 _materiaSetterData.objectReferenceValue = data;
-
                 serializedObject.ApplyModifiedProperties();
 
                 Utils.ShallowCopyFields(data, _materiaSetter);
-                _materiaSetter.Mesh = data.NativeMesh;
-                //_materiaSetter.GridSize = data.NativeGridSize;
 
-                
+                if (_editMode.enumValueIndex == 0)
+                {
+                    _materiaSetter.Mesh = data.NativeMesh;
+                }
+                else if (_editMode.enumValueIndex == 1)
+                {
+                    LoadAtlas(data.MateriaAtlas);
+                }
+
                 serializedObject.Update();
-
                 _materiaSetter.UpdateRenderer();
-
-                //_materiaSetter.GenerateMateriaSlots();
-                //_materiaSetter.UpdateColorsOfAllTextures();
             }
             else
             {
