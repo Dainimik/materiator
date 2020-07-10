@@ -105,14 +105,12 @@ namespace Materiator
 
         private MaterialData CreateMaterialData(string name)
         {
-            var materialData = CreateInstance<MaterialData>();
-            materialData.name = name;
-
-            materialData.ShaderData = _settings.DefaultShaderData;
-
             var material = Utils.CreateMaterial(_settings.DefaultShaderData.Shader);
             material.name = "DefaultMaterial";
-            materialData.Material = material;
+
+            var materialData = CreateInstance<MaterialData>();
+            materialData.Init(_settings.DefaultShaderData, material);
+            materialData.name = name;
 
             AssetDatabase.AddObjectToAsset(materialData, _settings);
             AssetDatabase.AddObjectToAsset(material, _settings);
