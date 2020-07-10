@@ -60,6 +60,11 @@ namespace Materiator
             Initialize();
         }
 
+        private void OnDisable()
+        {
+            _materiaSetter = (MateriaSetter)target;
+        }
+
         public override VisualElement CreateInspectorGUI()
         {
             InitializeEditor<MateriaSetter>();
