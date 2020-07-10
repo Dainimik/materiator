@@ -29,6 +29,8 @@ namespace Materiator
         private Button _overwriteButton;
         private Button _saveAsNewButton;
 
+        private MateriaAtlas _atlas;
+
         private List<MateriaSetter> _materiaSetters = new List<MateriaSetter>();
         private List<MateriaSetter> _compatibleMateriaSetters = new List<MateriaSetter>();
         private List<MateriaSetter> _incompatibleMateriaSetters = new List<MateriaSetter>();
@@ -95,7 +97,7 @@ namespace Materiator
 
             var filteredList = new List<MateriaSetter>();
 
-            foreach (var item in _materiaSetters)
+            foreach (var item in _compatibleMateriaSetters)
             {
                 if (MatchesSearchInput(item, _searchString))
                 {
@@ -103,13 +105,13 @@ namespace Materiator
                 }
             }
 
-            if (filteredList.Count != _materiaSetters.Count)
+            if (filteredList.Count != _compatibleMateriaSetters.Count)
             {
                 _materiaSetterDataListView.itemsSource = filteredList;
             }
             else
             {
-                _materiaSetterDataListView.itemsSource = _materiaSetters;
+                _materiaSetterDataListView.itemsSource = _compatibleMateriaSetters;
             }
             
             _materiaSetterDataListView.Refresh();
@@ -169,7 +171,9 @@ namespace Materiator
 
         private void LoadAtlas()
         {
-            LoadPrefabs((MateriaAtlas)_atlasObjectField.value);
+            _atlas = (MateriaAtlas)_atlasObjectField.value;
+
+            LoadPrefabs(_atlas);
 
             GenerateListView(_compatibleMateriaSetters);
         }
@@ -240,7 +244,11 @@ namespace Materiator
 
         private void Overwrite()
         {
-
+            if (EditorUtility.DisplayDialog("Overwrite current atlas?", "Are you sure you want to overwrite " + _atlasObjectField.value.name + " with current settings?", "Yes", "No"))
+            {
+                var kvp = new KeyValuePair<MaterialData, List<MateriaSetter>>(_atlas.MaterialData, _compatibleMateriaSetters);
+                AtlasFactory.CreateAtlas(kvp, kvp.Key.Material, AssetDatabase.GetAssetPath(_atlas), _atlas);
+            }
         }
 
         private void SaveAsNew()
@@ -251,7 +259,7 @@ namespace Materiator
                 var i = 0;
                 foreach (var kvp in _groupsList)
                 {
-                    AtlasFactory.CreateAtlas(kvp, _materialDataMaterialGroups[kvp.Key], path, false, "_newPrefabSuffix");
+                    AtlasFactory.CreateAtlas(kvp, _materialDataMaterialGroups[kvp.Key], path, null);
                     i++;
                 }
             }
@@ -306,10 +314,6 @@ namespace Materiator
             //_materiaSetterListViewDropArea.RegisterCallback<DragUpdatedEvent>(OnDragUpdatedEvent);
             //_materiaSetterListViewDropArea.RegisterCallback<DragPerformEvent>(OnDragPerformEvent);
             //_materiaSetterListViewDropArea.RegisterCallback<DragExitedEvent>(OnDragExitedEvent);
-
-
-
-            EditorUtils.DrawDropArea<GameObject>(_materiaSetterListViewDropArea, HandleDraggedInGameObjects);
         }
 
 

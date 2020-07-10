@@ -14,25 +14,27 @@ namespace Materiator
     {
         public bool IsInitialized = false;
         public bool IsDirty = true;
+
         public EditMode EditMode;
 
-        public MateriaSetterData MateriaSetterData;
-        public Mesh Mesh;
-        public MeshFilter MeshFilter;
         public Renderer Renderer;
+        public MeshFilter MeshFilter;
         public MeshRenderer MeshRenderer;
         public SkinnedMeshRenderer SkinnedMeshRenderer;
 
         public List<MateriaSlot> MateriaSlots;
 
-        public SerializableDictionary<int, Rect> FilteredRects;
+        public Mesh Mesh;
         public Rect[] Rects;
+        public SerializableDictionary<int, Rect> FilteredRects;
+
+        public MateriaSetterData MateriaSetterData;
 
         public MateriaAtlas MateriaAtlas;
         public MateriaPreset MateriaPreset;
         public MaterialData MaterialData;
-        public Material Material;
 
+        public Material Material;
         public Textures Textures;
 
         public Mesh NativeMesh;
@@ -48,7 +50,7 @@ namespace Materiator
 
             Refresh();
 
-            UpdateColorsOfAllTextures();
+            //UpdateColorsOfAllTextures(); // why is this necessary?
 
             IsInitialized = true;
         }
@@ -95,6 +97,11 @@ namespace Materiator
             else
             {
                 Mesh = MeshFilter.sharedMesh;
+            }
+
+            if (EditMode == EditMode.Native)
+            {
+                NativeMesh = Mesh;
             }
         }
 
@@ -298,10 +305,11 @@ namespace Materiator
 
                 MateriaAtlas = atlas;
 
-                MaterialData = atlas.MaterialData;
-                Material = atlas.MaterialData.Material;
-                Textures = atlas.Textures;
                 Mesh = MateriaSetterData.AtlasedMesh;
+                MaterialData = atlas.MaterialData;
+                Material = atlas.Material;
+                Textures = atlas.Textures;
+                
                 GridSize = MateriaSetterData.AtlasedGridSize;
                 UVRect = MateriaSetterData.AtlasedUVRect;
 
@@ -314,11 +322,13 @@ namespace Materiator
         {
             EditMode = EditMode.Native;
 
-            MaterialData = MateriaSetterData.MaterialData;
-            Material = MateriaSetterData.MaterialData.Material;
-            Textures = MateriaSetterData.Textures;
             Mesh = MateriaSetterData.NativeMesh;
+            MaterialData = MateriaSetterData.MaterialData;
+            Material = MateriaSetterData.Material;
+            Textures = MateriaSetterData.Textures;
+
             GridSize = MateriaSetterData.NativeGridSize;
+            UVRect = new Rect(0f, 0f, 1f, 1f);
 
             Textures.SetTextures(Material, MaterialData.ShaderData);
             UpdateRenderer();

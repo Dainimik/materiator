@@ -21,7 +21,7 @@ namespace Materiator
             }
         }
 
-        public static void CreateAtlas(KeyValuePair<MaterialData, List<MateriaSetter>> group, Material material, string path, bool saveAsNewPrefabs, string newPrefabSuffix)
+        public static void CreateAtlas(KeyValuePair<MaterialData, List<MateriaSetter>> group, Material material, string path, MateriaAtlas existingAtlas = null)
         {
             var msCount = 0;
             List<GameObject> prefabs = new List<GameObject>();
@@ -42,7 +42,7 @@ namespace Materiator
                 }
             }
 
-            if (saveAsNewPrefabs)
+            /*if (saveAsNewPrefabs)
             {
                 for (int i = 0; i < prefabs.Count; i++)
                 {
@@ -52,7 +52,7 @@ namespace Materiator
                     prefabs[i] = AssetDatabase.LoadAssetAtPath<GameObject>(newPath);
                     prefabPaths[i] = newPath;
                 }
-            }
+            }*/
 
             var dir = AssetUtils.GetDirectoryName(path);
             var atlasName = AssetUtils.GetFileName(path);
@@ -61,7 +61,15 @@ namespace Materiator
             var rectIndex = 0;
             var gridSize = Utils.CalculateAtlasSize(msCount);
 
-            var atlas = CreateMateriaAtlasAsset(dir, atlasName, material, gridSize);
+            MateriaAtlas atlas = null;
+            if (existingAtlas == null)
+            {
+                atlas = CreateMateriaAtlasAsset(dir, atlasName, material, gridSize);
+            }
+            else
+            {
+                atlas = existingAtlas;
+            }
 
             var processedPrefabs = new HashSet<GameObject>();
             var skipSavingPrefab = false;
@@ -81,7 +89,7 @@ namespace Materiator
 
                         //processedPrefabs.Add(nearestPrefabInstanceRoot);
 
-                        var atlasedMesh = Utils.CopyMesh(ms[j].Mesh);
+                        var atlasedMesh = Utils.CopyMesh(ms[j].NativeMesh); // Maybe you should copy mesh from MateriaSetterData instead?
                         var remappedUVs = atlasedMesh.uv;
 
                         for (var k = 0; k < remappedUVs.Length; k++)
@@ -100,14 +108,17 @@ namespace Materiator
                         var data = ms[j].MateriaSetterData;
 
                         var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.MateriaSetterData == ms[j].MateriaSetterData).FirstOrDefault();
-                        atlas.AtlasEntries.Add(prefabMS, data);
+                        if (!atlas.AtlasEntries.ContainsKey(prefabMS))
+                        {
+                            atlas.AtlasEntries.Add(prefabMS, data);
+                        }
                         
                         atlas.MaterialData = group.Key;
                         atlas.GridSize = gridSize;
 
 
                         data.MateriaAtlas = atlas;
-                        data.NativeMesh = ms[j].Mesh;
+                        data.NativeMesh = ms[j].NativeMesh;
                         data.AtlasedMesh = atlasedMesh;
                         data.AtlasedUVRect = rects[rectIndex];
                         data.AtlasedGridSize = gridSize;
@@ -115,7 +126,7 @@ namespace Materiator
                         ms[j].MateriaSetterData = data;
 
                         ms[j].MateriaAtlas = atlas;
-                        ms[j].NativeMesh = ms[j].Mesh;
+                        //ms[j].NativeMesh = ms[j].Mesh;
                         ms[j].AtlasedMesh = atlasedMesh;
 
                         var baseCol = data.Textures.Color.GetPixels32();
@@ -129,6 +140,11 @@ namespace Materiator
                         atlas.Textures.Emission.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, emission);
 
                         //AssetDatabase.AddObjectToAsset(newMeshData, prefabs[i]);
+
+                        //----------
+                        // Need here to remove old atlasedMesh from data asset and add new one and update its references everywhere
+                        //------------
+
                         AssetDatabase.AddObjectToAsset(atlasedMesh, data);
                         AssetDatabase.SaveAssets();
 
