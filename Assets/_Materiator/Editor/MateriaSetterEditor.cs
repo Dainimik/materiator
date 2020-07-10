@@ -673,7 +673,7 @@ namespace Materiator
 
         private void OnMateriaSetterDataChanged(MateriaSetterData data)
         {
-            if (_materiaSetterDataObjectField.value != null)
+            if (data != null)
             {
                 _materiaSetterData.objectReferenceValue = data;
                 serializedObject.ApplyModifiedProperties();
@@ -686,7 +686,15 @@ namespace Materiator
                 }
                 else if (_editMode.enumValueIndex == 1)
                 {
-                    LoadAtlas(data.MateriaAtlas);
+                    if (data.MateriaAtlas != null)
+                    {
+                        LoadAtlas(data.MateriaAtlas);
+                        _materiaSetter.AnalyzeMesh(); // not sure why this is needed here
+                    }
+                    else
+                    {
+                        UnloadAtlas();
+                    }
                 }
 
                 serializedObject.Update();
