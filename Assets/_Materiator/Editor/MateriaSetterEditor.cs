@@ -783,7 +783,6 @@ namespace Materiator
                             AssetDatabase.RemoveObjectFromAsset(material);
                             AssetDatabase.SaveAssets();
                             AssetDatabase.AddObjectToAsset(mat, data);
-                            //AssetDatabase.SaveAssets();
                             AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(mat));
                             material = mat;
                         }
@@ -1011,8 +1010,6 @@ namespace Materiator
             _materiaPresetObjectField.BindProperty(_materiaPreset);
             _materiaSetterDataObjectField.BindProperty(_materiaSetterData);
             _materialDataObjectField.BindProperty(_materialData);
-
-            //_uvDisplayModeEnumField.
         }
 
         protected override void RegisterButtons()

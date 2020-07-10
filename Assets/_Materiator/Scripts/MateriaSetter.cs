@@ -50,8 +50,6 @@ namespace Materiator
 
             Refresh();
 
-            //UpdateColorsOfAllTextures(); // why is this necessary?
-
             IsInitialized = true;
         }
 
@@ -308,8 +306,6 @@ namespace Materiator
             if (atlas != null)
             {
                 EditMode = EditMode.Atlas;
-
-                //Utils.ShallowCopyFields(MateriaSetterData, this);
 
                 MateriaAtlas = atlas;
 
