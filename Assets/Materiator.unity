@@ -256,47 +256,6 @@ MonoBehaviour:
   blendDistance: 0
   weight: 1
   sharedProfile: {fileID: 11400000, guid: 014a6f00e31fd494195a54151b2ed089, type: 2}
---- !u!1 &542620415
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 542620418}
-  - component: {fileID: 542620417}
-  - component: {fileID: 2204573145610354667}
-  - component: {fileID: 4837042113090623094}
-  m_Layer: 0
-  m_Name: OilBarrel
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!33 &542620417
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 542620415}
-  m_Mesh: {fileID: 2750013030952444713, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
---- !u!4 &542620418
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 542620415}
-  m_LocalRotation: {x: 0.5354583, y: -0, z: -0, w: 0.84456164}
-  m_LocalPosition: {x: -0.707, y: 0.4, z: -8.65}
-  m_LocalScale: {x: 0.6428136, y: 0.6428136, z: 0.6428136}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 64.75, y: 0, z: 0}
 --- !u!1 &1032660775
 GameObject:
   m_ObjectHideFlags: 0
@@ -390,13 +349,53 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!23 &2204573145610354667
+--- !u!33 &7542336572443946076
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7542336572443946402}
+  m_Mesh: {fileID: 2750013030952444713, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
+--- !u!4 &7542336572443946079
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7542336572443946402}
+  m_LocalRotation: {x: 0.5354583, y: -0, z: -0, w: 0.84456164}
+  m_LocalPosition: {x: -1.122, y: 0.4, z: -8.65}
+  m_LocalScale: {x: 0.6428136, y: 0.6428136, z: 0.6428136}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 64.75, y: 0, z: 0}
+--- !u!1 &7542336572443946402
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7542336572443946079}
+  - component: {fileID: 7542336572443946076}
+  - component: {fileID: 8517420419481512118}
+  m_Layer: 0
+  m_Name: greenPrefab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!23 &8517420419481512118
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 542620415}
+  m_GameObject: {fileID: 7542336572443946402}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -409,7 +408,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -3768314323482887784, guid: ff0a046e9c000d14bb44ec9df1563de4, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -431,151 +430,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &4837042113090623094
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 542620415}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9cc8b14ac3fd0804585ec453092f7071, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _instanceID: -9127142
-  IsInitialized: 1
-  IsDirty: 0
-  EditMode: 0
-  MateriaSetterData: {fileID: 11400000, guid: ff0a046e9c000d14bb44ec9df1563de4, type: 2}
-  Mesh: {fileID: 2750013030952444713, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
-  MeshFilter: {fileID: 542620417}
-  Renderer: {fileID: 2204573145610354667}
-  MeshRenderer: {fileID: 2204573145610354667}
-  SkinnedMeshRenderer: {fileID: 0}
-  MateriaSlots:
-  - ID: 1
-    Materia: {fileID: 11400000, guid: 2bf52f2715bfa4d48a7bfe6d265ba1d0, type: 2}
-    Tag: '-'
-  - ID: 0
-    Materia: {fileID: 5751510992737936953, guid: 34711a9de42869442b3422c531e00e60, type: 2}
-    Tag: '-'
-  - ID: 4
-    Materia: {fileID: 5751510992737936953, guid: 34711a9de42869442b3422c531e00e60, type: 2}
-    Tag: '-'
-  FilteredRects:
-    _keys: 010000000000000004000000
-    _values:
-    - serializedVersion: 2
-      x: 0.25
-      y: 0
-      width: 0.25
-      height: 0.25
-    - serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0.25
-      height: 0.25
-    - serializedVersion: 2
-      x: 0
-      y: 0.25
-      width: 0.25
-      height: 0.25
-  Rects:
-  - serializedVersion: 2
-    x: 0
-    y: 0
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.25
-    y: 0
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.5
-    y: 0
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.75
-    y: 0
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0
-    y: 0.25
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.25
-    y: 0.25
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.5
-    y: 0.25
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.75
-    y: 0.25
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0
-    y: 0.5
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.25
-    y: 0.5
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.5
-    y: 0.5
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.75
-    y: 0.5
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0
-    y: 0.75
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.25
-    y: 0.75
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.5
-    y: 0.75
-    width: 0.25
-    height: 0.25
-  - serializedVersion: 2
-    x: 0.75
-    y: 0.75
-    width: 0.25
-    height: 0.25
-  MateriaAtlas: {fileID: 0}
-  MateriaPreset: {fileID: 0}
-  MaterialData: {fileID: 6531699448008869641, guid: 34711a9de42869442b3422c531e00e60, type: 2}
-  Material: {fileID: -3768314323482887784, guid: ff0a046e9c000d14bb44ec9df1563de4, type: 2}
-  Textures:
-    Color: {fileID: 2061515999373678460, guid: ff0a046e9c000d14bb44ec9df1563de4, type: 2}
-    MetallicSmoothness: {fileID: 3962622664001634258, guid: ff0a046e9c000d14bb44ec9df1563de4, type: 2}
-    Emission: {fileID: -2294274500615941471, guid: ff0a046e9c000d14bb44ec9df1563de4, type: 2}
-  NativeMesh: {fileID: 2750013030952444713, guid: 51e7ec7eadfccd14ca29c0de1a5875cc, type: 3}
-  AtlasedMesh: {fileID: 0}
-  GridSize: 4
-  UVRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
