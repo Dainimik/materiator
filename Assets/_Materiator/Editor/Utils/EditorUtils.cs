@@ -5,7 +5,6 @@ using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UnityEngine.VFX;
 
 namespace Materiator
 {
