@@ -1,88 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-4519066705501620889
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6610ce87081f434eb698da7afac3d9f, type: 3}
-  m_Name: StandardSpecular_BuiltInRenderPipeline
-  m_EditorClassIdentifier: 
-  Shader: {fileID: 45, guid: 0000000000000000f000000000000000, type: 0}
-  BaseColorPropertyName: _Color
-  MainTexturePropertyName: _MainTex
-  MetallicSmoothnessTexturePropertyName: 
-  SpecularGlossTexturePropertyName: _SpecGlossMap
-  EmissionColorPropertyName: _EmissionColor
-  EmissionTexturePropertyName: _EmissionMap
-  MetallicSmoothnessKeywordName: _METALLICGLOSSMAP
-  EmissionKeywordName: _EMISSION
-  IsEditable: 0
---- !u!114 &-2016125734600272180
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6610ce87081f434eb698da7afac3d9f, type: 3}
-  m_Name: Standard_BuiltInRenderPipeline
-  m_EditorClassIdentifier: 
-  Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
-  BaseColorPropertyName: _Color
-  MainTexturePropertyName: _MainTex
-  MetallicSmoothnessTexturePropertyName: _MetallicGlossMap
-  SpecularGlossTexturePropertyName: 
-  EmissionColorPropertyName: _EmissionColor
-  EmissionTexturePropertyName: _EmissionMap
-  MetallicSmoothnessKeywordName: _METALLICGLOSSMAP
-  EmissionKeywordName: _EMISSION
-  IsEditable: 0
---- !u!114 &-77128397660476342
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98a0da4775618c64c9071e6e22401428, type: 3}
-  m_Name: MateriaTags
-  m_EditorClassIdentifier: 
-  MateriaTagsList:
-  - '-'
-  - Metal
-  - Plastic
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9993698cad73f364895202aff686f817, type: 3}
-  m_Name: MateriatorSettings
-  m_EditorClassIdentifier: 
-  SavePath: 
-  GridSize: 4
-  PackAssets: 1
-  MateriaTags: {fileID: -77128397660476342}
-  DefaultMaterialData: {fileID: 6531699448008869641}
-  DefaultShaderData: {fileID: 3685643814042670961}
-  DefaultMateria: {fileID: 5751510992737936953}
-  HighlightColor: {r: 1, g: 1, b: 0, a: 1}
-  HighlightMode: 0
-  FilterMode: 0
---- !u!114 &3553727234208055986
+--- !u!114 &-6703512396538338625
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -104,7 +22,23 @@ MonoBehaviour:
   MetallicSmoothnessKeywordName: _METALLICSPECGLOSSMAP
   EmissionKeywordName: _EMISSION
   IsEditable: 0
---- !u!114 &3685643814042670961
+--- !u!114 &-5423883128148828353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98a0da4775618c64c9071e6e22401428, type: 3}
+  m_Name: MateriaTags
+  m_EditorClassIdentifier: 
+  MateriaTagsList:
+  - '-'
+  - Metal
+  - Plastic
+--- !u!114 &-4688282724222944474
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -126,7 +60,29 @@ MonoBehaviour:
   MetallicSmoothnessKeywordName: _METALLICSPECGLOSSMAP
   EmissionKeywordName: _EMISSION
   IsEditable: 0
---- !u!114 &5751510992737936953
+--- !u!114 &-3831360083498517937
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6610ce87081f434eb698da7afac3d9f, type: 3}
+  m_Name: Standard_BuiltInRenderPipeline
+  m_EditorClassIdentifier: 
+  Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  BaseColorPropertyName: _Color
+  MainTexturePropertyName: _MainTex
+  MetallicSmoothnessTexturePropertyName: _MetallicGlossMap
+  SpecularGlossTexturePropertyName: 
+  EmissionColorPropertyName: _EmissionColor
+  EmissionTexturePropertyName: _EmissionMap
+  MetallicSmoothnessKeywordName: _METALLICGLOSSMAP
+  EmissionKeywordName: _EMISSION
+  IsEditable: 0
+--- !u!114 &-3006317050987934041
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -147,7 +103,51 @@ MonoBehaviour:
   EmissionColor:
     serializedVersion: 2
     rgba: 4278190080
---- !u!21 &5852835902241345212
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9993698cad73f364895202aff686f817, type: 3}
+  m_Name: MateriatorSettings
+  m_EditorClassIdentifier: 
+  SavePath: 
+  GridSize: 4
+  PackAssets: 1
+  MateriaTags: {fileID: -5423883128148828353}
+  DefaultMaterialData: {fileID: 5085386425809931805}
+  DefaultShaderData: {fileID: -4688282724222944474}
+  DefaultMateria: {fileID: -3006317050987934041}
+  HighlightColor: {r: 1, g: 1, b: 0, a: 1}
+  HighlightMode: 0
+  FilterMode: 0
+--- !u!114 &1140284845837733657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6610ce87081f434eb698da7afac3d9f, type: 3}
+  m_Name: StandardSpecular_BuiltInRenderPipeline
+  m_EditorClassIdentifier: 
+  Shader: {fileID: 45, guid: 0000000000000000f000000000000000, type: 0}
+  BaseColorPropertyName: _Color
+  MainTexturePropertyName: _MainTex
+  MetallicSmoothnessTexturePropertyName: 
+  SpecularGlossTexturePropertyName: _SpecGlossMap
+  EmissionColorPropertyName: _EmissionColor
+  EmissionTexturePropertyName: _EmissionMap
+  MetallicSmoothnessKeywordName: _METALLICGLOSSMAP
+  EmissionKeywordName: _EMISSION
+  IsEditable: 0
+--- !u!21 &3157752266669938911
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
@@ -222,7 +222,7 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
---- !u!114 &6531699448008869641
+--- !u!114 &5085386425809931805
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -234,5 +234,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a28387396e5d384bbaf13e179b273ca, type: 3}
   m_Name: DefaultMaterialData
   m_EditorClassIdentifier: 
-  ShaderData: {fileID: 3685643814042670961}
-  Material: {fileID: 5852835902241345212}
+  _shaderData: {fileID: -4688282724222944474}
+  _material: {fileID: 3157752266669938911}

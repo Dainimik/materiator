@@ -29,9 +29,9 @@ namespace Materiator
 
         private void CreateDefaultSettingsData()
         {
-            var editorScriptPath = AssetUtils.GetEditorScriptDirectory(this);
-            AssetUtils.CheckDirAndCreate(editorScriptPath, "Resources");
-            var path = editorScriptPath + "/Resources";
+            AssetUtils.CheckDirAndCreate("Assets", "Materiator");
+            AssetUtils.CheckDirAndCreate("Assets/Materiator", "Resources");
+            var path = "Assets/Materiator/Resources";
 
             _settings = AssetUtils.CreateScriptableObjectAsset<MateriatorSettings>(path, "MateriatorSettings");
             _settings.PackAssets = true;
