@@ -88,7 +88,7 @@ namespace Materiator
             _materiaSetterDataListView.itemsSource = materiaSettersList;
 
             // Callback invoked when the user double clicks an item
-            _materiaSetterDataListView.onItemsChosen += (items) => FocusListEntry((MateriaSetter)items.FirstOrDefault());
+            //_materiaSetterDataListView.onItemsChosen += (items) => FocusListEntry((MateriaSetter)items.FirstOrDefault()); This line doesn't work on Unity 2019.4
         }
 
         private void FilterMateriaSetterListView(string e)
