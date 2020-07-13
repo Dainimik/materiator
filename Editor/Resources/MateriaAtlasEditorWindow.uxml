@@ -22,6 +22,9 @@
             </ui:VisualElement>
             <uie:ToolbarSearchField focusable="True" name="MateriaSetterSearchToolbar" style="width: 40%;" />
         </ui:VisualElement>
+        <ui:VisualElement name="ButtonContainer">
+            <ui:Button text="Unlink Atlas" name="UnlinkAtlasButton" />
+        </ui:VisualElement>
         <ui:VisualElement name="LabelContainer" style="flex-direction: row; justify-content: space-around;">
             <ui:Label text="Materia Setter" name="MateriaSetterLabel" />
             <ui:Label text="Prefab" name="PrefabLabel" />

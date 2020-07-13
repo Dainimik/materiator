@@ -12,6 +12,8 @@ namespace Materiator
     {
         private static MateriaAtlasEditorWindow _window;
 
+        private EditMode _editMode;
+
         private VisualElement _materiaSetterListViewDropArea;
         private Label _selectedMateriaSettersValue;
         private ListView _materiaSetterDataListView;
@@ -26,6 +28,7 @@ namespace Materiator
         private Button _scanProjectButton;
         private Button _selectAtlasButton;
         private Button _loadAtlasButton;
+        private Button _removeAtlasData;
         private Button _overwriteButton;
         private Button _saveAsNewButton;
 
@@ -36,6 +39,8 @@ namespace Materiator
         private List<MateriaSetter> _incompatibleMateriaSetters = new List<MateriaSetter>();
         private Dictionary<MaterialData, List<MateriaSetter>> _groupsList = new Dictionary<MaterialData, List<MateriaSetter>>();
         private Dictionary<MaterialData, Material> _materialDataMaterialGroups = new Dictionary<MaterialData, Material>();
+
+        private List<MateriaSetter> _selectedListViewMateriaSetters = new List<MateriaSetter>();
 
         [MenuItem("Tools/Materiator/Atlas Editor")]
 
@@ -53,6 +58,8 @@ namespace Materiator
             _atlasSectionContainer.visible = false;
 
             RegisterCallbacks();
+
+            SwitchEditMode(EditMode.Native);
         }
 
         private void GenerateListView(List<MateriaSetter> materiaSettersList)
@@ -88,7 +95,16 @@ namespace Materiator
             _materiaSetterDataListView.itemsSource = materiaSettersList;
 
             // Callback invoked when the user double clicks an item
-            //_materiaSetterDataListView.onItemsChosen += (items) => FocusListEntry((MateriaSetter)items.FirstOrDefault()); This line doesn't work on Unity 2019.4
+            _materiaSetterDataListView.onItemsChosen += (items) =>
+            {
+                FocusListEntry((MateriaSetter)items.FirstOrDefault()); //This line doesn't work on Unity 2019.4
+            };
+
+            _materiaSetterDataListView.onSelectionChange += (items) =>
+            {
+                _selectedListViewMateriaSetters.Clear();
+                _selectedListViewMateriaSetters = items.OfType<MateriaSetter>().ToList();
+            };
         }
 
         private void FilterMateriaSetterListView(string e)
@@ -157,6 +173,7 @@ namespace Materiator
 
         private void ScanForPrefabs()
         {
+            SwitchEditMode(EditMode.Native);
             LoadPrefabs((MateriaAtlas)_atlasObjectField.value);
 
             GenerateListView(_compatibleMateriaSetters);
@@ -171,11 +188,34 @@ namespace Materiator
 
         private void LoadAtlas()
         {
+            SwitchEditMode(EditMode.Atlas);
             _atlas = (MateriaAtlas)_atlasObjectField.value;
 
             LoadPrefabs(_atlas);
 
             GenerateListView(_compatibleMateriaSetters);
+        }
+
+        private void RemoveAtlasData()
+        {
+            foreach (var item in _selectedListViewMateriaSetters)
+            {
+                if (item.MateriaSetterData.MateriaAtlas != null)
+                {
+                    var itemData = item.MateriaSetterData;
+
+                    item.UnloadAtlas();
+                    itemData.MateriaAtlas.AtlasEntries.Remove(item);
+                    itemData.MateriaAtlas = null;
+
+                    itemData.AtlasedGridSize = 0;
+                    itemData.AtlasedUVRect = new Rect(0f, 0f, 1f, 1f);
+
+                    AssetDatabase.RemoveObjectFromAsset(itemData.AtlasedMesh);
+                    itemData.AtlasedMesh = null;
+                }
+            }
+            AssetDatabase.SaveAssets();
         }
 
         private void LoadPrefabs(MateriaAtlas atlas = null)
@@ -204,6 +244,21 @@ namespace Materiator
             CheckMateriaSettersCompatibility(_materiaSetters);
 
             _selectedMateriaSettersValue.text = _materiaSetters.Count.ToString();
+        }
+
+        private void SwitchEditMode(EditMode editMode)
+        {
+            _editMode = editMode;
+
+            /*if (editMode == EditMode.Atlas)
+            {
+                _removeAtlasData.visible = true;
+            }
+
+            if (editMode == EditMode.Native)
+            {
+                _removeAtlasData.visible = false;
+            }*/
         }
 
         private void CheckMateriaSettersCompatibility(ICollection<MateriaSetter> materiaSetters)
@@ -288,7 +343,6 @@ namespace Materiator
             _materiaSetterListViewDropArea.RegisterCallback<DragUpdatedEvent>(evt =>
             {
                 DragAndDrop.visualMode = DragAndDropVisualMode.Move;
-                Debug.Log("aaa");
             });
 
             _materiaSetterListViewDropArea.RegisterCallback<DragPerformEvent>(evt =>
@@ -354,6 +408,7 @@ namespace Materiator
             _scanProjectButton = root.Q<Button>("ScanProjectButton");
             _selectAtlasButton = root.Q<Button>("SelectAtlasButton");
             _loadAtlasButton = root.Q<Button>("LoadAtlasButton");
+            _removeAtlasData = root.Q<Button>("UnlinkAtlasButton");
             _overwriteButton = root.Q<Button>("OverwriteButton");
             _saveAsNewButton = root.Q<Button>("SaveAsNewButton");
         }
@@ -368,6 +423,7 @@ namespace Materiator
             _scanProjectButton.clicked += ScanForPrefabs;
             _selectAtlasButton.clicked += SelectAtlas;
             _loadAtlasButton.clicked += LoadAtlas;
+            _removeAtlasData.clicked += RemoveAtlasData;
             _overwriteButton.clicked += Overwrite;
             _saveAsNewButton.clicked += SaveAsNew;
         }
