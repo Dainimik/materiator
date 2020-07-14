@@ -148,7 +148,7 @@ namespace Materiator
             IMGUIContainer defaultInspector = new IMGUIContainer(() => IMGUI());
             root.Add(defaultInspector);
 
-            _materiaReorderableList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaSlots"), true, true, false, false);
+            _materiaReorderableList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaSlots"), false, true, false, false);
             DrawMateriaReorderableList();
             IMGUIContainer materiaReorderableList = new IMGUIContainer(() => MateriaReorderableList());
             _IMGUIContainer.Add(materiaReorderableList);
