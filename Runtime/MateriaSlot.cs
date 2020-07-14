@@ -7,9 +7,9 @@ namespace Materiator
     {
         public int ID;
         public Materia Materia;
-        public string Tag;
+        public MateriaTag Tag;
 
-        public MateriaSlot(int id, Materia materia = null, string tag = null)
+        public MateriaSlot(int id, Materia materia = null, MateriaTag tag = null)
         {
             ID = id;
 

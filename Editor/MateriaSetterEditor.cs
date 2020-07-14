@@ -359,10 +359,6 @@ namespace Materiator
 
                 _materiaSetter.UpdateColorsOfAllTextures();
             }
-            else
-            {
-                SetMateriaSetterDirty(false);
-            }
 
             DrawUVInspector(true);
         }
@@ -388,7 +384,7 @@ namespace Materiator
                 var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(index);
                 var elementID = element.FindPropertyRelative("ID");
                 var elementMateria = element.FindPropertyRelative("Materia").objectReferenceValue as Materia;
-                var materiaTag = element.FindPropertyRelative("Tag");
+                var materiaTag = _materiaSetter.MateriaSlots[index].Tag;
 
                 Rect r = new Rect(rect.x, rect.y, 22f, 22f);
 
@@ -414,13 +410,14 @@ namespace Materiator
 
                 int _materiaTagIndex = 0;
                 EditorGUI.BeginChangeCheck();
-                _materiaTagIndex = EditorGUI.Popup(new Rect(rect.x + 25f, rect.y, 95f, rect.height), SystemData.Settings.MateriaTags.MateriaTagsList.IndexOf(materiaTag.stringValue), SystemData.Settings.MateriaTags.MateriaTagsArray, EditorStyles.popup);
+                _materiaTagIndex = EditorGUI.Popup(new Rect(rect.x + 25f, rect.y, 95f, rect.height), SystemData.Settings.MateriaTags.MateriaTagsList.IndexOf(SystemData.Settings.MateriaTags.MateriaTagsList.Where(t => t.Name == materiaTag.Name).FirstOrDefault()), SystemData.Settings.MateriaTags.MateriaTagNamesArray, EditorStyles.popup);
                 if (EditorGUI.EndChangeCheck())
                 {
                     SetMateriaSetterDirty(true);
                     var newTag = SystemData.Settings.MateriaTags.MateriaTagsList[_materiaTagIndex];
                     Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Materia Tag");
                     _materiaSetter.MateriaSlots[index].Tag = newTag;
+                    serializedObject.Update();
                 }
 
                 EditorGUI.BeginChangeCheck();
@@ -645,7 +642,7 @@ namespace Materiator
                 {
                     for (int j = 0; j < preset.MateriaPresetItemList.Count; j++)
                     {
-                        if (materiaSlots[i].Tag == preset.MateriaPresetItemList[j].Tag)
+                        if (materiaSlots[i].Tag.Name == preset.MateriaPresetItemList[j].Tag.Name)
                         {
                             if (materiaSlots[i].Materia != preset.MateriaPresetItemList[j].Materia)
                             {

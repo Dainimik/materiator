@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Linq;
+using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -48,15 +49,15 @@ namespace Materiator
             _materiaPresetItemList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
             {
                 var element = _materiaPresetItemList.serializedProperty.GetArrayElementAtIndex(index);
-                var materiaTag = element.FindPropertyRelative("Tag");
+                var materiaTag = _materiaPreset.MateriaPresetItemList[index].Tag;
                 var materia = element.FindPropertyRelative("Materia").objectReferenceValue as Materia;
 
                 Rect r = new Rect(rect.x, rect.y, 150f, 22f);
 
-
                 serializedObject.Update();
                 int _materiaTagIndex = 0;
-                _materiaTagIndex = EditorGUI.Popup(new Rect(r.x + 15, r.y, r.width, r.height), SystemData.Settings.MateriaTags.MateriaTagsList.IndexOf(materiaTag.stringValue), SystemData.Settings.MateriaTags.MateriaTagsArray, EditorStyles.popup);
+                EditorGUI.BeginChangeCheck();
+                _materiaTagIndex = EditorGUI.Popup(new Rect(r.x + 15, r.y, r.width, r.height), SystemData.Settings.MateriaTags.MateriaTagsList.IndexOf(SystemData.Settings.MateriaTags.MateriaTagsList.Where(t => t.Name == materiaTag.Name).FirstOrDefault()), SystemData.Settings.MateriaTags.MateriaTagNamesArray, EditorStyles.popup);
                 if (EditorGUI.EndChangeCheck())
                 {
                     var newTag = SystemData.Settings.MateriaTags.MateriaTagsList[_materiaTagIndex];
@@ -76,6 +77,7 @@ namespace Materiator
                     }
                 }
 
+                EditorGUI.BeginChangeCheck();
                 materia = (Materia)EditorGUI.ObjectField(new Rect(r.x + 185, r.y, rect.width - 185f, r.height), materia, typeof(Materia), false);
                 if (EditorGUI.EndChangeCheck())
                 {
@@ -86,9 +88,15 @@ namespace Materiator
                 }
             };
 
-            _materiaPresetItemList.onAddCallback = (ReorderableList List) =>
+            _materiaPresetItemList.onAddCallback = (ReorderableList list) =>
             {
-                _materiaPreset.MateriaPresetItemList.Add(new MateriaPresetItem("-"));
+                var index = list.serializedProperty.arraySize;
+                list.serializedProperty.arraySize++;
+                list.index = index;
+                var element = list.serializedProperty.GetArrayElementAtIndex(index);
+                serializedObject.ApplyModifiedProperties();
+                _materiaPreset.MateriaPresetItemList[index].Tag = SystemData.Settings.DefaultTag;
+                serializedObject.Update();
             };
         }
     }

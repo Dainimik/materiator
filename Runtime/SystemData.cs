@@ -135,9 +135,7 @@ namespace Materiator
             var materiaTags = ScriptableObject.CreateInstance<MateriaTags>();
             materiaTags.name = name;
 
-            materiaTags.MateriaTagsList.Add("-");
-            materiaTags.MateriaTagsList.Add("Metal");
-            materiaTags.MateriaTagsList.Add("Plastic");
+            materiaTags.MateriaTagsList.Add(Settings.DefaultTag);
 
             AssetDatabase.AddObjectToAsset(materiaTags, _settings);
 

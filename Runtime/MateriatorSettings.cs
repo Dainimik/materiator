@@ -17,12 +17,11 @@ namespace Materiator
         public MaterialData DefaultMaterialData;
         public ShaderData DefaultShaderData;
         public Materia DefaultMateria;
+        public MateriaTag DefaultTag = new MateriaTag("-");
         //public MaterialGlobalIlluminationFlags GlobalIlluminationFlag;
         public Color HighlightColor;
         public HighlightMode HighlightMode;
         public FilterMode FilterMode;
-
-        public string DefaultTag { get { return "-"; } }
 
         [HideInInspector] public readonly Color GUIGray = new Color(0.75f, 0.75f, 0.75f, 1f);
         [HideInInspector] public readonly Color GUIGreen = new Color(0f, 0.75f, 0f, 1f);

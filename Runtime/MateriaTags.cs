@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Materiator
 {
     public class MateriaTags : ScriptableObject
     {
-        public List<string> MateriaTagsList = new List<string>();
-        public string[] MateriaTagsArray
+        public List<MateriaTag> MateriaTagsList = new List<MateriaTag>();
+        public string[] MateriaTagNamesArray
         {
-            get { return MateriaTagsList.ToArray(); }
+            get { return MateriaTagsList.Select(t => t.Name).ToArray(); }
         }
     }
 }
