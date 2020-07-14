@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEditor;
+#endif
+using UnityEngine;
 
 namespace Materiator
 {
@@ -12,5 +15,27 @@ namespace Materiator
         public float Smoothness;
         public bool IsEmissive;
         public Color32 EmissionColor = new Color32(0, 0, 0, 255);
+
+        private bool IsInitialized;
+
+        private void OnEnable()
+        {
+            if (!IsInitialized) Init();
+        }
+
+        public void Init()
+        {
+            BaseColor = SystemData.Settings.DefaultMateria.BaseColor;
+            Metallic = SystemData.Settings.DefaultMateria.Metallic;
+            Smoothness = SystemData.Settings.DefaultMateria.Smoothness;
+            IsEmissive = SystemData.Settings.DefaultMateria.IsEmissive;
+            EmissionColor = SystemData.Settings.DefaultMateria.EmissionColor;
+
+            IsInitialized = true;
+        }
+
+#if UNITY_EDITOR
+        public Texture2D PreviewIcon;
+#endif
     }
 }

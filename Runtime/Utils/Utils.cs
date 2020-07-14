@@ -79,33 +79,6 @@ namespace Materiator
             return Mesh.Instantiate(mesh);
         }
 
-        /*public static void GenerateColorDataIcons(Materia materia, Material material)
-        {
-            if (materia.PreviewIcon != null)
-                Object.DestroyImmediate(materia.PreviewIcon);
-
-            if (materia.PreviewIconGray != null)
-                Object.DestroyImmediate(materia.PreviewIconGray);
-
-            material.SetColor(Settings.DefaultShaderData.MainColorPropertyName, materia.Color);
-            material.SetFloat("_Metallic", materia.Metallic);
-            material.SetFloat("_Smoothness", materia.Smoothness);
-            if (materia.IsEmissive)
-            {
-                material.EnableKeyword(Settings.DefaultShaderData.EmissionKeywordName);
-                material.globalIlluminationFlags = Settings.GlobalIlluminationFlag;
-                material.SetColor(Settings.DefaultShaderData.EmissionColorPropertyName, materia.Emission);
-            }
-            else
-            {
-                material.DisableKeyword(Settings.DefaultShaderData.EmissionKeywordName);
-                material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
-            }
-
-            materia.PreviewIcon = GenerateThumbnail(material, Color.black);
-            materia.PreviewIconGray = GenerateThumbnail(material, new Color(0.78431f, 0.78431f, 0.78431f, 1));
-        }*/
-
         public static Texture2D GenerateThumbnail(Material material, Color backgroundColor)
         {
             RuntimePreviewGenerator.BackgroundColor = backgroundColor;
