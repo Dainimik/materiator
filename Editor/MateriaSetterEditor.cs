@@ -401,13 +401,14 @@ namespace Materiator
                 if (elementMateria.IsEmissive)
                 {
                     var texE = new Texture2D(4, 4);
-                    Rect texRE = new Rect(rect.x + 45f, rect.y, 20f, 20f);
+                    Rect texRE = new Rect(rect.x + 145f, rect.y, 20f, 20f);
                     GUI.DrawTexture(texRE, texE, ScaleMode.StretchToFill, false, 0, emission, 0, 0);
                 }
 
                 var tex = new Texture2D(4, 4);
 
                 EditorGUI.LabelField(r, new GUIContent((elementID.intValue + 1).ToString()));
+                EditorGUI.LabelField(new Rect(rect.x + 120f, rect.y, rect.width, rect.height), new GUIContent(_materiaSetter.MateriaSlots[index].Materia.PreviewIcon));
 
                 serializedObject.Update();
 
