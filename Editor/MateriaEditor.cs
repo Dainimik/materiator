@@ -46,6 +46,11 @@ namespace Materiator
             _previewRenderUtility?.Cleanup();
         }
 
+        private void OnDestroy()
+        {
+            _previewRenderUtility?.Cleanup();
+        }
+
         public override VisualElement CreateInspectorGUI()
         {
             InitializeEditor<Materia>();
