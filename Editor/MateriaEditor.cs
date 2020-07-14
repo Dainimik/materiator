@@ -38,7 +38,7 @@ namespace Materiator
 
             SetUpPreview();
 
-            OnValueChanged();
+            EditorUtils.GenerateMateriaPreviewIcons(_materia, _previewMaterial);
         }
 
         private void OnDisable()
@@ -126,7 +126,6 @@ namespace Materiator
         {
             UpdateSceneMateriaSettersColors();
             UpdatePrefabMateriaSettersColors();
-            EditorUtils.GenerateMateriaPreviewIcons(_materia, _previewMaterial);
         }
 
         private void UpdateSceneMateriaSettersColors()
