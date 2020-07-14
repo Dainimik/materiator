@@ -189,17 +189,20 @@ namespace Materiator
         {
             _drag = EditorUtils.Drag2D(_drag, r);
 
-            _previewRenderUtility.BeginPreview(r, background);
+            if (Event.current.type == EventType.Repaint)
+            {
+                _previewRenderUtility.BeginPreview(r, background);
 
-            _previewRenderUtility.DrawMesh(_previewMesh, Vector3.zero, new Vector3(1, 1, 1), Quaternion.identity, _previewMaterial, 0, null, null, false);
+                _previewRenderUtility.DrawMesh(_previewMesh, Vector3.zero, new Vector3(1, 1, 1), Quaternion.identity, _previewMaterial, 0, null, null, false);
 
-            _previewRenderUtility.camera.transform.position = Vector2.zero;
-            _previewRenderUtility.camera.transform.rotation = Quaternion.Euler(new Vector3(-_drag.y, -_drag.x, 0));
-            _previewRenderUtility.camera.transform.position = _previewRenderUtility.camera.transform.forward * -4f;
-            _previewRenderUtility.camera.Render();
+                _previewRenderUtility.camera.transform.position = Vector2.zero;
+                _previewRenderUtility.camera.transform.rotation = Quaternion.Euler(new Vector3(-_drag.y, -_drag.x, 0));
+                _previewRenderUtility.camera.transform.position = _previewRenderUtility.camera.transform.forward * -4f;
+                _previewRenderUtility.camera.Render();
 
-            _previewTexture = _previewRenderUtility.EndPreview();
-            GUI.DrawTexture(r, _previewTexture, ScaleMode.ScaleToFit, false);
+                _previewTexture = _previewRenderUtility.EndPreview();
+                GUI.DrawTexture(r, _previewTexture, ScaleMode.ScaleToFit, false);
+            }
         }
 
         public override void OnPreviewSettings()
