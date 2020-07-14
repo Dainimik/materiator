@@ -16,6 +16,7 @@ namespace Materiator
         public bool IsEmissive;
         public Color32 EmissionColor = new Color32(0, 0, 0, 255);
 
+        [SerializeField]
         private bool IsInitialized;
 
         private void OnEnable()
