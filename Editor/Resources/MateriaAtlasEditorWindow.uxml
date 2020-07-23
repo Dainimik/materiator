@@ -2,7 +2,7 @@
     <ui:Label text="Atlas Editor" class="title-header">
         <Style src="Materiator.uss" />
     </ui:Label>
-    <ui:VisualElement name="ButtonContainer" style="flex-direction: row; justify-content: center; visibility: visible;">
+    <ui:VisualElement name="ButtonContainer" style="flex-direction: row; justify-content: center; visibility: visible;">
         <Style src="Materiator.uss" />
         <ui:Button text="Scan Project" name="ScanProjectButton" />
         <ui:Button text="Select Atlas" name="SelectAtlasButton" />
@@ -15,7 +15,7 @@
     </ui:VisualElement>
     <ui:VisualElement name="ContentContainer">
         <Style src="Materiator.uss" />
-        <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
+        <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
             <ui:VisualElement name="SelectedMateriaSettersContainer" style="flex-direction: row;">
                 <ui:Label text="Selected Materia Setters" />
                 <ui:Label name="SelectedMateriaSettersValue" />
@@ -25,13 +25,31 @@
         <ui:VisualElement name="ButtonContainer">
             <ui:Button text="Unlink Atlas" name="UnlinkAtlasButton" />
         </ui:VisualElement>
-        <ui:VisualElement name="LabelContainer" style="flex-direction: row; justify-content: space-around;">
-            <ui:Label text="Materia Setter" name="MateriaSetterLabel" />
-            <ui:Label text="Prefab" name="PrefabLabel" />
-            <ui:Label text="Material Data" name="MaterialDataLabel" />
-        </ui:VisualElement>
         <ui:VisualElement name="MateriaSetterListViewDropArea" style="height: 200px;">
-            <ui:ListView focusable="True" item-height="20" name="MateriaSetterDataListView" selection-type="Multiple" style="flex-grow: 1;" />
+            <ui:VisualElement style="flex-direction: row;">
+                <ui:Label text="Compatible: " />
+                <ui:Label name="CompatibleCountLabel" />
+            </ui:VisualElement>
+            <ui:VisualElement name="LabelContainer" style="flex-direction: row; justify-content: space-between;">
+                <ui:Label text="Number        " name="Number" style="width: 10%;" />
+                <ui:Label text="Materia Setter" name="MateriaSetterLabel" style="flex-grow: 1; width: 25%;" />
+                <ui:Label text="Prefab" name="PrefabLabel" style="flex-grow: 1; width: 25%;" />
+                <ui:Label text="Material Data" name="MaterialDataLabel" style="flex-grow: 1; width: 20%;" />
+                <ui:Label text="Controls" name="Controls" style="width: 20%;" />
+            </ui:VisualElement>
+            <ui:ListView focusable="True" item-height="20" name="MateriaSetterDataListView" selection-type="Multiple" show-border="true" style="flex-grow: 1;" />
+            <ui:VisualElement style="flex-direction: row;">
+                <ui:Label text="Incompatible: " />
+                <ui:Label text="Label" name="IncompatibleCountLabel" />
+            </ui:VisualElement>
+            <ui:VisualElement name="LabelContainer" style="flex-direction: row; justify-content: space-between;">
+                <ui:Label text="Number        " name="Number" style="width: 10%;" />
+                <ui:Label text="Materia Setter" name="MateriaSetterLabel" style="flex-grow: 1; width: 25%;" />
+                <ui:Label text="Prefab" name="PrefabLabel" style="flex-grow: 1; width: 25%;" />
+                <ui:Label text="Material Data" name="MaterialDataLabel" style="flex-grow: 1; width: 20%;" />
+                <ui:Label text="Controls" name="Controls" style="width: 20%;" />
+            </ui:VisualElement>
+            <ui:ListView focusable="True" item-height="20" name="IncompatibleMateriaSetterDataListView" selection-type="Multiple" style="flex-grow: 1;" />
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="OutputSectionContainer" class="section-container">

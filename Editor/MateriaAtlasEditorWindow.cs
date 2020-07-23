@@ -17,7 +17,11 @@ namespace Materiator
         private VisualElement _materiaSetterListViewDropArea;
         private Label _selectedMateriaSettersValue;
         private ListView _materiaSetterDataListView;
+        private ListView _incompatibleMateriaSetterDataListView;
         private ObjectField _atlasObjectField;
+
+        private Label _compatibleMateriaSettersCountLabel;
+        private Label _incompatibleMateriaSettersCountLabel;
 
         private ToolbarSearchField _materiaSetterSearchToolbar;
         private TextField _materiaSetterSearchToolbarTextField;
@@ -62,121 +66,13 @@ namespace Materiator
             SwitchEditMode(EditMode.Native);
         }
 
-        private void GenerateListView(List<MateriaSetter> materiaSettersList)
-        {
-            _materiaSetterDataListView.Clear();
-            // The "makeItem" function will be called as needed
-            // when the ListView needs more items to render
-            Func<VisualElement> makeItem = () => new VisualElement();
-
-            // As the user scrolls through the list, the ListView object
-            // will recycle elements created by the "makeItem"
-            // and invoke the "bindItem" callback to associate
-            // the element with the matching data item (specified as an index in the list)
-            Action<VisualElement, int> bindItem = (e, i) =>
-            {
-                var ms = _materiaSetterDataListView.itemsSource.Cast<MateriaSetter>().ToList();
-                var go = ms[i].transform.root.gameObject;
-
-                var prefabGUIContent = EditorGUIUtility.ObjectContent(go, go.GetType());
-                // BUG?: If I cache materiaSetter GUIContent here and use it in the same manner as prefabGUIContent, materiaSetter's GUICOntent replaces prefabGUIContent icon and text in list view
-                //----------------------------------------------------------------------------------------
-
-                var item = new AtlasEditorListEntry((i + 1).ToString(), prefabGUIContent.image as Texture2D, prefabGUIContent.text,
-                    EditorGUIUtility.ObjectContent(ms[i], ms[i].GetType()).image as Texture2D, ms[i].name,
-                    EditorGUIUtility.ObjectContent(ms[i].MaterialData, ms[i].MaterialData.GetType()).image as Texture2D, ms[i].MaterialData.name);
-                item.RemoveListEntryButton.clicked += () => RemoveListEntry(ms[i], materiaSettersList);
-
-                e.Add(item);
-            }; 
-
-            _materiaSetterDataListView.makeItem = makeItem;
-            _materiaSetterDataListView.bindItem = bindItem;
-            _materiaSetterDataListView.itemsSource = materiaSettersList;
-
-            // Callback invoked when the user double clicks an item
-            _materiaSetterDataListView.onItemsChosen += (items) =>
-            {
-                FocusListEntry((MateriaSetter)items.FirstOrDefault()); //This line doesn't work on Unity 2019.4
-            };
-
-            _materiaSetterDataListView.onSelectionChange += (items) =>
-            {
-                _selectedListViewMateriaSetters.Clear();
-                _selectedListViewMateriaSetters = items.OfType<MateriaSetter>().ToList();
-            };
-        }
-
-        private void FilterMateriaSetterListView(string e)
-        {
-            _searchString = e.ToLower();
-
-            var filteredList = new List<MateriaSetter>();
-
-            foreach (var item in _compatibleMateriaSetters)
-            {
-                if (MatchesSearchInput(item, _searchString))
-                {
-                    filteredList.Add(item);
-                }
-            }
-
-            if (filteredList.Count != _compatibleMateriaSetters.Count)
-            {
-                _materiaSetterDataListView.itemsSource = filteredList;
-            }
-            else
-            {
-                _materiaSetterDataListView.itemsSource = _compatibleMateriaSetters;
-            }
-            
-            _materiaSetterDataListView.Refresh();
-        }
-
-        private bool MatchesSearchInput(MateriaSetter ms, string searchInput)
-        {
-            if (ms.name.ToLower().Contains(searchInput))
-            {
-                return true;
-            }
-            else if (ms.transform.root.gameObject.name.ToLower().Contains(searchInput))
-            {
-                return true;
-            }
-            else if (ms.MateriaSetterData.MaterialData.name.ToLower().Contains(searchInput))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        private void FocusListEntry(MateriaSetter ms)
-        {
-            var go = ms.gameObject;
-
-            Selection.activeObject = go;
-            EditorGUIUtility.PingObject(go);
-        }
-
-        private void RemoveListEntry(MateriaSetter item, List<MateriaSetter> list)
-        {
-            list.Remove(item);
-            _materiaSetters.Remove(item);
-
-            _selectedMateriaSettersValue.text = _materiaSetters.Count.ToString();
-
-            FilterMateriaSetterListView(_searchString);
-        }
-
         private void ScanForPrefabs()
         {
             SwitchEditMode(EditMode.Native);
+
             LoadPrefabs((MateriaAtlas)_atlasObjectField.value);
 
-            GenerateListView(_compatibleMateriaSetters);
+            GenerateListViews();
 
             _atlasSectionContainer.visible = false;
         }
@@ -193,7 +89,7 @@ namespace Materiator
 
             LoadPrefabs(_atlas);
 
-            GenerateListView(_compatibleMateriaSetters);
+            GenerateListViews();
         }
 
         private void RemoveAtlasData()
@@ -220,35 +116,34 @@ namespace Materiator
 
         private void LoadPrefabs(MateriaAtlas atlas = null)
         {
-            if (atlas == null)
+            if (_editMode == EditMode.Native)
             {
                 //ResetAtlasGenerator(true);
                 _materiaSetters = AssetUtils.FindAllComponentsInPrefabs<MateriaSetter>();
             }
             else
             {
-                //_materiaSetters = new List<MateriaSetter>();
                 _materiaSetters = atlas.AtlasEntries.Keys.ToList();
-                //foreach (var msd in atlas.AtlasEntry.Keys)
-                //{
-                //   _materiaSetters.Add(msd);
-                //}
-                foreach (var item in _materiaSetters)
-                {
-                    Debug.Log(item.MateriaSetterData.name);
-                }
-
-                //_materiaSetters = AssetUtils.FindAllComponentsInPrefabs<MateriaSetter>().Where(d => d.MateriaSetterData == msd);
             }
 
             CheckMateriaSettersCompatibility(_materiaSetters);
 
+            UpdateCountLabels();
+        }
+
+        private void UpdateCountLabels()
+        {
             _selectedMateriaSettersValue.text = _materiaSetters.Count.ToString();
+            _compatibleMateriaSettersCountLabel.text = _compatibleMateriaSetters.Count.ToString();
+            _incompatibleMateriaSettersCountLabel.text = _incompatibleMateriaSetters.Count.ToString();
         }
 
         private void SwitchEditMode(EditMode editMode)
         {
             _editMode = editMode;
+
+            _compatibleMateriaSetters.Clear();
+            _incompatibleMateriaSetters.Clear();
 
             /*if (editMode == EditMode.Atlas)
             {
@@ -259,6 +154,124 @@ namespace Materiator
             {
                 _removeAtlasData.visible = false;
             }*/
+        }
+
+
+        private void FilterMateriaSetterListView(KeyValuePair<List<MateriaSetter>, ListView> kvp, string e)
+        {
+            _searchString = e.ToLower();
+
+            var filteredList = new List<MateriaSetter>();
+
+            foreach (var item in kvp.Key)
+            {
+                if (MatchesSearchInput(item, _searchString))
+                {
+                    filteredList.Add(item);
+                }
+            }
+
+
+            if (filteredList.Count != kvp.Key.Count)
+            {
+                kvp.Value.itemsSource = filteredList;
+            }
+            else
+            {
+                kvp.Value.itemsSource = kvp.Key;
+            }
+            
+            kvp.Value.Refresh();
+        }
+
+        private void GenerateListViews()
+        {
+            GenerateListView(_materiaSetterDataListView, _compatibleMateriaSetters);
+            GenerateListView(_incompatibleMateriaSetterDataListView, _incompatibleMateriaSetters);
+        }
+
+        private void GenerateListView(ListView listView, List<MateriaSetter> materiaSettersList)
+        {
+            listView.Clear();
+            // The "makeItem" function will be called as needed
+            // when the ListView needs more items to render
+            Func<VisualElement> makeItem = () => new VisualElement();
+
+            // As the user scrolls through the list, the ListView object
+            // will recycle elements created by the "makeItem"
+            // and invoke the "bindItem" callback to associate
+            // the element with the matching data item (specified as an index in the list)
+            Action<VisualElement, int> bindItem = (e, i) =>
+            {
+                var ms = listView.itemsSource.Cast<MateriaSetter>().ToList();
+                var go = ms[i].transform.root.gameObject;
+
+                var prefabGUIContent = EditorGUIUtility.ObjectContent(go, go.GetType());
+                // BUG?: If I cache materiaSetter GUIContent here and use it in the same manner as prefabGUIContent, materiaSetter's GUICOntent replaces prefabGUIContent icon and text in list view
+                //----------------------------------------------------------------------------------------
+
+                var item = new AtlasEditorListEntry((i + 1).ToString(), prefabGUIContent.image as Texture2D, prefabGUIContent.text,
+                    EditorGUIUtility.ObjectContent(ms[i], ms[i].GetType()).image as Texture2D, ms[i].name,
+                    EditorGUIUtility.ObjectContent(ms[i].MaterialData, ms[i].MaterialData.GetType()).image as Texture2D, ms[i].MaterialData.name);
+                item.RemoveListEntryButton.clicked += () => RemoveListEntry(ms[i], materiaSettersList);
+
+                e.Add(item);
+            };
+
+            listView.makeItem = makeItem;
+            listView.bindItem = bindItem;
+            listView.itemsSource = materiaSettersList;
+
+            // Callback invoked when the user double clicks an item
+            listView.onItemsChosen += (items) =>
+            {
+                FocusListEntry((MateriaSetter)items.FirstOrDefault()); //This line doesn't work on Unity 2019.4
+            };
+
+            listView.onSelectionChange += (items) =>
+            {
+                _selectedListViewMateriaSetters.Clear();
+                _selectedListViewMateriaSetters = items.OfType<MateriaSetter>().ToList();
+            };
+        }
+
+        private bool MatchesSearchInput(MateriaSetter ms, string searchInput)
+        {
+            if (ms.name.ToLower().Contains(searchInput))
+            {
+                return true;
+            }
+            else if (ms.transform.root.gameObject.name.ToLower().Contains(searchInput))
+            {
+                return true;
+            }
+            else if (ms.MateriaSetterData != null && ms.MateriaSetterData.MaterialData.name.ToLower().Contains(searchInput))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private void FocusListEntry(MateriaSetter ms)
+        {
+            var go = ms.gameObject;
+
+            Selection.activeObject = go;
+            EditorGUIUtility.PingObject(go);
+        }
+
+        private void RemoveListEntry(MateriaSetter item, List<MateriaSetter> list)
+        {
+            list.Remove(item);
+            _materiaSetters.Remove(item);
+
+            UpdateCountLabels();
+
+            FilterMateriaSetterListView(new KeyValuePair<List<MateriaSetter>, ListView>(_compatibleMateriaSetters, _materiaSetterDataListView), _searchString);
+            FilterMateriaSetterListView(new KeyValuePair<List<MateriaSetter>, ListView>(_incompatibleMateriaSetters, _incompatibleMateriaSetterDataListView), _searchString);
         }
 
         private void CheckMateriaSettersCompatibility(ICollection<MateriaSetter> materiaSetters)
@@ -324,7 +337,8 @@ namespace Materiator
         {
             _materiaSetterSearchToolbarTextField.RegisterCallback<ChangeEvent<string>>(e =>
             {
-                FilterMateriaSetterListView(e.newValue);
+                FilterMateriaSetterListView(new KeyValuePair<List<MateriaSetter>, ListView>(_compatibleMateriaSetters, _materiaSetterDataListView), e.newValue);
+                FilterMateriaSetterListView(new KeyValuePair<List<MateriaSetter>, ListView>(_incompatibleMateriaSetters, _incompatibleMateriaSetterDataListView), e.newValue);
             });
 
             RegisterDropAreaCallbacks();
@@ -358,7 +372,8 @@ namespace Materiator
                         objs.Add((GameObject)draggedObject);
 
                 HandleDraggedInGameObjects(objs);
-                GenerateListView(_compatibleMateriaSetters);
+                GenerateListView(_materiaSetterDataListView, _compatibleMateriaSetters);
+                GenerateListView(_incompatibleMateriaSetterDataListView, _incompatibleMateriaSetters);
                 //Action(objs);
 
             });
@@ -391,14 +406,17 @@ namespace Materiator
 
         protected override void GetProperties()
         {
+            _selectedMateriaSettersValue = root.Q<Label>("SelectedMateriaSettersValue");
+            _compatibleMateriaSettersCountLabel = root.Q<Label>("CompatibleCountLabel");
+            _incompatibleMateriaSettersCountLabel = root.Q<Label>("IncompatibleCountLabel");
+
             _materiaSetterListViewDropArea = root.Q<VisualElement>("MateriaSetterListViewDropArea");
 
             _materiaSetterDataListView = root.Q<ListView>("MateriaSetterDataListView");
+            _incompatibleMateriaSetterDataListView = root.Q<ListView>("IncompatibleMateriaSetterDataListView");
 
             _materiaSetterSearchToolbar = root.Q<ToolbarSearchField>("MateriaSetterSearchToolbar");
             _materiaSetterSearchToolbarTextField = _materiaSetterSearchToolbar.Q<TextField>();
-
-            _selectedMateriaSettersValue = root.Q<Label>("SelectedMateriaSettersValue");
 
             _atlasSectionContainer = root.Q<VisualElement>("AtlasSectionContainer");
 

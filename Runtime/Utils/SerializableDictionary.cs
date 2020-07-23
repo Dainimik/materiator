@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Materiator
 {
     [Serializable]
-    public class SerializableDictionary<TKey, TValue> : SortedDictionary<TKey, TValue>, ISerializationCallbackReceiver
+    public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
     {
         [SerializeField]
         private List<TKey> _keys = new List<TKey>();
