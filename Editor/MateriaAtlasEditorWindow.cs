@@ -101,7 +101,9 @@ namespace Materiator
                     var itemData = item.MateriaSetterData;
 
                     item.UnloadAtlas();
-                    itemData.MateriaAtlas.AtlasEntries.Remove(item);
+                    var kvpToRemove = itemData.MateriaAtlas.AtlasEntries.Where(kvp => kvp.Value.MateriaSetter == item).FirstOrDefault().Key;
+                    itemData.MateriaAtlas.AtlasEntries[kvpToRemove].MateriaSetter = null;
+                    itemData.MateriaAtlas.AtlasEntries[kvpToRemove].MateriaSetterData = null;
                     itemData.MateriaAtlas = null;
 
                     itemData.AtlasedGridSize = 0;
@@ -123,7 +125,13 @@ namespace Materiator
             }
             else
             {
-                _materiaSetters = atlas.AtlasEntries.Keys.ToList();
+                foreach (var kvp in atlas.AtlasEntries.Values)
+                {
+                    if (kvp.MateriaSetter != null)
+                    {
+                        _materiaSetters.Add(kvp.MateriaSetter);
+                    }
+                }
             }
 
             CheckMateriaSettersCompatibility(_materiaSetters);

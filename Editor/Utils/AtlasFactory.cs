@@ -71,6 +71,19 @@ namespace Materiator
                 atlas = existingAtlas;
             }
 
+
+            var nullSlotIterator = 0;
+            var nullSlotIndices = new List<int>();
+            foreach (var kvp in atlas.AtlasEntries)
+            {
+                if (kvp.Value.MateriaSetterData == null)
+                {
+                    nullSlotIndices.Add(kvp.Key);
+                }
+            }
+
+
+
             var processedPrefabs = new HashSet<GameObject>();
             var skipSavingPrefab = false;
             
@@ -88,6 +101,11 @@ namespace Materiator
                             //continue;
 
                         //processedPrefabs.Add(nearestPrefabInstanceRoot);
+
+                        if (ms[j].MateriaSetterData.MateriaAtlas != null)
+                        {
+                            continue;
+                        }
 
                         var atlasedMesh = Utils.CopyMesh(ms[j].NativeMesh); // Maybe you should copy mesh from MateriaSetterData instead?
                         var remappedUVs = atlasedMesh.uv;
@@ -108,9 +126,20 @@ namespace Materiator
                         var data = ms[j].MateriaSetterData;
 
                         var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.MateriaSetterData == ms[j].MateriaSetterData).FirstOrDefault();
-                        if (!atlas.AtlasEntries.ContainsKey(prefabMS))
+                        Debug.Log(nullSlotIndices.Count);
+                        if (nullSlotIndices.Count > 0)
                         {
-                            atlas.AtlasEntries.Add(prefabMS, data);
+                            atlas.AtlasEntries[nullSlotIndices[nullSlotIterator]].MateriaSetter = prefabMS;
+                            atlas.AtlasEntries[nullSlotIndices[nullSlotIterator]].MateriaSetterData = data;
+
+                            nullSlotIterator++;
+                        }
+                        else
+                        {
+                            if (!atlas.AtlasEntries.ContainsKey(i))
+                            {
+                                atlas.AtlasEntries.Add(i, new MateriaAtlasEntry(prefabMS, data));
+                            }
                         }
                         
                         atlas.MaterialData = group.Key;
@@ -189,7 +218,7 @@ namespace Materiator
             AssetDatabase.SaveAssets();
 
             atlas.Textures.ImportTextureAssets();
-            atlas.AtlasEntries = new SerializableDictionary<MateriaSetter, MateriaSetterData>();
+            atlas.AtlasEntries = new SerializableDictionary<int, MateriaAtlasEntry>();
 
             return atlas;
         }

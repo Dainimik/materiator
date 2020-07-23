@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Materiator
 {
@@ -7,7 +8,7 @@ namespace Materiator
         public MaterialData MaterialData;
         public Material Material;
         public Textures Textures = new Textures();
-        public SerializableDictionary<MateriaSetter, MateriaSetterData> AtlasEntries; // Materia Setter prefab instance
+        public SerializableDictionary<int, MateriaAtlasEntry> AtlasEntries; // Materia Setter prefab instance
         public int GridSize;
     }
 }
