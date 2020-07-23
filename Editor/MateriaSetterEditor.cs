@@ -991,6 +991,15 @@ namespace Materiator
                         [ContextActions.Retry] = "Retry"
                     });
             }
+            else if (MateriaSetter.MeshRenderer.sharedMaterials.Count() > 1)
+            {
+                return ErrorMessage(
+                    "Renderer needs to have only one material assigned. Please remove excess materials and hit the Retry button.",
+                    new Dictionary<ContextAction, string>
+                    {
+                        [ContextActions.Retry] = "Retry"
+                    });
+            }
             else
             {
                 return true;
