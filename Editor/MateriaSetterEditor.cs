@@ -11,7 +11,10 @@ namespace Materiator
     [CustomEditor(typeof(MateriaSetter))]
     public class MateriaSetterEditor : MateriatorEditor
     {
-        private MateriaSetter _materiaSetter;
+        private delegate void ContextAction(MateriaSetterEditor editor);
+        private ContextAction _contextAction;
+
+        public MateriaSetter MateriaSetter;
 
         private ReorderableList _materiaReorderableList;
 
@@ -52,56 +55,62 @@ namespace Materiator
 
         private Label _currentShaderLabel;
 
+        private VisualElement _cachedGUIRoot;
+        private VisualElement _root;
+
         private void OnEnable()
         {
-            _materiaSetter = (MateriaSetter)target;
+            MateriaSetter = (MateriaSetter)target;
 
-            Initialize();
+            InitializeEditor<MateriaSetter>();
+
+            _root = new VisualElement();
+
+            if (Initialize())
+            {
+                DrawAtlasSection();
+                DrawPresetSection();
+                DrawDataSection();
+                DrawOutputSection();
+                DrawIMGUI();
+            }
         }
 
         private void OnDisable()
         {
-            _materiaSetter = (MateriaSetter)target;
+            MateriaSetter = (MateriaSetter)target;
         }
 
         public override VisualElement CreateInspectorGUI()
         {
-            InitializeEditor<MateriaSetter>();
-
-            DrawAtlasSection();
-            DrawPresetSection();
-            DrawDataSection();
-            DrawOutputSection();
-
-            DrawIMGUI();
-
-            return root;
+            return _root;
         }
 
-        private void Initialize()
+        public bool Initialize()
         {
-            _materiaSetter.Initialize();
-
-            /*if (!CheckAllSystems())
+            if (CheckAllSystems())
             {
-                return;
-            }*/
+                MateriaSetter.Initialize();
 
-            /*if (!_materiaSetter.IsDirty && _materiaSetter.MateriaSetterData != null)
+                _root = root;
+
+                return true;
+            }
+            else
             {
-                ReloadData();
-            }*/
+                return false;
+            }
         }
 
         private void Refresh()
         {
-            _materiaSetter.Refresh();
+            MateriaSetter.Refresh();
             DrawUVInspector(true);
         }
 
         private void ResetMateriaSetter()
         {
-            _materiaSetter.ResetMateriaSetter();
+            MateriaSetter.ResetMateriaSetter();
 
             SetMateriaSetterDirty(true);
         }
@@ -133,11 +142,11 @@ namespace Materiator
 
         private void SwitchEditMode()
         {
-            if (_materiaSetter.EditMode == EditMode.Native)
+            if (MateriaSetter.EditMode == EditMode.Native)
             {
-                LoadAtlas(_materiaSetter.MateriaSetterData.MateriaAtlas);
+                LoadAtlas(MateriaSetter.MateriaSetterData.MateriaAtlas);
             }
-            else if (_materiaSetter.EditMode == EditMode.Atlas)
+            else if (MateriaSetter.EditMode == EditMode.Atlas)
             {
                 UnloadAtlas();
             }
@@ -194,7 +203,11 @@ namespace Materiator
         {
             DrawUVInspector(false);
 
-            _currentShaderLabel.text = _materiaSetter.MaterialData.ShaderData.Shader.name;
+            if (_currentShaderLabel != null)
+            {
+                _currentShaderLabel.text = MateriaSetter.MaterialData.ShaderData.Shader.name;
+            }
+            
 
             if (_materiaSetterDataObjectField.value == null)
             {
@@ -238,7 +251,7 @@ namespace Materiator
                 _uvIslandContainer.Clear();
             }
 
-            var rects = _materiaSetter.Rects;
+            var rects = MateriaSetter.Rects;
             var size = Mathf.Sqrt(rects.Length);
             Color borderColor;
 
@@ -256,21 +269,21 @@ namespace Materiator
                     item.name = "UVGridItem";
                     item.styleSheets.Add(Resources.Load<StyleSheet>("Materiator"));
 
-                    if (_materiaSetter.FilteredRects.ContainsKey(i))
+                    if (MateriaSetter.FilteredRects.ContainsKey(i))
                     {
                         Color color = SystemData.Settings.DefaultMateria.BaseColor;
                         switch (_uvDisplayModeEnumField.value)
                         {
                             case UVDisplayMode.BaseColor:
-                                color = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.BaseColor;
+                                color = MateriaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.BaseColor;
                                 break;
                             case UVDisplayMode.MetallicSpecularGlossSmoothness:
-                                var metallic = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.Metallic;
+                                var metallic = MateriaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.Metallic;
                                 var metallicColor = new Color(metallic, metallic, metallic, 1f);
                                 color = metallicColor;
                                 break;
                             case UVDisplayMode.EmissionColor:
-                                color = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.EmissionColor;
+                                color = MateriaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.EmissionColor;
                                 break;
                         }
 
@@ -315,9 +328,9 @@ namespace Materiator
         {
             if (atlas != null)
             {
-                _materiaSetter.MateriaSlots = _materiaSetter.MateriaSetterData.MateriaSlots;
+                MateriaSetter.MateriaSlots = MateriaSetter.MateriaSetterData.MateriaSlots;
 
-                _materiaSetter.LoadAtlas(atlas);
+                MateriaSetter.LoadAtlas(atlas);
             }
 
             SetMateriaSetterDirty(false);
@@ -325,21 +338,21 @@ namespace Materiator
 
         private void UnloadAtlas()
         {
-            _materiaSetter.UnloadAtlas();
+            MateriaSetter.UnloadAtlas();
         }
 
         private void LoadPreset(MateriaPreset preset)
         {
             List<MateriaSlot> materiaSlots;
-            if (_materiaSetter.MateriaSetterData != null)
+            if (MateriaSetter.MateriaSetterData != null)
             {
-                materiaSlots = _materiaSetter.MateriaSetterData.MateriaSlots;
+                materiaSlots = MateriaSetter.MateriaSetterData.MateriaSlots;
             }
             else
             {
-                materiaSlots = _materiaSetter.MateriaSlots;
+                materiaSlots = MateriaSetter.MateriaSlots;
             }
-            var same = AreMateriasSameAsPreset(preset, _materiaSetter.MateriaSlots);
+            var same = AreMateriasSameAsPreset(preset, MateriaSetter.MateriaSlots);
 
             if (!same)
             {
@@ -348,16 +361,16 @@ namespace Materiator
                 if (preset != null)
                 {
                     _reloadMateriaPresetButton.visible = true;
-                    _materiaSetter.LoadPreset(preset);
+                    MateriaSetter.LoadPreset(preset);
                 }
                 else
                 {
                     _reloadMateriaPresetButton.visible = false;
-                    _materiaSetter.LoadPreset(null);
+                    MateriaSetter.LoadPreset(null);
                 }
                 serializedObject.Update();
 
-                _materiaSetter.UpdateColorsOfAllTextures();
+                MateriaSetter.UpdateColorsOfAllTextures();
             }
 
             DrawUVInspector(true);
@@ -375,7 +388,7 @@ namespace Materiator
                 EditorGUI.LabelField(new Rect(rect.x + 25f, rect.y, 50f, 20f), new GUIContent("Tag", "Tag"), EditorStyles.boldLabel);
                 EditorGUI.LabelField(new Rect(rect.x + 125f, rect.y, 20f, 20f), new GUIContent("C", "Base Color"), EditorStyles.boldLabel);
                 EditorGUI.LabelField(new Rect(rect.x + 150f, rect.y, 20f, 20f), new GUIContent("E", "Emission Color"), EditorStyles.boldLabel);
-                EditorGUI.LabelField(new Rect(rect.x + 170f, rect.y, 100f, 20f), new GUIContent("Materia " + "(" + _materiaSetter.MateriaSlots.Count + ")"), EditorStyles.boldLabel);
+                EditorGUI.LabelField(new Rect(rect.x + 170f, rect.y, 100f, 20f), new GUIContent("Materia " + "(" + MateriaSetter.MateriaSlots.Count + ")"), EditorStyles.boldLabel);
             };
 
             _materiaReorderableList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
@@ -384,7 +397,7 @@ namespace Materiator
                 var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(index);
                 var elementID = element.FindPropertyRelative("ID");
                 var elementMateria = element.FindPropertyRelative("Materia").objectReferenceValue as Materia;
-                var materiaTag = _materiaSetter.MateriaSlots[index].Tag;
+                var materiaTag = MateriaSetter.MateriaSlots[index].Tag;
 
                 Rect r = new Rect(rect.x, rect.y, 22f, 22f);
 
@@ -404,7 +417,7 @@ namespace Materiator
                 var tex = new Texture2D(4, 4);
 
                 EditorGUI.LabelField(r, new GUIContent((elementID.intValue + 1).ToString()));
-                EditorGUI.LabelField(new Rect(rect.x + 120f, rect.y, rect.width, rect.height), new GUIContent(_materiaSetter.MateriaSlots[index].Materia.PreviewIcon));
+                EditorGUI.LabelField(new Rect(rect.x + 120f, rect.y, rect.width, rect.height), new GUIContent(MateriaSetter.MateriaSlots[index].Materia.PreviewIcon));
 
                 serializedObject.Update();
 
@@ -415,8 +428,8 @@ namespace Materiator
                 {
                     SetMateriaSetterDirty(true);
                     var newTag = SystemData.Settings.MateriaTags.MateriaTagsList[_materiaTagIndex];
-                    Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Materia Tag");
-                    _materiaSetter.MateriaSlots[index].Tag = newTag;
+                    Undo.RegisterCompleteObjectUndo(MateriaSetter, "Change Materia Tag");
+                    MateriaSetter.MateriaSlots[index].Tag = newTag;
                     serializedObject.Update();
                 }
 
@@ -424,18 +437,18 @@ namespace Materiator
                 elementMateria = (Materia)EditorGUI.ObjectField(new Rect(rect.x + 170f, rect.y, rect.width - 195f, rect.height), elementMateria, typeof(Materia), false);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Materia");
+                    Undo.RegisterCompleteObjectUndo(MateriaSetter, "Change Materia");
                     SetMateriaSetterDirty(true);
 
                     if (elementMateria == null)
                         elementMateria = SystemData.Settings.DefaultMateria;
                     else
-                        _materiaSetter.MateriaSlots[index].Materia = elementMateria;
+                        MateriaSetter.MateriaSlots[index].Materia = elementMateria;
 
                     serializedObject.Update();
                     DrawUVInspector(true);
 
-                    _materiaSetter.UpdateColorsOfAllTextures();
+                    MateriaSetter.UpdateColorsOfAllTextures();
 
                     serializedObject.ApplyModifiedProperties();
                     //_emissionInUse = IsEmissionInUse(_materiaSetter.Materia);
@@ -485,17 +498,17 @@ namespace Materiator
         Texture2D _highlightedTexture;
         private void HandleMateriaSlotSelection(int index, bool selected)
         {
-            var originalTexture = _materiaSetter.Textures.Color;
+            var originalTexture = MateriaSetter.Textures.Color;
 
             if (_highlightedTexture == null)
             {
-                _highlightedTexture = new Texture2D(_materiaSetter.Textures.Color.width, _materiaSetter.Textures.Color.height, TextureFormat.RGBA32, false);
+                _highlightedTexture = new Texture2D(MateriaSetter.Textures.Color.width, MateriaSetter.Textures.Color.height, TextureFormat.RGBA32, false);
                 EditorUtility.CopySerialized(originalTexture, _highlightedTexture);
                 _highlightedTexture.filterMode = SystemData.Settings.FilterMode;
             }
 
             var colors = originalTexture.GetPixels32();
-            var rectInt = Utils.GetRectIntFromRect(_materiaSetter.GridSize, _materiaSetter.FilteredRects[index]);
+            var rectInt = Utils.GetRectIntFromRect(MateriaSetter.GridSize, MateriaSetter.FilteredRects[index]);
 
             for (int i = 0; i < colors.Length; i++)
             {
@@ -507,14 +520,14 @@ namespace Materiator
                 _highlightedTexture.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, colors);
                 _highlightedTexture.Apply();
 
-                _materiaSetter.Renderer.sharedMaterial.SetTexture(_materiaSetter.MaterialData.ShaderData.MainTexturePropertyName, _highlightedTexture);
+                MateriaSetter.Renderer.sharedMaterial.SetTexture(MateriaSetter.MaterialData.ShaderData.MainTexturePropertyName, _highlightedTexture);
             }
             else
             {
                 _highlightedTexture.SetPixels32(originalTexture.GetPixels32());
                 _highlightedTexture.Apply();
 
-                _materiaSetter.Renderer.sharedMaterial.SetTexture(_materiaSetter.MaterialData.ShaderData.MainTexturePropertyName, originalTexture);
+                MateriaSetter.Renderer.sharedMaterial.SetTexture(MateriaSetter.MaterialData.ShaderData.MainTexturePropertyName, originalTexture);
             }
         }
 
@@ -528,11 +541,11 @@ namespace Materiator
 
                 if (editMode == 0)
                 {
-                    textures = _materiaSetter.MateriaSetterData.Textures;
+                    textures = MateriaSetter.MateriaSetterData.Textures;
                 }
                 else if (editMode == 1)
                 {
-                    textures = _materiaSetter.MateriaSetterData.MateriaAtlas.Textures;
+                    textures = MateriaSetter.MateriaSetterData.MateriaAtlas.Textures;
                 }
 
                 newTextures.CreateTextures(textures.Size.x, textures.Size.y);
@@ -546,19 +559,19 @@ namespace Materiator
 
                 serializedObject.ApplyModifiedProperties();
 
-                _materiaSetter.Textures = newTextures;
-                _materiaSetter.SetTextures();
+                MateriaSetter.Textures = newTextures;
+                MateriaSetter.SetTextures();
 
                 var newMateriaSlots = new List<MateriaSlot>();
 
-                foreach (var item in _materiaSetter.MateriaSetterData.MateriaSlots)
+                foreach (var item in MateriaSetter.MateriaSetterData.MateriaSlots)
                 {
                     newMateriaSlots.Add(new MateriaSlot(item.ID, item.Materia, item.Tag));
                 }
 
-                _materiaSetter.MateriaSlots = newMateriaSlots;
+                MateriaSetter.MateriaSlots = newMateriaSlots;
                 serializedObject.Update();
-                _materiaSetter.UpdateRenderer();
+                MateriaSetter.UpdateRenderer();
                 serializedObject.Update();
             }
         }
@@ -582,9 +595,9 @@ namespace Materiator
 
         private void OnMateriaAtlasChanged()
         {
-            if (_materiaSetter.MateriaSetterData != null)
+            if (MateriaSetter.MateriaSetterData != null)
             {
-                if (_materiaSetter.MateriaAtlas != null)
+                if (MateriaSetter.MateriaAtlas != null)
                 {
                     _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIGreen;
                 }
@@ -598,7 +611,7 @@ namespace Materiator
                 _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
             }
 
-            if (_materiaSetter.MateriaAtlas == null)
+            if (MateriaSetter.MateriaAtlas == null)
             {
                 _switchEditModeButton.SetEnabled(false);
             }
@@ -621,7 +634,7 @@ namespace Materiator
             {
                 _reloadMateriaPresetButton.SetEnabled(true);
                 
-                if (AreMateriasSameAsPreset((MateriaPreset)_materiaPresetObjectField.value, _materiaSetter.MateriaSlots))
+                if (AreMateriasSameAsPreset((MateriaPreset)_materiaPresetObjectField.value, MateriaSetter.MateriaSlots))
                 {
                     _presetIndicator.style.backgroundColor = SystemData.Settings.GUIGreen;
                 }
@@ -670,18 +683,18 @@ namespace Materiator
                 _materiaSetterData.objectReferenceValue = data;
                 serializedObject.ApplyModifiedProperties();
 
-                Utils.ShallowCopyFields(data, _materiaSetter);
+                Utils.ShallowCopyFields(data, MateriaSetter);
 
                 if (_editMode.enumValueIndex == 0)
                 {
-                    _materiaSetter.Mesh = data.NativeMesh;
+                    MateriaSetter.Mesh = data.NativeMesh;
                 }
                 else if (_editMode.enumValueIndex == 1)
                 {
                     if (data.MateriaAtlas != null)
                     {
                         LoadAtlas(data.MateriaAtlas);
-                        _materiaSetter.AnalyzeMesh(); // not sure why this is needed here
+                        MateriaSetter.AnalyzeMesh(); // not sure why this is needed here
                     }
                     else
                     {
@@ -690,7 +703,7 @@ namespace Materiator
                 }
 
                 serializedObject.Update();
-                _materiaSetter.UpdateRenderer();
+                MateriaSetter.UpdateRenderer();
             }
             else
             {
@@ -717,24 +730,24 @@ namespace Materiator
 
             serializedObject.ApplyModifiedProperties();
 
-            _materiaSetter.Material.name = _materiaSetter.gameObject.name;
-            _materiaSetter.Material.shader = materialData.ShaderData.Shader;
+            MateriaSetter.Material.name = MateriaSetter.gameObject.name;
+            MateriaSetter.Material.shader = materialData.ShaderData.Shader;
 
-            _materiaSetter.SetTextures();
-            _materiaSetter.UpdateRenderer(false);
+            MateriaSetter.SetTextures();
+            MateriaSetter.UpdateRenderer(false);
         }
 
         private void OverwriteMateriaSetterData()
         {
             if (EditorUtility.DisplayDialog("Overwrite current data?", "Are you sure you want to overwrite " + _materiaSetterData.objectReferenceValue.name + " with current settings?", "Yes", "No"))
             {
-                WriteAssetsToDisk(AssetDatabase.GetAssetPath(_materiaSetter.MateriaSetterData), SystemData.Settings.PackAssets);
+                WriteAssetsToDisk(AssetDatabase.GetAssetPath(MateriaSetter.MateriaSetterData), SystemData.Settings.PackAssets);
                 
             }
         }
         private void SaveAsNewMateriaSetterData()
         {
-            var path = EditorUtility.SaveFilePanelInProject("Save data", _materiaSetter.gameObject.name, "asset", "asset");
+            var path = EditorUtility.SaveFilePanelInProject("Save data", MateriaSetter.gameObject.name, "asset", "asset");
             if (path.Length != 0)
             {
                 WriteAssetsToDisk(path, SystemData.Settings.PackAssets);
@@ -756,7 +769,7 @@ namespace Materiator
             else
             {
                 dir = SystemData.Settings.SavePath;
-                name = _materiaSetter.gameObject.name;
+                name = MateriaSetter.gameObject.name;
                 path = dir + name + ".asset";
             }
 
@@ -764,7 +777,7 @@ namespace Materiator
             Textures outputTextures = null;
 
             bool isDataAssetExisting;
-            var data = AssetUtils.CreateOrReplaceScriptableObjectAsset(_materiaSetter.MateriaSetterData, path, out isDataAssetExisting);
+            var data = AssetUtils.CreateOrReplaceScriptableObjectAsset(MateriaSetter.MateriaSetterData, path, out isDataAssetExisting);
 
             if (isDataAssetExisting)
             {
@@ -773,9 +786,9 @@ namespace Materiator
                     outputTextures = data.Textures;
                     material = data.Material;
 
-                    if (data.MaterialData != _materiaSetter.MaterialData)
+                    if (data.MaterialData != MateriaSetter.MaterialData)
                     {
-                        var mat = Instantiate(_materiaSetter.Material);
+                        var mat = Instantiate(MateriaSetter.Material);
                         mat.name = material.name;
 
                         if (packAssets)
@@ -807,29 +820,29 @@ namespace Materiator
             else
             {
                 outputTextures = new Textures();
-                outputTextures.CreateTextures(_materiaSetter.Textures.Size.x, _materiaSetter.Textures.Size.y);
+                outputTextures.CreateTextures(MateriaSetter.Textures.Size.x, MateriaSetter.Textures.Size.y);
 
-                material = Instantiate(_materiaSetter.Material); // I'm instantiating here because Unity can't add an object to asset if it is already a part of an asset
+                material = Instantiate(MateriaSetter.Material); // I'm instantiating here because Unity can't add an object to asset if it is already a part of an asset
             }
 
             
 
             if (_editMode.enumValueIndex == 0)
             {
-                outputTextures.CopyPixelColors(_materiaSetter.Textures, _materiaSetter.Textures.Size.x, new Rect(0, 0, 1, 1), outputTextures.Size.x, new Rect(0, 0, 1, 1));
+                outputTextures.CopyPixelColors(MateriaSetter.Textures, MateriaSetter.Textures.Size.x, new Rect(0, 0, 1, 1), outputTextures.Size.x, new Rect(0, 0, 1, 1));
                 outputTextures.SetNames(name);
 
                 if (data.MateriaAtlas != null)
                 {
-                    data.MateriaAtlas.Textures.CopyPixelColors(_materiaSetter.Textures, _materiaSetter.Textures.Size.x, new Rect(0, 0, 1, 1), data.MateriaAtlas.Textures.Size.x, _materiaSetter.MateriaSetterData.AtlasedUVRect);
+                    data.MateriaAtlas.Textures.CopyPixelColors(MateriaSetter.Textures, MateriaSetter.Textures.Size.x, new Rect(0, 0, 1, 1), data.MateriaAtlas.Textures.Size.x, MateriaSetter.MateriaSetterData.AtlasedUVRect);
                 }
             }
             else if (_editMode.enumValueIndex == 1)
             {
-                outputTextures.CopyPixelColors(_materiaSetter.Textures, _materiaSetter.Textures.Size.x, _materiaSetter.UVRect, _materiaSetter.Textures.Size.x, _materiaSetter.UVRect);
+                outputTextures.CopyPixelColors(MateriaSetter.Textures, MateriaSetter.Textures.Size.x, MateriaSetter.UVRect, MateriaSetter.Textures.Size.x, MateriaSetter.UVRect);
                 outputTextures.SetNames(name);
 
-                data.Textures.CopyPixelColors(_materiaSetter.Textures, _materiaSetter.Textures.Size.x, _materiaSetter.UVRect, data.NativeGridSize, new Rect(0, 0, 1, 1));
+                data.Textures.CopyPixelColors(MateriaSetter.Textures, MateriaSetter.Textures.Size.x, MateriaSetter.UVRect, data.NativeGridSize, new Rect(0, 0, 1, 1));
             }
 
             
@@ -863,15 +876,15 @@ namespace Materiator
                 }
             }
 
-            _materiaSetter.Material = material;
-            _materiaSetter.Textures = outputTextures;
+            MateriaSetter.Material = material;
+            MateriaSetter.Textures = outputTextures;
 
             if (_editMode.enumValueIndex == 0)
             {
                 data.Material = material;
                 data.Textures = outputTextures;
-                data.NativeMesh = _materiaSetter.Mesh;
-                data.NativeGridSize = _materiaSetter.GridSize;
+                data.NativeMesh = MateriaSetter.Mesh;
+                data.NativeGridSize = MateriaSetter.GridSize;
             }
             else if (_editMode.enumValueIndex == 1)
             {
@@ -888,14 +901,14 @@ namespace Materiator
                 data.MateriaSlots = new List<MateriaSlot>();
             }
             
-            data.MateriaSlots.AddRange(_materiaSetter.MateriaSlots);
+            data.MateriaSlots.AddRange(MateriaSetter.MateriaSlots);
 
             data.MaterialData = (MaterialData)_materialData.objectReferenceValue;
             data.MateriaPreset = (MateriaPreset)_materiaPreset.objectReferenceValue;
            
 
-            _materiaSetter.SetTextures();
-            _materiaSetter.MateriaSetterData = data;
+            MateriaSetter.SetTextures();
+            MateriaSetter.MateriaSetterData = data;
 
             serializedObject.Update();
 
@@ -903,7 +916,7 @@ namespace Materiator
             AssetDatabase.Refresh();
             EditorUtils.MarkOpenPrefabSceneDirty();
 
-            _materiaSetter.UpdateRenderer(false);
+            MateriaSetter.UpdateRenderer(false);
 
             if (_editMode.enumValueIndex == 0)
             {
@@ -916,27 +929,67 @@ namespace Materiator
             
         }
 
-        /*private bool CheckAllSystems()
+        private bool CheckAllSystems()
         {
-            if (MateriatorSettings.Instance == null)
-            {
-                return ErrorMessage("Please first go to Tools->Materiator->Settings to generate a settings file.", true);
-            }
-            if ((_materiaSetter.MeshRenderer != null && _materiaSetter.SkinnedMeshRenderer != null) || (_materiaSetter.MeshFilter != null && _materiaSetter.SkinnedMeshRenderer != null))
+            MateriaSetter.GetMeshReferences();
+
+            if ((MateriaSetter.MeshRenderer != null && MateriaSetter.SkinnedMeshRenderer != null) || (MateriaSetter.MeshFilter != null && MateriaSetter.SkinnedMeshRenderer != null))
             {
                 return ErrorMessage("Please use either only a SKINNED MESH RENDERER component alone or a MESH FILTER + MESH RENDERER component combo.");
             }
-            else if (_materiaSetter.SkinnedMeshRenderer == null && _materiaSetter.MeshFilter == null)
+            else if (MateriaSetter.Renderer == null && MateriaSetter.MeshFilter == null)
             {
-                return ErrorMessage("Please first add a MESH FILTER component to this Game Object.");
+                return ErrorMessage(
+                    "Please first add a MESH FILTER or a SKINNED MESH RENDERER component to this Game Object.",
+                    new Dictionary<ContextAction, string>
+                    {
+                        [ContextActions.AddMeshFilter] = "Add Mesh Filter",
+                        [ContextActions.AddSkinnedMeshRenderer] = "Add Skinned Mesh Renderer"
+                    });
             }
-            else if (_materiaSetter.SkinnedMeshRenderer == null && _materiaSetter.MeshFilter.sharedMesh == null)
+            else if (MateriaSetter.MeshRenderer != null && MateriaSetter.MeshFilter == null)
             {
-                return ErrorMessage("Please first add a MESH first and hit the Retry button.", true);
+                return ErrorMessage(
+                    "Please first add a MESH FILTER component to this Game Object.",
+                    new Dictionary<ContextAction, string>
+                    {
+                        [ContextActions.AddMeshFilter] = "Add Mesh Filter"
+                    });
             }
-            else if (_materiaSetter.SkinnedMeshRenderer == null && _materiaSetter.MeshRenderer == null)
+            else if (MateriaSetter.SkinnedMeshRenderer == null && MateriaSetter.MeshFilter.sharedMesh == null)
             {
-                return ErrorMessage("Please first add a MESH RENDERER or a SKINNED MESH RENDERER component to this Game Object.");
+                return ErrorMessage(
+                    "Please add a MESH and hit the Retry button.",
+                    new Dictionary<ContextAction, string> { [ContextActions.Retry] = "Retry" }
+                    );
+            }
+            else if (MateriaSetter.SkinnedMeshRenderer == null && MateriaSetter.MeshRenderer == null && MateriaSetter.MeshFilter == null)
+            {
+                return ErrorMessage(
+                    "Please first add a MESH RENDERER or a SKINNED MESH RENDERER component to this Game Object.",
+                    new Dictionary<ContextAction, string>
+                    {
+                        [ContextActions.AddMeshRenderer] = "Add Mesh Renderer",
+                        [ContextActions.AddSkinnedMeshRenderer] = "Add Skinned Mesh Renderer"
+                    });
+            }
+            else if (MateriaSetter.SkinnedMeshRenderer == null && MateriaSetter.MeshRenderer == null && MateriaSetter.MeshFilter != null)
+            {
+                return ErrorMessage(
+                    "Please first add a MESH RENDERER component to this Game Object.",
+                    new Dictionary<ContextAction, string>
+                    {
+                        [ContextActions.AddMeshRenderer] = "Add Mesh Renderer"
+                    });
+            }
+            else if (MateriaSetter.SkinnedMeshRenderer != null && MateriaSetter.SkinnedMeshRenderer.sharedMesh == null)
+            {
+                return ErrorMessage(
+                    "Please first add a MESH to a SKINNED MESH RENDERER component and hit the Retry Button.",
+                    new Dictionary<ContextAction, string>
+                    {
+                        [ContextActions.Retry] = "Retry"
+                    });
             }
             else
             {
@@ -944,22 +997,26 @@ namespace Materiator
             }
         }
 
-        private bool ErrorMessage(string text, bool retryButton = false)
+        private bool ErrorMessage(string text, Dictionary<ContextAction, string> actionContent = null)
         {
-            root = new VisualElement();
-            tree = CreateInstance<VisualTreeAsset>();
+            _root.Clear();
             var warning = new HelpBox(text, HelpBoxMessageType.Warning);
-            root.Add(warning);
+            _root.Add(warning);
 
-            if (retryButton)
+            if (actionContent != null)
             {
-                var button = new Button(Reload);
-                button.text = "Retry";
-                root.Add(button);
+                foreach (var entry in actionContent)
+                {
+                    var button = new Button(() => entry.Key(this));
+                    button.text = entry.Value;
+                    _root.Add(button);
+                }
             }
 
             return false;
-        }*/
+        }
+
+
         protected override void GetProperties()
         {
             _editMode = serializedObject.FindProperty("EditMode");
