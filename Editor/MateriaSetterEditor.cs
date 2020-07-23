@@ -1000,6 +1000,17 @@ namespace Materiator
                         [ContextActions.Retry] = "Retry"
                     });
             }
+            else if (
+                (MateriaSetter.MeshFilter != null && MateriaSetter.MeshFilter.sharedMesh.subMeshCount > 1) ||
+                (MateriaSetter.SkinnedMeshRenderer != null && MateriaSetter.SkinnedMeshRenderer.sharedMesh.subMeshCount > 1))
+            {
+                return ErrorMessage(
+                    "Mesh has more than 1 sub-meshes. This usually happens when a mesh is exported with more than one materials. Please re-export the mesh so that it has only one sub-mesh.",
+                    new Dictionary<ContextAction, string>
+                    {
+                        [ContextActions.Retry] = "Retry"
+                    });
+            }
             else
             {
                 return true;
