@@ -63,18 +63,27 @@ namespace Materiator
 
             RegisterCallbacks();
 
-            SwitchEditMode(EditMode.Native);
+            SwitchEditModeTo(EditMode.Native);
         }
+
+        private void ResetFields()
+        {
+            _materiaSetters.Clear();
+            _compatibleMateriaSetters.Clear();
+            _incompatibleMateriaSetters.Clear();
+            _groupsList.Clear();
+            _materialDataMaterialGroups.Clear();
+            _selectedListViewMateriaSetters.Clear();
+            _atlas = null;
+    }
 
         private void ScanForPrefabs()
         {
-            SwitchEditMode(EditMode.Native);
+            SwitchEditModeTo(EditMode.Native);
 
             LoadPrefabs((MateriaAtlas)_atlasObjectField.value);
 
             GenerateListViews();
-
-            _atlasSectionContainer.visible = false;
         }
 
         private void SelectAtlas()
@@ -84,7 +93,8 @@ namespace Materiator
 
         private void LoadAtlas()
         {
-            SwitchEditMode(EditMode.Atlas);
+            SwitchEditModeTo(EditMode.Atlas);
+
             _atlas = (MateriaAtlas)_atlasObjectField.value;
 
             LoadPrefabs(_atlas);
@@ -100,10 +110,12 @@ namespace Materiator
                 {
                     var itemData = item.MateriaSetterData;
 
-                    item.UnloadAtlas();
-                    var kvpToRemove = itemData.MateriaAtlas.AtlasEntries.Where(kvp => kvp.Value.MateriaSetter == item).FirstOrDefault().Key;
-                    itemData.MateriaAtlas.AtlasEntries[kvpToRemove].MateriaSetter = null;
-                    itemData.MateriaAtlas.AtlasEntries[kvpToRemove].MateriaSetterData = null;
+                    item.UnloadAtlas(true);
+
+                    var kvpToRemove = item.MateriaSetterData.MateriaAtlas.AtlasEntries.Where(kvp => kvp.Value.MateriaSetter == item).FirstOrDefault().Key;
+                    item.MateriaSetterData.MateriaAtlas.AtlasEntries[kvpToRemove].MateriaSetter = null;
+                    item.MateriaSetterData.MateriaAtlas.AtlasEntries[kvpToRemove].MateriaSetterData = null;
+
                     itemData.MateriaAtlas = null;
 
                     itemData.AtlasedGridSize = 0;
@@ -120,14 +132,13 @@ namespace Materiator
         {
             if (_editMode == EditMode.Native)
             {
-                //ResetAtlasGenerator(true);
                 _materiaSetters = AssetUtils.FindAllComponentsInPrefabs<MateriaSetter>();
             }
             else
             {
                 foreach (var kvp in atlas.AtlasEntries.Values)
                 {
-                    if (kvp.MateriaSetter != null)
+                    if (kvp.MateriaSetter != null && kvp.MateriaSetterData != null)
                     {
                         _materiaSetters.Add(kvp.MateriaSetter);
                     }
@@ -146,22 +157,20 @@ namespace Materiator
             _incompatibleMateriaSettersCountLabel.text = _incompatibleMateriaSetters.Count.ToString();
         }
 
-        private void SwitchEditMode(EditMode editMode)
+        private void SwitchEditModeTo(EditMode editMode)
         {
             _editMode = editMode;
 
-            _compatibleMateriaSetters.Clear();
-            _incompatibleMateriaSetters.Clear();
-
-            /*if (editMode == EditMode.Atlas)
+            switch (_editMode)
             {
-                _removeAtlasData.visible = true;
+                case EditMode.Native:
+                    _atlasSectionContainer.visible = false;
+                    break;
+                case EditMode.Atlas:
+                    break;
             }
 
-            if (editMode == EditMode.Native)
-            {
-                _removeAtlasData.visible = false;
-            }*/
+            ResetFields();
         }
 
 
@@ -287,7 +296,7 @@ namespace Materiator
             foreach (var ms in materiaSetters)
             {
                 var groupMembers = new List<MateriaSetter>();
-                //-----TODO: Have an option to create atlas without having a preset set?
+
                 if (AtlasFactory.CheckMateriaSetterCompatibility(ms))
                 {
                     if (PrefabUtility.IsPartOfPrefabAsset(ms)

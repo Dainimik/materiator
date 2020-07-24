@@ -47,6 +47,13 @@ namespace Materiator
             }
         }
 
+        public void Assign(Textures textures)
+        {
+            Color = textures.Color;
+            MetallicSmoothness = textures.MetallicSmoothness;
+            Emission = textures.Emission;
+        }
+
         public void CreateTextures(int width, int height)
         {
             FilterMode = SystemData.Settings.FilterMode;
@@ -70,7 +77,7 @@ namespace Materiator
             Emission.Apply();
         }
 
-        public void SetTextures(Material material, ShaderData shaderData)
+        public void SetTexturesToMaterial(Material material, ShaderData shaderData)
         {
             if (material == null || shaderData == null) return;
 
@@ -148,7 +155,7 @@ namespace Materiator
             AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(Emission), name + "_Emission");
         }
 
-        public Textures CloneTextures(FilterMode filterMode, bool removeCloneFromName = false)
+        /*public Textures CloneTextures(FilterMode filterMode, bool removeCloneFromName = false)
         {
             //Don't create new instance here
             var texs = new Textures
@@ -164,7 +171,7 @@ namespace Materiator
                 texs.Names = Names;
 
             return texs;
-        }
+        }*/
 
         public void CopyPixelColors(Textures source, int sourceGridSize, Rect sourceRect, int destinationGridSize, Rect destinationRect)
         {

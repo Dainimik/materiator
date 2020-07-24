@@ -104,10 +104,10 @@ namespace Materiator
 
                         if (ms[j].MateriaSetterData.MateriaAtlas != null)
                         {
-                            continue;
+                            //continue; // Should I allow an object to be in multiple atlases?
                         }
 
-                        var atlasedMesh = Utils.CopyMesh(ms[j].NativeMesh); // Maybe you should copy mesh from MateriaSetterData instead?
+                        var atlasedMesh = Utils.CopyMesh(ms[j].MateriaSetterData.NativeMesh);
                         var remappedUVs = atlasedMesh.uv;
 
                         for (var k = 0; k < remappedUVs.Length; k++)
@@ -125,8 +125,7 @@ namespace Materiator
                         //var newMeshData = CreateMeshData(ms[j].Mesh.name, ms[j].Mesh, atlasedMesh, rects[rectIndex], gridSize, atlas);
                         var data = ms[j].MateriaSetterData;
 
-                        var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.MateriaSetterData == ms[j].MateriaSetterData).FirstOrDefault();
-                        Debug.Log(nullSlotIndices.Count);
+                        var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.MateriaSetterData == data).FirstOrDefault();
                         if (nullSlotIndices.Count > 0)
                         {
                             atlas.AtlasEntries[nullSlotIndices[nullSlotIterator]].MateriaSetter = prefabMS;
@@ -147,16 +146,9 @@ namespace Materiator
 
 
                         data.MateriaAtlas = atlas;
-                        data.NativeMesh = ms[j].NativeMesh;
                         data.AtlasedMesh = atlasedMesh;
                         data.AtlasedUVRect = rects[rectIndex];
                         data.AtlasedGridSize = gridSize;
-
-                        ms[j].MateriaSetterData = data;
-
-                        ms[j].MateriaAtlas = atlas;
-                        //ms[j].NativeMesh = ms[j].Mesh;
-                        ms[j].AtlasedMesh = atlasedMesh;
 
                         var baseCol = data.Textures.Color.GetPixels32();
                         var metallic = data.Textures.MetallicSmoothness.GetPixels32();
@@ -168,18 +160,12 @@ namespace Materiator
                         atlas.Textures.MetallicSmoothness.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, metallic);
                         atlas.Textures.Emission.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, emission);
 
-                        //AssetDatabase.AddObjectToAsset(newMeshData, prefabs[i]);
-
-                        //----------
-                        // Need here to remove old atlasedMesh from data asset and add new one and update its references everywhere
-                        //------------
-
                         AssetDatabase.AddObjectToAsset(atlasedMesh, data);
                         AssetDatabase.SaveAssets();
 
 
                         ms[j].LoadAtlas(atlas);
-                        //PopulateMateriaAtlas(ms[j], false, atlas, ms[j].MateriaPreset, rects[rectIndex]);
+
                         rectIndex++;
                     }
 
@@ -206,7 +192,6 @@ namespace Materiator
         private static MateriaAtlas CreateMateriaAtlasAsset(string directory, string name, Material material, int size)
         {
             var atlas = AssetUtils.CreateScriptableObjectAsset<MateriaAtlas>(directory, name);
-
             atlas.Textures.CreateTextures(size, size);
             atlas.Textures.SetNames(name);
             atlas.Material = Object.Instantiate(material);
@@ -222,19 +207,5 @@ namespace Materiator
 
             return atlas;
         }
-
-        /*private static MeshData CreateMeshData(string name, Mesh originalMesh, Mesh atlasedMesh, Rect uvRect, int gridSize, MateriaAtlas atlas)
-        {
-            var md = ScriptableObject.CreateInstance<MeshData>();
-
-            md.name = name;
-            md.AtlasedMesh = atlasedMesh;
-            md.OriginalMesh = originalMesh;
-            md.UVRect = uvRect;
-            md.GridSize = gridSize;
-            md.Atlas = atlas;
-
-            return md;
-        }*/
     }
 }

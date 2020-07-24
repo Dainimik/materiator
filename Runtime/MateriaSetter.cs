@@ -37,9 +37,6 @@ namespace Materiator
         public Material Material;
         public Textures Textures;
 
-        public Mesh NativeMesh;
-        public Mesh AtlasedMesh;
-
         public int GridSize;
         public Rect UVRect;
 
@@ -98,11 +95,6 @@ namespace Materiator
             else
             {
                 Mesh = MeshFilter.sharedMesh;
-            }
-
-            if (EditMode == EditMode.Native)
-            {
-                NativeMesh = Mesh;
             }
         }
 
@@ -174,7 +166,7 @@ namespace Materiator
         {
             if (Material == null) return;
 
-            Textures.SetTextures(Material, MaterialData.ShaderData);
+            Textures.SetTexturesToMaterial(Material, MaterialData.ShaderData);
         }
 
         public void AnalyzeMesh()
@@ -315,29 +307,34 @@ namespace Materiator
                 Mesh = MateriaSetterData.AtlasedMesh;
                 MaterialData = atlas.MaterialData;
                 Material = atlas.Material;
-                Textures = atlas.Textures;
-                
+                Textures.Assign(atlas.Textures);
+
                 GridSize = MateriaSetterData.AtlasedGridSize;
                 UVRect = MateriaSetterData.AtlasedUVRect;
 
-                Textures.SetTextures(Material, MaterialData.ShaderData);
+                Textures.SetTexturesToMaterial(Material, MaterialData.ShaderData);
                 UpdateRenderer();
             }
         }
 
-        public void UnloadAtlas()
+        public void UnloadAtlas(bool removeAtlasData = false)
         {
             EditMode = EditMode.Native;
+
+            if (removeAtlasData)
+            {
+                MateriaAtlas = null;
+            }
 
             Mesh = MateriaSetterData.NativeMesh;
             MaterialData = MateriaSetterData.MaterialData;
             Material = MateriaSetterData.Material;
-            Textures = MateriaSetterData.Textures;
+            Textures.Assign(MateriaSetterData.Textures);
 
             GridSize = MateriaSetterData.NativeGridSize;
             UVRect = new Rect(0f, 0f, 1f, 1f);
 
-            Textures.SetTextures(Material, MaterialData.ShaderData);
+            Textures.SetTexturesToMaterial(Material, MaterialData.ShaderData);
             UpdateRenderer();
         }
     }
