@@ -10,31 +10,30 @@ namespace Materiator
     {
         public static void CreateAtlas(KeyValuePair<MaterialData, List<MateriaSetter>> group, Material material, string path, MateriaAtlas existingAtlas = null)
         {
-            List<MateriaSetter> compatibleMateriaSetters = new List<MateriaSetter>();
-            List<GameObject> prefabs = new List<GameObject>();
-            List<string> prefabPaths = new List<string>();
-
-            var msCount = 0;
+            var compatibleMateriaSettersCount = 0;
+            var compatibleMateriaSetters = new List<MateriaSetter>();
+            var prefabs = new List<GameObject>();
+            var prefabPaths = new List<string>();
 
             foreach (var ms in group.Value)
             {
                 if (CheckMateriaSetterCompatibility(ms))
                 {
                     compatibleMateriaSetters.Add(ms);
-                    msCount++;
+                    compatibleMateriaSettersCount++;
                 }
             }
 
-            var dir = AssetUtils.GetDirectoryName(path);
-            var atlasName = AssetUtils.GetFileName(path);
-
-            var rects = Utils.CalculateRects(msCount);
+            var rects = Utils.CalculateRects(compatibleMateriaSettersCount);
             var rectIndex = 0;
-            var gridSize = Utils.CalculateAtlasSize(msCount);
+            var gridSize = Utils.CalculateAtlasSize(compatibleMateriaSettersCount);
 
             var includeAllPrefabs = false;
 
+            var dir = AssetUtils.GetDirectoryName(path);
+            var atlasName = AssetUtils.GetFileName(path);
             MateriaAtlas atlas = null;
+
             if (existingAtlas == null || existingAtlas.GridSize < gridSize)
             {
                 atlas = CreateMateriaAtlasAsset(dir, atlasName, material, new Vector2Int(gridSize, gridSize));
@@ -59,23 +58,8 @@ namespace Materiator
                     prefabs.Add(prefabGO);
                     prefabPaths.Add(AssetDatabase.GetAssetPath(root));
                 }
-                msCount++;
+                compatibleMateriaSettersCount++;
             }
-
-            /*if (saveAsNewPrefabs)
-            {
-                for (int i = 0; i < prefabs.Count; i++)
-                {
-                    var newPath = AssetUtils.GetDirectoryName(prefabPaths[i]) + "/" + AssetUtils.GetFileName(prefabPaths[i]) + newPrefabSuffix + AssetUtils.GetFileExtension(prefabPaths[i], true);
-                    AssetDatabase.CopyAsset(prefabPaths[i], newPath);
-
-                    prefabs[i] = AssetDatabase.LoadAssetAtPath<GameObject>(newPath);
-                    prefabPaths[i] = newPath;
-                }
-            }*/
-
-            
-
 
             var nullSlotIterator = 0;
             var nullSlotIndices = new List<int>();
