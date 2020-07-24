@@ -101,7 +101,7 @@ namespace Materiator
                     {
                         //var nearestPrefabInstanceRoot = PrefabUtility.GetNearestPrefabInstanceRoot(ms[j]);
                         //if (processedPrefabs.Contains(nearestPrefabInstanceRoot))
-                            //continue;
+                        //continue;
 
                         //processedPrefabs.Add(nearestPrefabInstanceRoot);
 
@@ -110,7 +110,20 @@ namespace Materiator
                             continue;
                         }
 
-                        var atlasedMesh = Utils.CopyMesh(ms[j].MateriaSetterData.NativeMesh);
+                        var data = ms[j].MateriaSetterData;
+
+                        Mesh atlasedMesh;
+
+                        if (data.AtlasedMesh != null)
+                        {
+                            atlasedMesh = data.AtlasedMesh;
+                        }
+                        else
+                        {
+                            atlasedMesh = Utils.CopyMesh(ms[j].MateriaSetterData.NativeMesh);
+                        }
+
+                        
                         var remappedUVs = atlasedMesh.uv;
 
                         for (var k = 0; k < remappedUVs.Length; k++)
@@ -126,7 +139,6 @@ namespace Materiator
                         atlasedMesh.uv = remappedUVs;
 
                         //var newMeshData = CreateMeshData(ms[j].Mesh.name, ms[j].Mesh, atlasedMesh, rects[rectIndex], gridSize, atlas);
-                        var data = ms[j].MateriaSetterData;
 
                         var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.MateriaSetterData == data).FirstOrDefault();
                         if (nullSlotIndices.Count > 0)
@@ -147,12 +159,6 @@ namespace Materiator
                         atlas.MaterialData = group.Key;
                         atlas.GridSize = gridSize;
 
-
-                        data.MateriaAtlas = atlas;
-                        data.AtlasedMesh = atlasedMesh;
-                        data.AtlasedUVRect = rects[rectIndex];
-                        data.AtlasedGridSize = gridSize;
-
                         var baseCol = data.Textures.Color.GetPixels32();
                         var metallic = data.Textures.MetallicSmoothness.GetPixels32();
                         var emission = data.Textures.Emission.GetPixels32();
@@ -163,7 +169,18 @@ namespace Materiator
                         atlas.Textures.MetallicSmoothness.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, metallic);
                         atlas.Textures.Emission.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, emission);
 
+
+                        if (data.AtlasedMesh != null)
+                        {
+                            AssetDatabase.RemoveObjectFromAsset(data.AtlasedMesh);
+                        }
                         AssetDatabase.AddObjectToAsset(atlasedMesh, data);
+
+                        data.MateriaAtlas = atlas;
+                        data.AtlasedMesh = atlasedMesh;
+                        data.AtlasedUVRect = rects[rectIndex];
+                        data.AtlasedGridSize = gridSize;
+
                         AssetDatabase.SaveAssets();
 
 
