@@ -4,12 +4,6 @@ using UnityEngine;
 
 namespace Materiator
 {
-    public enum EditMode
-    {
-        Native = 0,
-        Atlas = 1
-    }
-
     public class MateriaSetter : MonoBehaviour
     {
         public bool IsInitialized = false;
