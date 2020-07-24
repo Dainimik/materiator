@@ -8,20 +8,6 @@ namespace Materiator
 {
     public static class AtlasFactory
     {
-        public static bool CheckMateriaSetterCompatibility(MateriaSetter ms)
-        {
-            if (ms.IsDirty == false
-                && ms.MateriaSetterData != null
-                && ms.MateriaSetterData.Material != null)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         public static void CreateAtlas(KeyValuePair<MaterialData, List<MateriaSetter>> group, Material material, string path, MateriaAtlas existingAtlas = null)
         {
             List<MateriaSetter> compatibleMateriaSetters = new List<MateriaSetter>();
@@ -51,7 +37,7 @@ namespace Materiator
             MateriaAtlas atlas = null;
             if (existingAtlas == null || existingAtlas.GridSize < gridSize)
             {
-                atlas = CreateMateriaAtlasAsset(dir, atlasName, material, gridSize);
+                atlas = CreateMateriaAtlasAsset(dir, atlasName, material, new Vector2Int(gridSize, gridSize));
                 includeAllPrefabs = true;
             }
             else
@@ -63,12 +49,7 @@ namespace Materiator
             {
                 if (ms.MateriaSetterData.MateriaAtlas != null && !includeAllPrefabs)
                 {
-                    Debug.Log(ms.name + "     has atlas and is skipped");
                     continue;
-                }
-                else
-                {
-                    Debug.Log(ms.name + "     has NO atlas and is processed");
                 }
 
                 var root = ms.transform.root;
@@ -161,8 +142,6 @@ namespace Materiator
 
                             atlasedMesh.uv = remappedUVs;
 
-                            //var newMeshData = CreateMeshData(ms[j].Mesh.name, ms[j].Mesh, atlasedMesh, rects[rectIndex], gridSize, atlas);
-
                             var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.MateriaSetterData == data).FirstOrDefault();
                             if (nullSlotIndices.Count > 0)
                             {
@@ -195,20 +174,16 @@ namespace Materiator
 
                             if (data.AtlasedMesh != null)
                             {
-                                //atlasedMeshesRecycleBin.Add(data.AtlasedMesh);
                                 AssetDatabase.RemoveObjectFromAsset(data.AtlasedMesh);
 
                             }
-                            //atlasedMeshesQueue.Add(atlasedMesh, data);
+
                             AssetDatabase.AddObjectToAsset(atlasedMesh, data);
 
                             data.MateriaAtlas = atlas;
                             data.AtlasedMesh = atlasedMesh;
                             data.AtlasedUVRect = rects[rectIndex];
                             data.AtlasedGridSize = gridSize;
-
-                            //AssetDatabase.SaveAssets();
-
 
                             ms[j].LoadAtlas(atlas);
 
@@ -234,19 +209,6 @@ namespace Materiator
             
             AssetDatabase.StopAssetEditing();
 
-            /*AssetDatabase.StartAssetEditing();
-            foreach (var item in atlasedMeshesRecycleBin)
-            {
-                AssetDatabase.RemoveObjectFromAsset(item);
-            }
-
-            foreach (var kvp in atlasedMeshesQueue)
-            {
-                AssetDatabase.AddObjectToAsset(kvp.Key, kvp.Value);
-            }
-            AssetDatabase.StopAssetEditing();
-            AssetDatabase.SaveAssets();*/
-
             atlas.Textures.Apply();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -255,10 +217,24 @@ namespace Materiator
                 AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(item));
         }
 
-        private static MateriaAtlas CreateMateriaAtlasAsset(string directory, string name, Material material, int size)
+        public static bool CheckMateriaSetterCompatibility(MateriaSetter ms)
+        {
+            if (ms.IsDirty == false
+                && ms.MateriaSetterData != null
+                && ms.MateriaSetterData.Material != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private static MateriaAtlas CreateMateriaAtlasAsset(string directory, string name, Material material, Vector2Int size)
         {
             var atlas = AssetUtils.CreateScriptableObjectAsset<MateriaAtlas>(directory, name);
-            atlas.Textures.CreateTextures(size, size);
+            atlas.Textures.CreateTextures(size.x, size.y);
             atlas.Textures.SetNames(name);
             atlas.Material = UnityEngine.Object.Instantiate(material);
             atlas.Material.name = name;
