@@ -74,10 +74,10 @@ namespace Materiator
             var processedPrefabs = new HashSet<GameObject>();
             var skipSavingPrefab = false;
 
-            AssetDatabase.StartAssetEditing();
-
             try
             {
+                AssetDatabase.StartAssetEditing();
+
                 for (var i = 0; i < prefabs.Count; i++)
                 {
                     var prefab = PrefabUtility.LoadPrefabContents(AssetDatabase.GetAssetPath(prefabs[i]));
@@ -190,8 +190,10 @@ namespace Materiator
             {
                 Debug.LogError("[Materiator] Atlas creation was interrupted: " + ex);
             }
-            
-            AssetDatabase.StopAssetEditing();
+            finally
+            {
+                AssetDatabase.StopAssetEditing();
+            }
 
             atlas.Textures.Apply();
             AssetDatabase.SaveAssets();

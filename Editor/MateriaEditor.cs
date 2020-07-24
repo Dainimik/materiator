@@ -132,18 +132,6 @@ namespace Materiator
         {
             var materiaSetters = GameObject.FindObjectsOfType<MateriaSetter>();
 
-            var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
-            if (prefabStage != null)
-            {
-                var rootGameObjects = prefabStage.scene.GetRootGameObjects();
-                for (int i = 0; i < rootGameObjects.Length; i++)
-                {
-                    var obj = rootGameObjects[i].GetComponent<MateriaSetter>();
-                    if (obj != null) obj.Refresh();
-                }
-                EditorSceneManager.MarkSceneDirty(prefabStage.scene);
-            }
-
             for (int i = 0; i < materiaSetters.Length; i++)
             {
                 var aaa = materiaSetters[i].MateriaSlots.Where(m => m.Materia == (Materia)target);
