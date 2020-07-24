@@ -104,27 +104,38 @@ namespace Materiator
 
         private void RemoveAtlasData()
         {
-            foreach (var item in _selectedListViewMateriaSetters)
+            AssetDatabase.StartAssetEditing();
+
+            try
             {
-                if (item.MateriaSetterData.MateriaAtlas != null)
+                foreach (var item in _selectedListViewMateriaSetters)
                 {
-                    var itemData = item.MateriaSetterData;
+                    if (item.MateriaSetterData.MateriaAtlas != null)
+                    {
+                        var itemData = item.MateriaSetterData;
 
-                    item.UnloadAtlas(true);
+                        item.UnloadAtlas(true);
 
-                    var kvpToRemove = item.MateriaSetterData.MateriaAtlas.AtlasEntries.Where(kvp => kvp.Value.MateriaSetter == item).FirstOrDefault().Key;
-                    item.MateriaSetterData.MateriaAtlas.AtlasEntries[kvpToRemove].MateriaSetter = null;
-                    item.MateriaSetterData.MateriaAtlas.AtlasEntries[kvpToRemove].MateriaSetterData = null;
+                        var kvpToRemove = item.MateriaSetterData.MateriaAtlas.AtlasEntries.Where(kvp => kvp.Value.MateriaSetter == item).FirstOrDefault().Key;
+                        item.MateriaSetterData.MateriaAtlas.AtlasEntries[kvpToRemove].MateriaSetter = null;
+                        item.MateriaSetterData.MateriaAtlas.AtlasEntries[kvpToRemove].MateriaSetterData = null;
 
-                    itemData.MateriaAtlas = null;
+                        itemData.MateriaAtlas = null;
 
-                    itemData.AtlasedGridSize = 0;
-                    itemData.AtlasedUVRect = new Rect(0f, 0f, 1f, 1f);
+                        itemData.AtlasedGridSize = 0;
+                        itemData.AtlasedUVRect = new Rect(0f, 0f, 1f, 1f);
 
-                    AssetDatabase.RemoveObjectFromAsset(itemData.AtlasedMesh);
-                    itemData.AtlasedMesh = null;
+                        AssetDatabase.RemoveObjectFromAsset(itemData.AtlasedMesh);
+                        itemData.AtlasedMesh = null;
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Debug.LogError("[Materiator] Removal of atlas data was interrupted: " + ex);
+            }
+            
+            AssetDatabase.StopAssetEditing();
             AssetDatabase.SaveAssets();
         }
 
@@ -332,6 +343,8 @@ namespace Materiator
             if (EditorUtility.DisplayDialog("Overwrite current atlas?", "Are you sure you want to overwrite " + _atlasObjectField.value.name + " with current settings?", "Yes", "No"))
             {
                 var kvp = new KeyValuePair<MaterialData, List<MateriaSetter>>(_atlas.MaterialData, _compatibleMateriaSetters);
+                Debug.Log(_atlasObjectField.value.name);
+                Debug.Log(_atlas);
                 AtlasFactory.CreateAtlas(kvp, kvp.Key.Material, AssetDatabase.GetAssetPath(_atlas), _atlas);
             }
         }
