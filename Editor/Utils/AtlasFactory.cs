@@ -61,10 +61,13 @@ namespace Materiator
             var rectIndex = 0;
             var gridSize = Utils.CalculateAtlasSize(msCount);
 
+            var includeAllPrefabs = false;
+
             MateriaAtlas atlas = null;
-            if (existingAtlas == null)
+            if (existingAtlas == null || existingAtlas.GridSize < gridSize)
             {
                 atlas = CreateMateriaAtlasAsset(dir, atlasName, material, gridSize);
+                includeAllPrefabs = true;
             }
             else
             {
@@ -102,9 +105,9 @@ namespace Materiator
 
                         //processedPrefabs.Add(nearestPrefabInstanceRoot);
 
-                        if (ms[j].MateriaSetterData.MateriaAtlas != null)
+                        if (ms[j].MateriaSetterData.MateriaAtlas != null && !includeAllPrefabs)
                         {
-                            //continue; // Should I allow an object to be in multiple atlases?
+                            continue;
                         }
 
                         var atlasedMesh = Utils.CopyMesh(ms[j].MateriaSetterData.NativeMesh);
