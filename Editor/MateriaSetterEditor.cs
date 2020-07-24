@@ -73,6 +73,11 @@ namespace Materiator
                 DrawDataSection();
                 DrawOutputSection();
                 DrawIMGUI();
+
+                if (_materiaSetterData.objectReferenceValue == null)
+                {
+                    SetMateriaSetterDirty(true);
+                }
             }
         }
 
