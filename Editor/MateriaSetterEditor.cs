@@ -17,12 +17,12 @@ namespace Materiator
 
         #region Serialized Properties
 
-        private SerializedProperty _editMode;
-        private SerializedProperty _isDirty;
+        public SerializedProperty EditMode;
+        public SerializedProperty IsDirty;
         private SerializedProperty _materiaAtlas;
-        private SerializedProperty _materiaPreset;
+        public SerializedProperty MateriaPreset;
         private SerializedProperty _materiaSetterData;
-        private SerializedProperty _materialData;
+        public SerializedProperty MaterialData;
         private SerializedProperty _material;
 
         #endregion
@@ -52,7 +52,6 @@ namespace Materiator
 
         private Label _currentShaderLabel;
 
-        private VisualElement _cachedGUIRoot;
         public VisualElement Root;
 
         private void OnEnable()
@@ -122,18 +121,18 @@ namespace Materiator
             serializedObject.Update();
             if (value)
             {
-                if (!_isDirty.boolValue)
+                if (!IsDirty.boolValue)
                 {
-                    _isDirty.boolValue = true;
+                    IsDirty.boolValue = true;
 
-                    CreateEditModeData(_editMode.enumValueIndex);
+                    CreateEditModeData(EditMode.enumValueIndex);
                 }
             }
             else
             {
-                if (_isDirty.boolValue)
+                if (IsDirty.boolValue)
                 {
-                    _isDirty.boolValue = false;
+                    IsDirty.boolValue = false;
                 }  
             }
 
@@ -144,11 +143,11 @@ namespace Materiator
 
         private void SwitchEditMode()
         {
-            if (MateriaSetter.EditMode == EditMode.Native)
+            if (MateriaSetter.EditMode == Materiator.EditMode.Native)
             {
                 LoadAtlas(MateriaSetter.MateriaSetterData.MateriaAtlas);
             }
-            else if (MateriaSetter.EditMode == EditMode.Atlas)
+            else if (MateriaSetter.EditMode == Materiator.EditMode.Atlas)
             {
                 UnloadAtlas();
             }
@@ -167,7 +166,7 @@ namespace Materiator
 
         private void IMGUI()
         {
-            if (_isDirty.boolValue == true)
+            if (IsDirty.boolValue == true)
             {
                 _outputIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
                 _dataIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
@@ -326,7 +325,7 @@ namespace Materiator
             }
         }
 
-        private void LoadAtlas(MateriaAtlas atlas)
+        public void LoadAtlas(MateriaAtlas atlas)
         {
             if (atlas != null)
             {
@@ -568,10 +567,13 @@ namespace Materiator
 
         private void NewData()
         {
+            if (EditMode.enumValueIndex == 1)
+                MateriaSetter.UnloadAtlas();
+
             ResetMateriaSetter();
         }
 
-        private void ReloadData(MateriaSetterData data)
+        public void ReloadData(MateriaSetterData data)
         {
             OnMateriaSetterDataChanged(data);
         }
@@ -603,7 +605,7 @@ namespace Materiator
                 _switchEditModeButton.SetEnabled(true);
             }
 
-            _switchEditModeButton.text = _editMode.enumNames[_editMode.enumValueIndex] + " Mode";
+            _switchEditModeButton.text = EditMode.enumNames[EditMode.enumValueIndex] + " Mode";
         }
 
         private void OnMateriaPresetChanged()
@@ -668,11 +670,11 @@ namespace Materiator
 
                 Utils.ShallowCopyFields(data, MateriaSetter);
 
-                if (_editMode.enumValueIndex == 0)
+                if (EditMode.enumValueIndex == 0)
                 {
                     MateriaSetter.Mesh = data.NativeMesh;
                 }
-                else if (_editMode.enumValueIndex == 1)
+                else if (EditMode.enumValueIndex == 1)
                 {
                     if (data.MateriaAtlas != null)
                     {
@@ -724,7 +726,7 @@ namespace Materiator
         {
             if (EditorUtility.DisplayDialog("Overwrite current data?", "Are you sure you want to overwrite " + _materiaSetterData.objectReferenceValue.name + " with current settings?", "Yes", "No"))
             {
-                WriteAssetsToDisk(AssetDatabase.GetAssetPath(MateriaSetter.MateriaSetterData), SystemData.Settings.PackAssets);
+                MateriaDataFactory.WriteAssetsToDisk(this, AssetDatabase.GetAssetPath(MateriaSetter.MateriaSetterData), SystemData.Settings.PackAssets);
                 
             }
         }
@@ -733,192 +735,18 @@ namespace Materiator
             var path = EditorUtility.SaveFilePanelInProject("Save data", MateriaSetter.gameObject.name, "asset", "asset");
             if (path.Length != 0)
             {
-                WriteAssetsToDisk(path, SystemData.Settings.PackAssets);
+                MateriaDataFactory.WriteAssetsToDisk(this, path, SystemData.Settings.PackAssets);
             }    
-        }
-
-        public void WriteAssetsToDisk(string path, bool packAssets)
-        {
-            if (!_isDirty.boolValue) return;
-
-            string name;
-            string dir = "";
-
-            if (path != null)
-            {
-                dir = AssetUtils.GetDirectoryName(path);
-                name = AssetUtils.GetFileName(path);
-            }
-            else
-            {
-                name = MateriaSetter.gameObject.name;
-                path = dir + name + ".asset";
-            }
-
-            Material material = null;
-            Textures outputTextures = null;
-
-            bool isDataAssetExisting;
-            var data = AssetUtils.CreateOrReplaceScriptableObjectAsset(MateriaSetter.MateriaSetterData, path, out isDataAssetExisting);
-
-            if (isDataAssetExisting)
-            {
-                if (_editMode.enumValueIndex == 0)
-                {
-                    outputTextures = data.Textures;
-                    material = data.Material;
-
-                    if (data.MaterialData != MateriaSetter.MaterialData)
-                    {
-                        var mat = Instantiate(MateriaSetter.Material);
-                        mat.name = material.name;
-
-                        if (packAssets)
-                        {
-                            AssetDatabase.RemoveObjectFromAsset(material);
-                            AssetDatabase.SaveAssets();
-                            AssetDatabase.AddObjectToAsset(mat, data);
-                            AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(mat));
-                            material = mat;
-                        }
-                        else
-                        {
-                            AssetUtils.CheckDirAndCreate(dir, name);
-                            var folderDir = dir + "/" + name + "/";
-                            AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(material));
-                            AssetDatabase.CreateAsset(mat, folderDir + name + "_Material.mat");
-                            material = (Material)AssetDatabase.LoadAssetAtPath(folderDir + name + "_Material.mat", typeof(Material));
-                        }
-                        
-                    }
-                }
-                else if (_editMode.enumValueIndex == 1)
-                {
-                    outputTextures = data.MateriaAtlas.Textures;
-                    material = data.MateriaAtlas.Material;
-                    name = data.MateriaAtlas.name;
-                }
-            }
-            else
-            {
-                outputTextures = new Textures();
-                outputTextures.CreateTextures(MateriaSetter.Textures.Size.x, MateriaSetter.Textures.Size.y);
-
-                material = Instantiate(MateriaSetter.Material); // I'm instantiating here because Unity can't add an object to asset if it is already a part of an asset
-            }
-
-            
-
-            if (_editMode.enumValueIndex == 0)
-            {
-                outputTextures.CopyPixelColors(MateriaSetter.Textures, MateriaSetter.Textures.Size, new Rect(0, 0, 1, 1), outputTextures.Size, new Rect(0, 0, 1, 1));
-                outputTextures.SetNames(name);
-
-                if (data.MateriaAtlas != null)
-                {
-                    data.MateriaAtlas.Textures.CopyPixelColors(MateriaSetter.Textures, MateriaSetter.Textures.Size, new Rect(0, 0, 1, 1), data.MateriaAtlas.Textures.Size, MateriaSetter.MateriaSetterData.AtlasedUVRect);
-                }
-            }
-            else if (_editMode.enumValueIndex == 1)
-            {
-                outputTextures.CopyPixelColors(MateriaSetter.Textures, MateriaSetter.Textures.Size, MateriaSetter.UVRect, MateriaSetter.Textures.Size, MateriaSetter.UVRect);
-                outputTextures.SetNames(name);
-
-                data.Textures.CopyPixelColors(MateriaSetter.Textures, MateriaSetter.Textures.Size, MateriaSetter.UVRect, data.NativeGridSize, new Rect(0, 0, 1, 1));
-            }
-
-            
-
-            if (packAssets)
-            {
-                material.name = name + "_Material";
-
-                if (!isDataAssetExisting)
-                {
-                    AssetDatabase.AddObjectToAsset(material, data);
-                    outputTextures.AddTexturesToAsset(data);
-                }
-            }
-            else
-            {
-                AssetUtils.CheckDirAndCreate(dir, name);
-                var folderDir = dir + "/" + name + "/";
-
-                if (!isDataAssetExisting)
-                {
-                    AssetDatabase.CreateAsset(material, folderDir + name + "_Material.mat");
-                    material = (Material)AssetDatabase.LoadAssetAtPath(folderDir + name + "_Material.mat", typeof(Material));
-                    outputTextures.WriteTexturesToDisk(folderDir);
-                }
-                else
-                {
-                    //AssetDatabase.CreateAsset(material, folderDir + name + "_Material.mat");
-                    //material = (Material)AssetDatabase.LoadAssetAtPath(folderDir + name + "_Material.mat", typeof(Material));
-                    outputTextures.WriteTexturesToDisk(folderDir);
-                }
-            }
-
-            MateriaSetter.Material = material;
-            MateriaSetter.Textures = outputTextures;
-
-            if (_editMode.enumValueIndex == 0)
-            {
-                data.Material = material;
-                data.Textures = outputTextures;
-                data.NativeMesh = MateriaSetter.Mesh;
-                data.NativeGridSize = MateriaSetter.GridSize;
-            }
-            else if (_editMode.enumValueIndex == 1)
-            {
-                //data.Material = material;
-                //data.Textures = outputTextures;
-            }
-
-            if (data.MateriaSlots != null)
-            {
-                data.MateriaSlots.Clear();
-            }
-            else
-            {
-                data.MateriaSlots = new List<MateriaSlot>();
-            }
-            
-            data.MateriaSlots.AddRange(MateriaSetter.MateriaSlots);
-
-            data.MaterialData = (MaterialData)_materialData.objectReferenceValue;
-            data.MateriaPreset = (MateriaPreset)_materiaPreset.objectReferenceValue;
-           
-
-            MateriaSetter.SetTextures();
-            MateriaSetter.MateriaSetterData = data;
-
-            serializedObject.Update();
-
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-            EditorUtils.MarkOpenPrefabSceneDirty();
-
-            MateriaSetter.UpdateRenderer(false);
-
-            if (_editMode.enumValueIndex == 0)
-            {
-                ReloadData(data);
-            }
-            else if (_editMode.enumValueIndex == 1)
-            {
-                LoadAtlas(data.MateriaAtlas);
-            }
-            
         }
 
         protected override void GetProperties()
         {
-            _editMode = serializedObject.FindProperty("EditMode");
-            _isDirty = serializedObject.FindProperty("IsDirty");
+            EditMode = serializedObject.FindProperty("EditMode");
+            IsDirty = serializedObject.FindProperty("IsDirty");
             _materiaAtlas = serializedObject.FindProperty("MateriaAtlas");
-            _materiaPreset = serializedObject.FindProperty("MateriaPreset");
+            MateriaPreset = serializedObject.FindProperty("MateriaPreset");
             _materiaSetterData = serializedObject.FindProperty("MateriaSetterData");
-            _materialData = serializedObject.FindProperty("MaterialData");
+            MaterialData = serializedObject.FindProperty("MaterialData");
             _material = serializedObject.FindProperty("Material");
 
             _materiaAtlasObjectField = root.Q<ObjectField>("MateriaAtlasObjectField");
@@ -958,9 +786,9 @@ namespace Materiator
         protected override void BindProperties()
         {
             _materiaAtlasObjectField.BindProperty(_materiaAtlas);
-            _materiaPresetObjectField.BindProperty(_materiaPreset);
+            _materiaPresetObjectField.BindProperty(MateriaPreset);
             _materiaSetterDataObjectField.BindProperty(_materiaSetterData);
-            _materialDataObjectField.BindProperty(_materialData);
+            _materialDataObjectField.BindProperty(MaterialData);
         }
 
         protected override void RegisterButtons()
