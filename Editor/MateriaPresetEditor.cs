@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -12,6 +13,10 @@ namespace Materiator
         private MateriaPreset _materiaPreset;
 
         private ReorderableList _materiaPresetItemList;
+
+        private SerializedProperty _description;
+
+        private TextField _descriptionTextField;
 
         private void OnEnable()
         {
@@ -98,6 +103,18 @@ namespace Materiator
                 _materiaPreset.MateriaPresetItemList[index].Tag = SystemData.Settings.DefaultTag;
                 serializedObject.Update();
             };
+        }
+
+        protected override void GetProperties()
+        {
+            _description = serializedObject.FindProperty("Description");
+
+            _descriptionTextField = root.Q<TextField>("DescriptionTextField");
+        }
+
+        protected override void BindProperties()
+        {
+            _descriptionTextField.BindProperty(_description);
         }
     }
 }

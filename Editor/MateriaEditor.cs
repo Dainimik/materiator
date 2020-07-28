@@ -21,10 +21,12 @@ namespace Materiator
         private SerializedProperty _smoothness;
         private SerializedProperty _isEmissive;
         private SerializedProperty _emissionColor;
+        private SerializedProperty _description;
 
         private ColorField _baseColorField;
         private Toggle _isEmissiveToggle;
         private ColorField _emissionColorField;
+        private TextField _descriptionTextField;
 
         private PreviewRenderUtility _previewRenderUtility;
         private Mesh _previewMesh;
@@ -238,12 +240,14 @@ namespace Materiator
             _smoothness = serializedObject.FindProperty("Smoothness");
             _isEmissive = serializedObject.FindProperty("IsEmissive");
             _emissionColor = serializedObject.FindProperty("EmissionColor");
+            _description = serializedObject.FindProperty("Description");
 
             _IMGUIContainer = root.Q<IMGUIContainer>("IMGUIContainer");
 
             _baseColorField = root.Q<ColorField>("BaseColorField");
             _isEmissiveToggle = root.Q<Toggle>("IsEmissiveToggle");
             _emissionColorField = root.Q<ColorField>("EmissionColorField");
+            _descriptionTextField = root.Q<TextField>("DescriptionTextField");
 
             _IMGUIContainer = root.Q<VisualElement>("IMGUIContainer");
         }
@@ -253,6 +257,7 @@ namespace Materiator
             _baseColorField.BindProperty(_baseColor);
             _isEmissiveToggle.BindProperty(_isEmissive);
             _emissionColorField.BindProperty(_emissionColor);
+            _descriptionTextField.BindProperty(_description);
         }
 
         protected override void RegisterButtons()

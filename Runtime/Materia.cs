@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Materiator
 {
     [CreateAssetMenu(menuName = "Materiator/Materia", fileName = "Materia")]
-    public class Materia : ScriptableObject
+    public class Materia : MateriatorScriptableObject
     {
         public Color32 BaseColor;
         [Range(0f, 1f)]
