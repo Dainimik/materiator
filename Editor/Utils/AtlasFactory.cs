@@ -263,7 +263,9 @@ namespace Materiator
             return rects;
         }
 
-        /*public static Rect[] CalculateRects(Vector2Int size, Rect offset) // 4, 0
+        
+        /*This function is borrowed for easier comparison and should be deleted
+         * public static Rect[] CalculateRects(Vector2Int size, Rect offset) // 4, 0
         {
             var rects = new Rect[size.x * size.y]; // 16
             var rectSize = new Vector2();
