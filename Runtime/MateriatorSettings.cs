@@ -11,7 +11,7 @@ namespace Materiator
     public class MateriatorSettings : ScriptableObject
     {
         public string SavePath;
-        public int GridSize = 4;
+        public Vector2Int GridSize = new Vector2Int(4, 4);
         public bool PackAssets;
         public MateriaTags MateriaTags;
         public MaterialData DefaultMaterialData;

@@ -87,7 +87,7 @@ namespace Materiator
             material.SetTexture(shaderData.EmissionTexturePropertyName, Emission);
         }
 
-        public void UpdateColors(SerializableDictionary<int, Rect> rects, int gridSize, List<MateriaSlot> materiaSlots)
+        public void UpdateColors(SerializableDictionary<int, Rect> rects, Vector2Int gridSize, List<MateriaSlot> materiaSlots)
         {
             foreach (var rect in rects)
             {
@@ -173,10 +173,10 @@ namespace Materiator
             return texs;
         }*/
 
-        public void CopyPixelColors(Textures source, int sourceGridSize, Rect sourceRect, int destinationGridSize, Rect destinationRect)
+        public void CopyPixelColors(Textures source, Vector2Int sourceGridSize, Rect sourceRect, Vector2Int destinationGridSize, Rect destinationRect)
         {
-            var sourceRectInt = new RectInt((int)(sourceRect.x * sourceGridSize), (int)(sourceRect.y * sourceGridSize), (int)(sourceRect.width * sourceGridSize), (int)(sourceRect.height * sourceGridSize));
-            var destinationRectInt = new RectInt((int)(destinationRect.x * destinationGridSize), (int)(destinationRect.y * destinationGridSize), (int)(destinationRect.width * destinationGridSize), (int)(destinationRect.height * destinationGridSize));
+            var sourceRectInt = new RectInt((int)(sourceRect.x * sourceGridSize.x), (int)(sourceRect.y * sourceGridSize.y), (int)(sourceRect.width * sourceGridSize.x), (int)(sourceRect.height * sourceGridSize.y));
+            var destinationRectInt = new RectInt((int)(destinationRect.x * destinationGridSize.x), (int)(destinationRect.y * destinationGridSize.y), (int)(destinationRect.width * destinationGridSize.x), (int)(destinationRect.height * destinationGridSize.y));
 
             var baseColors = Utils.ColorToColor32Array(source.Color.GetPixels(sourceRectInt.x, sourceRectInt.y, sourceRectInt.width, sourceRectInt.height));
             var metallicColors = Utils.ColorToColor32Array(source.MetallicSmoothness.GetPixels(sourceRectInt.x, sourceRectInt.y, sourceRectInt.width, sourceRectInt.height));

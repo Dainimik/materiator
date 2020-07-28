@@ -555,7 +555,7 @@ namespace Materiator
 
                 newTextures.CreateTextures(textures.Size.x, textures.Size.y);
                 var mat = Instantiate(_material.objectReferenceValue);
-                newTextures.CopyPixelColors(textures, textures.Size.x, new Rect(0, 0, 1, 1), newTextures.Size.x, new Rect(0, 0, 1, 1));
+                newTextures.CopyPixelColors(textures, textures.Size, new Rect(0, 0, 1, 1), newTextures.Size, new Rect(0, 0, 1, 1));
 
                 if (name != null)
                     mat.name = name;
@@ -834,20 +834,20 @@ namespace Materiator
 
             if (_editMode.enumValueIndex == 0)
             {
-                outputTextures.CopyPixelColors(MateriaSetter.Textures, MateriaSetter.Textures.Size.x, new Rect(0, 0, 1, 1), outputTextures.Size.x, new Rect(0, 0, 1, 1));
+                outputTextures.CopyPixelColors(MateriaSetter.Textures, MateriaSetter.Textures.Size, new Rect(0, 0, 1, 1), outputTextures.Size, new Rect(0, 0, 1, 1));
                 outputTextures.SetNames(name);
 
                 if (data.MateriaAtlas != null)
                 {
-                    data.MateriaAtlas.Textures.CopyPixelColors(MateriaSetter.Textures, MateriaSetter.Textures.Size.x, new Rect(0, 0, 1, 1), data.MateriaAtlas.Textures.Size.x, MateriaSetter.MateriaSetterData.AtlasedUVRect);
+                    data.MateriaAtlas.Textures.CopyPixelColors(MateriaSetter.Textures, MateriaSetter.Textures.Size, new Rect(0, 0, 1, 1), data.MateriaAtlas.Textures.Size, MateriaSetter.MateriaSetterData.AtlasedUVRect);
                 }
             }
             else if (_editMode.enumValueIndex == 1)
             {
-                outputTextures.CopyPixelColors(MateriaSetter.Textures, MateriaSetter.Textures.Size.x, MateriaSetter.UVRect, MateriaSetter.Textures.Size.x, MateriaSetter.UVRect);
+                outputTextures.CopyPixelColors(MateriaSetter.Textures, MateriaSetter.Textures.Size, MateriaSetter.UVRect, MateriaSetter.Textures.Size, MateriaSetter.UVRect);
                 outputTextures.SetNames(name);
 
-                data.Textures.CopyPixelColors(MateriaSetter.Textures, MateriaSetter.Textures.Size.x, MateriaSetter.UVRect, data.NativeGridSize, new Rect(0, 0, 1, 1));
+                data.Textures.CopyPixelColors(MateriaSetter.Textures, MateriaSetter.Textures.Size, MateriaSetter.UVRect, data.NativeGridSize, new Rect(0, 0, 1, 1));
             }
 
             

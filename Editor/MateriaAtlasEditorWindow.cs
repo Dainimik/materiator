@@ -122,7 +122,7 @@ namespace Materiator
 
                         itemData.MateriaAtlas = null;
 
-                        itemData.AtlasedGridSize = 0;
+                        itemData.AtlasedGridSize = new Vector2Int(0, 0);
                         itemData.AtlasedUVRect = new Rect(0f, 0f, 1f, 1f);
 
                         AssetDatabase.RemoveObjectFromAsset(itemData.AtlasedMesh);

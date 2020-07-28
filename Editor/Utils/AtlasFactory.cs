@@ -34,9 +34,9 @@ namespace Materiator
             var atlasName = AssetUtils.GetFileName(path);
             MateriaAtlas atlas = null;
 
-            if (existingAtlas == null || existingAtlas.GridSize < gridSize)
+            if (existingAtlas == null || existingAtlas.GridSize.x < gridSize.x || existingAtlas.GridSize.y < gridSize.y)
             {
-                atlas = CreateMateriaAtlasAsset(dir, atlasName, material, new Vector2Int(gridSize, gridSize));
+                atlas = CreateMateriaAtlasAsset(dir, atlasName, material, gridSize);
                 includeAllPrefabs = true;
             }
             else

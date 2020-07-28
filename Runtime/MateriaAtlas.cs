@@ -8,6 +8,6 @@ namespace Materiator
         public Material Material;
         public Textures Textures = new Textures();
         public SerializableDictionary<int, MateriaAtlasEntry> AtlasEntries;
-        public int GridSize;
+        public Vector2Int GridSize;
     }
 }

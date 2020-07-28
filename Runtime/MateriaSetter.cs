@@ -31,7 +31,7 @@ namespace Materiator
         public Material Material;
         public Textures Textures;
 
-        public int GridSize;
+        public Vector2Int GridSize;
         public Rect UVRect;
 
 
@@ -150,7 +150,7 @@ namespace Materiator
 
             if (Textures.Color == null || Textures.MetallicSmoothness == null || Textures.Emission == null)
             {
-                Textures.CreateTextures(GridSize, GridSize);
+                Textures.CreateTextures(GridSize.x, GridSize.y);
             }
 
             SetTextures();

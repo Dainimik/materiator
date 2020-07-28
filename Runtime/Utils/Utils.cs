@@ -41,34 +41,37 @@ namespace Materiator
             Rect[] rects = new Rect[number];
             var size = CalculateAtlasSize(number);
 
-            var sizeMultiplier = 4 / (float)size;
+            var sizeMultiplierX = 4 / (float)size.x;
+            var sizeMultiplierY = 4 / (float)size.y;
 
-            for (int i = 0, y = 0; y < size / 4; y++)
+            for (int i = 0, y = 0; y < size.y / 4; y++)
             {
-                for (int x = 0; x < size / 4; x++, i++)
+                for (int x = 0; x < size.x / 4; x++, i++)
                 {
                     if (i >= number) break;
-                    rects[i] = new Rect(x * sizeMultiplier, y * sizeMultiplier, sizeMultiplier, sizeMultiplier);
+                    rects[i] = new Rect(x * sizeMultiplierX, y * sizeMultiplierY, sizeMultiplierX, sizeMultiplierY);
                 }
             }
 
             return rects;
         }
 
-        public static RectInt GetRectIntFromRect(int gridSize, Rect rect)
+        public static RectInt GetRectIntFromRect(Vector2Int gridSize, Rect rect)
         {
-            return new RectInt((int)(gridSize * rect.x), (int)(gridSize * rect.y), (int)(gridSize * rect.width), (int)(gridSize * rect.height));
+            return new RectInt((int)(gridSize.x * rect.x), (int)(gridSize.y * rect.y), (int)(gridSize.x * rect.width), (int)(gridSize.y * rect.height));
         }
 
-        public static int CalculateAtlasSize(int numberOfMeshes)
+        public static Vector2Int CalculateAtlasSize(int numberOfMeshes)
         {
             var ranges = new Vector2[] { new Vector2(0, 2), new Vector2(1, 5), new Vector2(4, 17), new Vector2(16, 65), new Vector2(64, 257), new Vector2(256, 1025), new Vector2(1024, 4097), new Vector2(4096, 16385), new Vector2(16384, 65537), new Vector2(65536, 262145), new Vector2(262144, 1048577), new Vector2(1048576, 4194305) };
-            var size = 4;
+            var size = new Vector2Int(4, 4); // Minimum atlas size is hardcoded here
             for (int i = 0; i < ranges.Length; i++)
             {
                 if (numberOfMeshes > ranges[i].x && numberOfMeshes < ranges[i].y)
                 {
-                    size = 4 * (int)Mathf.Pow(2, i);
+                    // This is temporary
+                    size.x = 4 * (int)Mathf.Pow(2, i);
+                    size.y = 4 * (int)Mathf.Pow(2, i);
                 }
             }
             return size;

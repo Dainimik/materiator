@@ -24,22 +24,29 @@ namespace Materiator
 
             return filteredRects;
         }
-
-        public static Rect[] CalculateRects(int size, Rect offset)
+        /// <summary>
+        /// Returns Rects with percent-based position and size values that are relative to the offset Rect.
+        /// </summary>
+        /// <param name="size"> Size in pixels</param>
+        /// <param name="offset"> Relative rect to calculate rects against</param>
+        /// <returns></returns>
+        public static Rect[] CalculateRects(Vector2Int size, Rect offset)
         {
-            var rects = new Rect[size * size];
-            var rectSize = 1 / (float)size * offset.width;
+            var rects = new Rect[size.x * size.y];
+            var rectSize = new Vector2();
+            rectSize.x = 1 / (float)size.x * offset.width;
+            rectSize.y = 1 / (float)size.y * offset.height;
 
-            for (int i = 0, y = 0; y < size; y++)
+            for (int i = 0, y = 0; y < size.y; y++)
             {
-                for (int x = 0; x < size; x++, i++)
+                for (int x = 0; x < size.x; x++, i++)
                 {
-                    if (i >= size * size) break;
-                    rects[i] = new Rect(offset.x + (x / (float)size * offset.width), offset.y + (y / (float)size * offset.height), rectSize, rectSize);
+                    if (i >= size.x * size.y) break;
+                    rects[i] = new Rect(offset.x + (x / (float)size.x * offset.width), offset.y + (y / (float)size.y * offset.height), rectSize.x, rectSize.y);
                     rects[i].xMin = rects[i].x;
                     rects[i].yMin = rects[i].y;
-                    rects[i].xMax = rects[i].x + rectSize;
-                    rects[i].yMax = rects[i].y + rectSize;
+                    rects[i].xMax = rects[i].x + rectSize.x;
+                    rects[i].yMax = rects[i].y + rectSize.y;
                 }
             }
 
