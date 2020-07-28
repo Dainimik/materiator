@@ -4,26 +4,6 @@ namespace Materiator
 {
     public static class MeshAnalyzer
     {
-        public static SerializableDictionary<int, Rect> FilterRects(Rect[] rects, Vector2[] uvs)
-        {
-            var filteredRects = new SerializableDictionary<int, Rect>();
-
-            for (int i = 0; i < uvs.Length; i++)
-            {
-                for (int r = 0; r < rects.Length; r++)
-                {
-                    if (rects[r].Contains(uvs[i]))
-                    {
-                        if (!filteredRects.ContainsKey(r))
-                        {
-                            filteredRects.Add(r, rects[r]);
-                        } 
-                    }
-                }
-            }
-
-            return filteredRects;
-        }
         /// <summary>
         /// Returns Rects with percent-based position and size values that are relative to the offset Rect.
         /// </summary>
@@ -51,6 +31,27 @@ namespace Materiator
             }
 
             return rects;
+        }
+
+        public static SerializableDictionary<int, Rect> FilterRects(Rect[] rects, Vector2[] uvs)
+        {
+            var filteredRects = new SerializableDictionary<int, Rect>();
+
+            for (int i = 0; i < uvs.Length; i++)
+            {
+                for (int r = 0; r < rects.Length; r++)
+                {
+                    if (rects[r].Contains(uvs[i]))
+                    {
+                        if (!filteredRects.ContainsKey(r))
+                        {
+                            filteredRects.Add(r, rects[r]);
+                        } 
+                    }
+                }
+            }
+
+            return filteredRects;
         }
     }
 }

@@ -94,7 +94,7 @@ namespace Materiator
 
             if (Renderer != null)
             {
-                if (Renderer.sharedMaterial == null || (Renderer.sharedMaterial != null && Material == null))
+                if (Renderer.sharedMaterial == null || Material == null)
                 {
                     Material = Instantiate(SystemData.Settings.DefaultMaterialData.Material);
                     Material.name = gameObject.name;
@@ -127,7 +127,7 @@ namespace Materiator
             if (EditMode == EditMode.Native)
             {
                 GridSize = SystemData.Settings.GridSize;
-                UVRect = new Rect(0f, 0f, 1f, 1f);
+                UVRect = SystemData.Settings.UVRect;
             }
             else if (EditMode == EditMode.Atlas)
             {
@@ -139,14 +139,10 @@ namespace Materiator
         private void InitializeTextures()
         {
             if (Textures == null)
-            {
                 Textures = new Textures();
-            }
 
             if (Textures.Color == null || Textures.MetallicSmoothness == null || Textures.Emission == null)
-            {
                 Textures.CreateTextures(GridSize.x, GridSize.y);
-            }
 
             SetTextures();
         }
@@ -163,9 +159,7 @@ namespace Materiator
             var gridSize = SystemData.Settings.GridSize;
 
             if (MateriaSetterData != null)
-            {
                 gridSize = MateriaSetterData.NativeGridSize;
-            }
 
             Rects = MeshAnalyzer.CalculateRects(gridSize, UVRect);
             FilteredRects = MeshAnalyzer.FilterRects(Rects, Mesh.uv);
@@ -321,7 +315,7 @@ namespace Materiator
             Textures.Assign(MateriaSetterData.Textures);
 
             GridSize = MateriaSetterData.NativeGridSize;
-            UVRect = new Rect(0f, 0f, 1f, 1f);
+            UVRect = SystemData.Settings.UVRect;
 
             Textures.SetTexturesToMaterial(Material, MaterialData.ShaderData);
             UpdateRenderer();
