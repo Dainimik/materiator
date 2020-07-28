@@ -11,9 +11,6 @@ namespace Materiator
     [CustomEditor(typeof(MateriaSetter))]
     public class MateriaSetterEditor : MateriatorEditor
     {
-        private delegate void ContextAction(MateriaSetterEditor editor);
-        private ContextAction _contextAction;
-
         public MateriaSetter MateriaSetter;
 
         private ReorderableList _materiaReorderableList;
@@ -56,7 +53,7 @@ namespace Materiator
         private Label _currentShaderLabel;
 
         private VisualElement _cachedGUIRoot;
-        private VisualElement _root;
+        public VisualElement Root;
 
         private void OnEnable()
         {
@@ -64,7 +61,7 @@ namespace Materiator
 
             InitializeEditor<MateriaSetter>();
 
-            _root = new VisualElement();
+            Root = new VisualElement();
 
             if (Initialize())
             {
@@ -88,16 +85,16 @@ namespace Materiator
 
         public override VisualElement CreateInspectorGUI()
         {
-            return _root;
+            return Root;
         }
 
         public bool Initialize()
         {
-            if (CheckAllSystems())
+            if (SystemChecker.CheckAllSystems(this))
             {
                 MateriaSetter.Initialize();
 
-                _root = root;
+                Root = root;
 
                 return true;
             }
@@ -932,114 +929,6 @@ namespace Materiator
             }
             
         }
-
-        private bool CheckAllSystems()
-        {
-            MateriaSetter.GetMeshReferences();
-
-            if ((MateriaSetter.MeshRenderer != null && MateriaSetter.SkinnedMeshRenderer != null) || (MateriaSetter.MeshFilter != null && MateriaSetter.SkinnedMeshRenderer != null))
-            {
-                return ErrorMessage("Please use either only a SKINNED MESH RENDERER component alone or a MESH FILTER + MESH RENDERER component combo.");
-            }
-            else if (MateriaSetter.Renderer == null && MateriaSetter.MeshFilter == null)
-            {
-                return ErrorMessage(
-                    "Please first add a MESH FILTER or a SKINNED MESH RENDERER component to this Game Object.",
-                    new Dictionary<ContextAction, string>
-                    {
-                        [ContextActions.AddMeshFilter] = "Add Mesh Filter",
-                        [ContextActions.AddSkinnedMeshRenderer] = "Add Skinned Mesh Renderer"
-                    });
-            }
-            else if (MateriaSetter.MeshRenderer != null && MateriaSetter.MeshFilter == null)
-            {
-                return ErrorMessage(
-                    "Please first add a MESH FILTER component to this Game Object.",
-                    new Dictionary<ContextAction, string>
-                    {
-                        [ContextActions.AddMeshFilter] = "Add Mesh Filter"
-                    });
-            }
-            else if (MateriaSetter.SkinnedMeshRenderer == null && MateriaSetter.MeshFilter.sharedMesh == null)
-            {
-                return ErrorMessage(
-                    "Please add a MESH and hit the Retry button.",
-                    new Dictionary<ContextAction, string> { [ContextActions.Retry] = "Retry" }
-                    );
-            }
-            else if (MateriaSetter.SkinnedMeshRenderer == null && MateriaSetter.MeshRenderer == null && MateriaSetter.MeshFilter == null)
-            {
-                return ErrorMessage(
-                    "Please first add a MESH RENDERER or a SKINNED MESH RENDERER component to this Game Object.",
-                    new Dictionary<ContextAction, string>
-                    {
-                        [ContextActions.AddMeshRenderer] = "Add Mesh Renderer",
-                        [ContextActions.AddSkinnedMeshRenderer] = "Add Skinned Mesh Renderer"
-                    });
-            }
-            else if (MateriaSetter.SkinnedMeshRenderer == null && MateriaSetter.MeshRenderer == null && MateriaSetter.MeshFilter != null)
-            {
-                return ErrorMessage(
-                    "Please first add a MESH RENDERER component to this Game Object.",
-                    new Dictionary<ContextAction, string>
-                    {
-                        [ContextActions.AddMeshRenderer] = "Add Mesh Renderer"
-                    });
-            }
-            else if (MateriaSetter.SkinnedMeshRenderer != null && MateriaSetter.SkinnedMeshRenderer.sharedMesh == null)
-            {
-                return ErrorMessage(
-                    "Please first add a MESH to a SKINNED MESH RENDERER component and hit the Retry Button.",
-                    new Dictionary<ContextAction, string>
-                    {
-                        [ContextActions.Retry] = "Retry"
-                    });
-            }
-            else if (MateriaSetter.MeshRenderer.sharedMaterials.Count() > 1)
-            {
-                return ErrorMessage(
-                    "Renderer needs to have only one material assigned. Please remove excess materials and hit the Retry button.",
-                    new Dictionary<ContextAction, string>
-                    {
-                        [ContextActions.Retry] = "Retry"
-                    });
-            }
-            else if (
-                (MateriaSetter.MeshFilter != null && MateriaSetter.MeshFilter.sharedMesh.subMeshCount > 1) ||
-                (MateriaSetter.SkinnedMeshRenderer != null && MateriaSetter.SkinnedMeshRenderer.sharedMesh.subMeshCount > 1))
-            {
-                return ErrorMessage(
-                    "Mesh has more than 1 sub-meshes. This usually happens when a mesh is exported with more than one materials. Please re-export the mesh so that it has only one sub-mesh.",
-                    new Dictionary<ContextAction, string>
-                    {
-                        [ContextActions.Retry] = "Retry"
-                    });
-            }
-            else
-            {
-                return true;
-            }
-        }
-
-        private bool ErrorMessage(string text, Dictionary<ContextAction, string> actionContent = null)
-        {
-            _root.Clear();
-            var warning = new HelpBox(text, HelpBoxMessageType.Warning);
-            _root.Add(warning);
-
-            if (actionContent != null)
-            {
-                foreach (var entry in actionContent)
-                {
-                    var button = new Button(() => entry.Key(this));
-                    button.text = entry.Value;
-                    _root.Add(button);
-                }
-            }
-
-            return false;
-        }
-
 
         protected override void GetProperties()
         {
