@@ -30,6 +30,12 @@ namespace Materiator
             atlasTexture.Apply(false);
         }
 
+        /// <summary>
+        /// Returns absolute rect values (in pixels)
+        /// </summary>
+        /// <param name="gridSize"></param>
+        /// <param name="rect">Rect with relative values (in percent).</param>
+        /// <returns></returns>
         public static RectInt GetRectIntFromRect(Vector2Int gridSize, Rect rect)
         {
             return new RectInt((int)(gridSize.x * rect.x), (int)(gridSize.y * rect.y), (int)(gridSize.x * rect.width), (int)(gridSize.y * rect.height));
