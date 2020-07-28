@@ -6,7 +6,6 @@ namespace Materiator
 {
     public class MateriaSetter : MonoBehaviour
     {
-        public bool IsInitialized = false;
         public bool IsDirty = true;
 
         public EditMode EditMode;
@@ -37,11 +36,7 @@ namespace Materiator
 
         public void Initialize()
         {
-            IsInitialized = false;
-
             Refresh();
-
-            IsInitialized = true;
         }
 
         public void Refresh()

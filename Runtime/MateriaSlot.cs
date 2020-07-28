@@ -14,23 +14,14 @@ namespace Materiator
             ID = id;
 
             if (materia != null)
-            {
                 Materia = materia;
-            }
             else
-            {
                 Materia = SystemData.Settings.DefaultMateria;
-            }
             
             if (tag != null)
-            {
                 Tag = tag;
-            }
             else
-            {
-                Tag = SystemData.Settings.DefaultTag;
-            }
-            
+                Tag = SystemData.Settings.DefaultTag;            
         }
     }
 }

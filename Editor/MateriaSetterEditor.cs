@@ -764,7 +764,7 @@ namespace Materiator
             if (!_isDirty.boolValue) return;
 
             string name;
-            string dir;
+            string dir = "";
 
             if (path != null)
             {
@@ -773,7 +773,6 @@ namespace Materiator
             }
             else
             {
-                dir = SystemData.Settings.SavePath;
                 name = MateriaSetter.gameObject.name;
                 path = dir + name + ".asset";
             }

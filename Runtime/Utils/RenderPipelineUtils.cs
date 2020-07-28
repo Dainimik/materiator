@@ -18,7 +18,6 @@ namespace Materiator
         /// <returns></returns>
         public static PipelineType GetActivePipelineType()
         {
-#if UNITY_2019_1_OR_NEWER
             if (GraphicsSettings.renderPipelineAsset != null)
             {
                 var srpType = GraphicsSettings.renderPipelineAsset.GetType().ToString();
@@ -32,11 +31,7 @@ namespace Materiator
                 }
                 else return PipelineType.Unsupported;
             }
-#elif UNITY_2017_1_OR_NEWER
-            if (GraphicsSettings.renderPipelineAsset != null) {
-                return PipelineType.Unsupported;
-            }
-#endif
+
             return PipelineType.BuiltIn;
         }
     }

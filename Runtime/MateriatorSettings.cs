@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEditor;
+#endif
+using UnityEngine;
 
 namespace Materiator
 {
@@ -10,7 +13,6 @@ namespace Materiator
 
     public class MateriatorSettings : ScriptableObject
     {
-        public string SavePath;
         public Vector2Int GridSize = new Vector2Int(4, 4);
         public bool PackAssets;
         public MateriaTags MateriaTags;
@@ -23,9 +25,11 @@ namespace Materiator
         public HighlightMode HighlightMode;
         public FilterMode FilterMode;
 
+#if UNITY_EDITOR
         [HideInInspector] public readonly Color GUIGray = new Color(0.75f, 0.75f, 0.75f, 1f);
         [HideInInspector] public readonly Color GUIGreen = new Color(0f, 0.75f, 0f, 1f);
         [HideInInspector] public readonly Color GUIRed = new Color(0.75f, 0f, 0f, 1f);
+#endif
     }
 }
 
