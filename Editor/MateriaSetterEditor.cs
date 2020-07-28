@@ -478,25 +478,6 @@ namespace Materiator
             };
         }
 
-        /*private void GenerateMateriaDictionary(bool resetToDefault = false)
-        {
-            if (!_materiaSetter.IsInitialized || _materiaSetter.Materia.Count == 0)
-            {
-                var newMateriaDictionary = new SerializableIntMateriaDictionary();
-
-                var rects = MeshAnalyzer.CalculateRects(Utils.Settings.GridSize);
-                _materiaSetter.FilteredRects = MeshAnalyzer.FilterRects(rects, _materiaSetter.Mesh.uv);
-
-                foreach (var rect in _materiaSetter.FilteredRects)
-                {
-                    newMateriaDictionary.Add(rect.Key, Utils.Settings.DefaultMateria);
-                }
-
-                _materiaSetter.Materia = newMateriaDictionary;
-                _materiaSetter.Rects = rects;
-            }
-        }*/
-
         Texture2D _highlightedTexture;
         private void HandleMateriaSlotSelection(int index, bool selected)
         {
