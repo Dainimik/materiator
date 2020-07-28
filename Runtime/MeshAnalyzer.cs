@@ -14,6 +14,7 @@ namespace Materiator
         {
             var rects = new Rect[size.x * size.y];
             var rectSize = new Vector2();
+
             rectSize.x = 1 / (float)size.x * offset.width;
             rectSize.y = 1 / (float)size.y * offset.height;
 
@@ -22,7 +23,15 @@ namespace Materiator
                 for (int x = 0; x < size.x; x++, i++)
                 {
                     if (i >= size.x * size.y) break;
-                    rects[i] = new Rect(offset.x + (x / (float)size.x * offset.width), offset.y + (y / (float)size.y * offset.height), rectSize.x, rectSize.y);
+
+                    rects[i] = new Rect
+                    (
+                        offset.x + (x / (float)size.x * offset.width),
+                        offset.y + (y / (float)size.y * offset.height),
+                        rectSize.x,
+                        rectSize.y
+                    );
+
                     rects[i].xMin = rects[i].x;
                     rects[i].yMin = rects[i].y;
                     rects[i].xMax = rects[i].x + rectSize.x;
