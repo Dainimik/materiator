@@ -24,9 +24,9 @@ namespace Materiator
                 }
             }
 
-            var rects = Utils.CalculateRects(compatibleMateriaSettersCount);
+            var rects = CalculateRects(compatibleMateriaSettersCount);
             var rectIndex = 0;
-            var gridSize = Utils.CalculateAtlasSize(compatibleMateriaSettersCount);
+            var gridSize = CalculateAtlasSize(compatibleMateriaSettersCount);
 
             var includeAllPrefabs = false;
 
@@ -234,6 +234,42 @@ namespace Materiator
             atlas.AtlasEntries = new SerializableDictionary<int, MateriaAtlasEntry>();
 
             return atlas;
+        }
+
+        private static Rect[] CalculateRects(int number)
+        {
+            Rect[] rects = new Rect[number];
+            var size = CalculateAtlasSize(number);
+
+            var sizeMultiplierX = 4 / (float)size.x;
+            var sizeMultiplierY = 4 / (float)size.y;
+
+            for (int i = 0, y = 0; y < size.y / 4; y++)
+            {
+                for (int x = 0; x < size.x / 4; x++, i++)
+                {
+                    if (i >= number) break;
+                    rects[i] = new Rect(x * sizeMultiplierX, y * sizeMultiplierY, sizeMultiplierX, sizeMultiplierY);
+                }
+            }
+
+            return rects;
+        }
+
+        public static Vector2Int CalculateAtlasSize(int numberOfMeshes)
+        {
+            var ranges = new Vector2[] { new Vector2(0, 2), new Vector2(1, 5), new Vector2(4, 17), new Vector2(16, 65), new Vector2(64, 257), new Vector2(256, 1025), new Vector2(1024, 4097), new Vector2(4096, 16385), new Vector2(16384, 65537), new Vector2(65536, 262145), new Vector2(262144, 1048577), new Vector2(1048576, 4194305) };
+            var size = new Vector2Int(4, 4); // Minimum atlas size is hardcoded here
+            for (int i = 0; i < ranges.Length; i++)
+            {
+                if (numberOfMeshes > ranges[i].x && numberOfMeshes < ranges[i].y)
+                {
+                    // This is temporary
+                    size.x = 4 * (int)Mathf.Pow(2, i);
+                    size.y = 4 * (int)Mathf.Pow(2, i);
+                }
+            }
+            return size;
         }
     }
 }

@@ -87,7 +87,7 @@ namespace Materiator
             material.SetTexture(shaderData.EmissionTexturePropertyName, Emission);
         }
 
-        public void UpdateColors(SerializableDictionary<int, Rect> rects, Vector2Int gridSize, List<MateriaSlot> materiaSlots)
+        public void UpdateColors(IDictionary<int, Rect> rects, Vector2Int gridSize, List<MateriaSlot> materiaSlots)
         {
             foreach (var rect in rects)
             {
@@ -148,31 +148,6 @@ namespace Materiator
 
 #if UNITY_EDITOR
 
-        public void RenameTextureAssets(string name)
-        {
-            AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(Color), name + "_Color");
-            AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(MetallicSmoothness), name + "_MetallicSmoothness");
-            AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(Emission), name + "_Emission");
-        }
-
-        /*public Textures CloneTextures(FilterMode filterMode, bool removeCloneFromName = false)
-        {
-            //Don't create new instance here
-            var texs = new Textures
-            {
-                Color = Object.Instantiate(Color),
-                MetallicSmoothness = Object.Instantiate(MetallicSmoothness),
-                Emission = Object.Instantiate(Color)
-            };
-            texs.SetFilterMode(filterMode);
-            texs.SetWrapMode(TextureWrapMode.Clamp);
-
-            if (removeCloneFromName)
-                texs.Names = Names;
-
-            return texs;
-        }*/
-
         public void CopyPixelColors(Textures source, Vector2Int sourceGridSize, Rect sourceRect, Vector2Int destinationGridSize, Rect destinationRect)
         {
             var sourceRectInt = new RectInt((int)(sourceRect.x * sourceGridSize.x), (int)(sourceRect.y * sourceGridSize.y), (int)(sourceRect.width * sourceGridSize.x), (int)(sourceRect.height * sourceGridSize.y));
@@ -187,13 +162,6 @@ namespace Materiator
             Emission.SetPixels32(destinationRectInt.x, destinationRectInt.y, destinationRectInt.width, destinationRectInt.height, emissionColors);
 
             Apply();
-        }
-
-        public void CopySerialized(Textures source)
-        {
-            EditorUtility.CopySerialized(source.Color, Color);
-            EditorUtility.CopySerialized(source.MetallicSmoothness, MetallicSmoothness);
-            EditorUtility.CopySerialized(source.Emission, Emission);
         }
 
         public void AddTexturesToAsset(Object objectToAddTo)
