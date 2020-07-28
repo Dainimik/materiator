@@ -15,16 +15,37 @@ namespace Materiator
         {
             var cases = new[]
             {
-                new Tuple<int, Vector2Int>(0, new Vector2Int(4, 4)),
-                new Tuple<int, Vector2Int>(1, new Vector2Int(4, 4)),
-                new Tuple<int, Vector2Int>(5, new Vector2Int(16, 16))
+                new Tuple<int, Vector2Int, Vector2Int>(0, new Vector2Int(4, 4), new Vector2Int(4, 4)),
+                new Tuple<int, Vector2Int, Vector2Int>(1, new Vector2Int(8, 8), new Vector2Int(8, 8)),
+                new Tuple<int, Vector2Int, Vector2Int>(5, new Vector2Int(8, 8), new Vector2Int(32, 32))
             };
 
-            foreach (var (number, expectation) in cases)
+            foreach (var (number, entrySize, expectation) in cases)
             {
-                var result = AtlasFactory.CalculateAtlasSize(number);
+                var result = AtlasFactory.CalculateAtlasSize(number, entrySize);
 
                 Assert.AreEqual(expectation, result);
+            }
+        }
+
+        [Test]
+        public void ShouldCalculateCorrectRectSizeWithSameDimensions()
+        {
+            var cases = new[]
+            {
+                new Tuple<int, Vector2Int, Rect>(10, new Vector2Int(4, 4), new Rect(0f, 0f, 0.25f, 0.25f)),
+                new Tuple<int, Vector2Int, Rect>(8, new Vector2Int(8, 8), new Rect(0f, 0f, 0.25f, 0.25f))
+            };
+
+            foreach (var (number, rectSize, expectation) in cases)
+            {
+                var rects = AtlasFactory.CalculateRects(number, rectSize);
+
+                foreach (var rect in rects)
+                {
+                    Assert.AreEqual(expectation.width, rect.width);
+                    Assert.AreEqual(expectation.height, rect.height);
+                }
             }
         }
         #endregion

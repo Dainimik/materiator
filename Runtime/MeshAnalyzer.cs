@@ -4,13 +4,34 @@ namespace Materiator
 {
     public static class MeshAnalyzer
     {
+        public static SerializableDictionary<int, Rect> FilterRects(Rect[] rects, Vector2[] uvs)
+        {
+            var filteredRects = new SerializableDictionary<int, Rect>();
+
+            for (int i = 0; i < uvs.Length; i++)
+            {
+                for (int r = 0; r < rects.Length; r++)
+                {
+                    if (rects[r].Contains(uvs[i]))
+                    {
+                        if (!filteredRects.ContainsKey(r))
+                        {
+                            filteredRects.Add(r, rects[r]);
+                        } 
+                    }
+                }
+            }
+
+            return filteredRects;
+        }
+
         /// <summary>
         /// Returns Rects with percent-based position and size values that are relative to the offset Rect.
         /// </summary>
         /// <param name="size"> Size in pixels</param>
         /// <param name="offset"> Relative rect to calculate rects against</param>
         /// <returns></returns>
-        public static Rect[] CalculateRects(Vector2Int size, Rect offset)
+        public static Rect[] CalculateRects(Vector2Int size, Rect offset) // This function has nothing to do with meshes and needs to be moved out of here
         {
             var rects = new Rect[size.x * size.y];
             var rectSize = new Vector2();
@@ -40,27 +61,6 @@ namespace Materiator
             }
 
             return rects;
-        }
-
-        public static SerializableDictionary<int, Rect> FilterRects(Rect[] rects, Vector2[] uvs)
-        {
-            var filteredRects = new SerializableDictionary<int, Rect>();
-
-            for (int i = 0; i < uvs.Length; i++)
-            {
-                for (int r = 0; r < rects.Length; r++)
-                {
-                    if (rects[r].Contains(uvs[i]))
-                    {
-                        if (!filteredRects.ContainsKey(r))
-                        {
-                            filteredRects.Add(r, rects[r]);
-                        } 
-                    }
-                }
-            }
-
-            return filteredRects;
         }
     }
 }

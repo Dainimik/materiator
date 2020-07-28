@@ -24,9 +24,9 @@ namespace Materiator
                 }
             }
 
-            var rects = CalculateRects(compatibleMateriaSettersCount);
+            var rects = CalculateRects(compatibleMateriaSettersCount, SystemData.Settings.GridSize);
             var rectIndex = 0;
-            var gridSize = CalculateAtlasSize(compatibleMateriaSettersCount);
+            var atlasGridSize = CalculateAtlasSize(compatibleMateriaSettersCount, SystemData.Settings.GridSize);
 
             var includeAllPrefabs = false;
 
@@ -34,9 +34,9 @@ namespace Materiator
             var atlasName = AssetUtils.GetFileName(path);
             MateriaAtlas atlas = null;
 
-            if (existingAtlas == null || existingAtlas.GridSize.x < gridSize.x || existingAtlas.GridSize.y < gridSize.y)
+            if (existingAtlas == null || existingAtlas.GridSize.x < atlasGridSize.x || existingAtlas.GridSize.y < atlasGridSize.y)
             {
-                atlas = CreateMateriaAtlasAsset(dir, atlasName, material, gridSize);
+                atlas = CreateMateriaAtlasAsset(dir, atlasName, material, atlasGridSize);
                 includeAllPrefabs = true;
             }
             else
@@ -143,13 +143,13 @@ namespace Materiator
                             }
 
                             atlas.MaterialData = group.Key;
-                            atlas.GridSize = gridSize;
+                            atlas.GridSize = atlasGridSize;
 
                             var baseCol = data.Textures.Color.GetPixels32();
                             var metallic = data.Textures.MetallicSmoothness.GetPixels32();
                             var emission = data.Textures.Emission.GetPixels32();
 
-                            var rectInt = Utils.GetRectIntFromRect(gridSize, rects[rectIndex]);
+                            var rectInt = Utils.GetRectIntFromRect(atlasGridSize, rects[rectIndex]);
 
                             atlas.Textures.Color.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, baseCol);
                             atlas.Textures.MetallicSmoothness.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, metallic);
@@ -167,7 +167,7 @@ namespace Materiator
                             data.MateriaAtlas = atlas;
                             data.AtlasedMesh = atlasedMesh;
                             data.AtlasedUVRect = rects[rectIndex];
-                            data.AtlasedGridSize = gridSize;
+                            data.AtlasedGridSize = atlasGridSize;
 
                             ms[j].LoadAtlas(atlas);
 
@@ -236,37 +236,77 @@ namespace Materiator
             return atlas;
         }
 
-        private static Rect[] CalculateRects(int number)
+        #region These two functions are almost identical
+        public static Rect[] CalculateRects(int number, Vector2Int gridSize) //16, 4x4
         {
-            Rect[] rects = new Rect[number];
-            var size = CalculateAtlasSize(number);
+            Rect[] rects = new Rect[number]; // 16
+            var size = CalculateAtlasSize(number, gridSize);
 
-            var sizeMultiplierX = 4 / (float)size.x;
-            var sizeMultiplierY = 4 / (float)size.y;
+            var sizeMultiplierX = gridSize.x / (float)size.x; // 0.25
+            var sizeMultiplierY = gridSize.y / (float)size.y;
 
-            for (int i = 0, y = 0; y < size.y / 4; y++)
+            for (int i = 0, y = 0; y < size.y / gridSize.y; y++) // 4
             {
-                for (int x = 0; x < size.x / 4; x++, i++)
+                for (int x = 0; x < size.x / gridSize.x; x++, i++) // 4
                 {
-                    if (i >= number) break;
-                    rects[i] = new Rect(x * sizeMultiplierX, y * sizeMultiplierY, sizeMultiplierX, sizeMultiplierY);
+                    if (i >= number) break; // 16
+                    rects[i] = new Rect
+                    (
+                        x * sizeMultiplierX, //if 10 then 2.5
+                        y * sizeMultiplierY,
+                        sizeMultiplierX,// 0.25
+                        sizeMultiplierY
+                    );
                 }
             }
 
             return rects;
         }
 
-        public static Vector2Int CalculateAtlasSize(int numberOfMeshes)
+        /*public static Rect[] CalculateRects(Vector2Int size, Rect offset) // 4, 0
+        {
+            var rects = new Rect[size.x * size.y]; // 16
+            var rectSize = new Vector2();
+
+            rectSize.x = 1 / (float)size.x * offset.width; // 0.25
+            rectSize.y = 1 / (float)size.y * offset.height;
+
+            for (int i = 0, y = 0; y < size.y; y++) // 4
+            {
+                for (int x = 0; x < size.x; x++, i++) // 4
+                {
+                    if (i >= size.x * size.y) break; // 16
+
+                    rects[i] = new Rect
+                    (
+                        offset.x + (x / (float)size.x * offset.width), // if 10 then 2.5
+                        offset.y + (y / (float)size.y * offset.height),
+                        rectSize.x,
+                        rectSize.y
+                    );
+
+                    rects[i].xMin = rects[i].x;
+                    rects[i].yMin = rects[i].y;
+                    rects[i].xMax = rects[i].x + rectSize.x;
+                    rects[i].yMax = rects[i].y + rectSize.y;
+                }
+            }
+
+            return rects;
+        }*/
+        #endregion
+
+        public static Vector2Int CalculateAtlasSize(int numberOfMeshes, Vector2Int atlasEntrySize)
         {
             var ranges = new Vector2[] { new Vector2(0, 2), new Vector2(1, 5), new Vector2(4, 17), new Vector2(16, 65), new Vector2(64, 257), new Vector2(256, 1025), new Vector2(1024, 4097), new Vector2(4096, 16385), new Vector2(16384, 65537), new Vector2(65536, 262145), new Vector2(262144, 1048577), new Vector2(1048576, 4194305) };
-            var size = new Vector2Int(4, 4); // Minimum atlas size
+            var size = atlasEntrySize; // Minimum atlas size
             for (int i = 0; i < ranges.Length; i++)
             {
                 if (numberOfMeshes > ranges[i].x && numberOfMeshes < ranges[i].y)
                 {
                     // This is temporary
-                    size.x = 4 * (int)Mathf.Pow(2, i);
-                    size.y = 4 * (int)Mathf.Pow(2, i);
+                    size.x *= (int)Mathf.Pow(2, i);
+                    size.y *= (int)Mathf.Pow(2, i);
                 }
             }
             return size;
