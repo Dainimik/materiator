@@ -259,7 +259,7 @@ namespace Materiator
         public static Vector2Int CalculateAtlasSize(int numberOfMeshes)
         {
             var ranges = new Vector2[] { new Vector2(0, 2), new Vector2(1, 5), new Vector2(4, 17), new Vector2(16, 65), new Vector2(64, 257), new Vector2(256, 1025), new Vector2(1024, 4097), new Vector2(4096, 16385), new Vector2(16384, 65537), new Vector2(65536, 262145), new Vector2(262144, 1048577), new Vector2(1048576, 4194305) };
-            var size = new Vector2Int(4, 4); // Minimum atlas size is hardcoded here
+            var size = new Vector2Int(4, 4); // Minimum atlas size
             for (int i = 0; i < ranges.Length; i++)
             {
                 if (numberOfMeshes > ranges[i].x && numberOfMeshes < ranges[i].y)
