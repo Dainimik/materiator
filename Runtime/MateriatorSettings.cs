@@ -15,11 +15,15 @@ namespace Materiator
     {
         public Vector2Int GridSize = new Vector2Int(4, 4);
         public bool PackAssets;
+
+        [HideInInspector]
         public MateriaTags MateriaTags;
+
         public MaterialData DefaultMaterialData;
         public ShaderData DefaultShaderData;
         public Materia DefaultMateria;
         public MateriaTag DefaultTag = new MateriaTag("-");
+
         //public MaterialGlobalIlluminationFlags GlobalIlluminationFlag;
         public Color HighlightColor;
         public HighlightMode HighlightMode;

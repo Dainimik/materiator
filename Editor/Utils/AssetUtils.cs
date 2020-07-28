@@ -9,21 +9,6 @@ namespace Materiator
 {
     public static class AssetUtils
     {
-        public static T CreateOrReplaceAsset<T>(T asset, string path) where T : Object
-        {
-            T existingAsset = AssetDatabase.LoadAssetAtPath<T>(path);
-
-            if (existingAsset == null)
-            {
-                AssetDatabase.CreateAsset(asset, path);
-                existingAsset = asset;
-            }
-            else
-                EditorUtility.CopySerialized(asset, existingAsset);
-
-            return existingAsset;
-        }
-
         public static T CreateOrReplaceScriptableObjectAsset<T>(T asset, string path, out bool wasExisting) where T : ScriptableObject
         {
             wasExisting = false;
@@ -71,7 +56,6 @@ namespace Materiator
 
         public static string GetFileExtension(string filePathOrName, bool includeDot)
         {
-            var name = "";
             string[] splitPath = filePathOrName.Split(char.Parse("/"));
             var presetNameFrag = splitPath[splitPath.Length - 1].Split(char.Parse("."));
             if (includeDot)
@@ -80,43 +64,8 @@ namespace Materiator
                 return presetNameFrag[1];
         }
 
-        public static string GetRelativePathWithoutFilename(string path)
-        {
-            return AbsoluteToRelativePath(GetPathWithoutFilename(path));
-        }
-
-        public static string AbsoluteToRelativePath(string path)
-        {
-            if (path.StartsWith(Application.dataPath))
-                path = "Assets" + path.Substring(Application.dataPath.Length);
-            return path;
-        }
-
-        public static string GetPathWithoutFilename(string path)
-        {
-            string pathWithoutFilename = "";
-            var pathFragments = path.Split(char.Parse("/"));
-            var pathFragmentsLength = pathFragments.Length;
-
-            for (int i = 0; i < pathFragmentsLength; i++)
-            {
-                if (i < pathFragmentsLength - 2)
-                    pathWithoutFilename += pathFragments[i] + "/";
-                else
-                    pathWithoutFilename += pathFragments[i];
-            }
-            return pathWithoutFilename;
-        }
-
-        public static string GetEditorScriptDirectory(ScriptableObject so)
-        {
-            var script = MonoScript.FromScriptableObject(so);
-            var path = GetDirectoryName(AssetDatabase.GetAssetPath(script));
-            return path;
-        }
-
         /// <summary>
-        /// Returns directory name with the path to it.
+        /// Returns directory name with a path to it.
         /// </summary>
         /// <param name="directory">Absolute or relative directory.</param>
         /// <returns></returns>
@@ -137,7 +86,7 @@ namespace Materiator
         }
 
         /// <summary>
-        /// Returns a HashSet of components from all Prefabs from a given directory.
+        /// Returns a list of components from all Prefabs from a given directory.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="directory"> Relative prefab directory. If null, scans project Assets folder and deeper.</param>
@@ -200,27 +149,6 @@ namespace Materiator
                 }
             }
             return AssetDatabase.LoadAssetAtPath<T>(aAssetPath);
-        }
-
-        public static int GetPixelCount(Texture2D texture)
-        {
-            return texture.width * texture.height;
-        }
-
-        public static bool IsTextureReadable(Texture2D texture)
-        {
-            if (texture.isReadable)
-                return true;
-            else
-                return false;
-        }
-
-        public static bool HasSuportedTextureFormat(Texture2D texture)
-        {
-            if (texture.format == TextureFormat.ARGB32 || texture.format == TextureFormat.RGBA32 || texture.format == TextureFormat.RGB24)
-                return true;
-            else
-                return false;
         }
 
         public static T[] FindObjectsOfTypeInOpenedPrefabStage<T>(out PrefabStage prefabStage)
