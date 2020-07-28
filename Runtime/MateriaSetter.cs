@@ -59,9 +59,7 @@ namespace Materiator
             var fields = GetType().GetFields();
 
             for (int i = 0; i < fields.Length; i++)
-            {
                 fields[i].SetValue(this, null);
-            }
 
             Initialize();
             IsDirty = true;
@@ -77,9 +75,7 @@ namespace Materiator
             if (MeshFilter == null)
             {
                 if (SkinnedMeshRenderer != null)
-                {
                     Mesh = SkinnedMeshRenderer.sharedMesh;
-                }
             }
             else
             {
@@ -165,74 +161,50 @@ namespace Materiator
             FilteredRects = MeshAnalyzer.FilterRects(Rects, Mesh.uv);
         }
 
-        public void GenerateMateriaSlots(bool reset = false, bool refresh = false)
+        // TODO: Refactor this function (it is confusing)
+        public void GenerateMateriaSlots()
         {
             var materiaSlotsCount = 0;
 
+            // Rebuild Materia Slots
             if (MateriaSlots != null)
             {
                 var newMateriaSlots = new List<MateriaSlot>();
 
-                foreach (var ms in MateriaSlots)
+                foreach (var slot in MateriaSlots)
                 {
-                    if (FilteredRects.ContainsKey(ms.ID))
+                    if (FilteredRects.ContainsKey(slot.ID))
                     {
-                        if (ms.Materia != null)
-                        {
-                            newMateriaSlots.Add(new MateriaSlot(ms.ID, ms.Materia, ms.Tag));
-                        }
+                        if (slot.Materia != null)
+                            newMateriaSlots.Add(new MateriaSlot(slot.ID, slot.Materia, slot.Tag));
                         else
-                        {
-                            newMateriaSlots.Add(new MateriaSlot(ms.ID, SystemData.Settings.DefaultMateria, ms.Tag));
-                        }
+                            newMateriaSlots.Add(new MateriaSlot(slot.ID, SystemData.Settings.DefaultMateria, slot.Tag));
                     }
                 }
 
                 if (newMateriaSlots.Count != MateriaSlots.Count)
-                {
                     MateriaSlots = newMateriaSlots;
-                }
 
                 materiaSlotsCount = MateriaSlots.Count;
 
                 if (!IsDirty && MateriaSetterData != null)
-                {
                     MateriaSlots = MateriaSetterData.MateriaSlots;
-                }
             }
 
-            if (reset || refresh || materiaSlotsCount == 0 || FilteredRects.Count != materiaSlotsCount)
+            // If there are no slots or mesh was updated with extra UVs that led to more filtered rects than materia slots
+            if (materiaSlotsCount == 0 || FilteredRects.Count != materiaSlotsCount)
             {
                 if (MateriaSlots == null)
-                {
                     MateriaSlots = new List<MateriaSlot>();
-                }
 
-                if (reset)
-                {
-                    if (MateriaSlots != null)
-                    {
-                        MateriaSlots.Clear(); 
-                    }
-                    else
-                    {
-                        MateriaSlots = new List<MateriaSlot>();
-                    }
-                }
+                var materiaSlotIDs = new int[MateriaSlots.Count];
 
-                var keyArray = new int[MateriaSlots.Count];
-                for (int i = 0; i < keyArray.Length; i++)
-                {
-                    keyArray[i] = MateriaSlots[i].ID;
-                }
+                for (int i = 0; i < materiaSlotIDs.Length; i++)
+                    materiaSlotIDs[i] = MateriaSlots[i].ID;
 
                 foreach (var rect in FilteredRects)
-                {
-                    if (!keyArray.Contains(rect.Key))
-                    {
+                    if (!materiaSlotIDs.Contains(rect.Key))
                         MateriaSlots.Add(new MateriaSlot(rect.Key));
-                    }
-                }
             }
         }
 
@@ -243,40 +215,13 @@ namespace Materiator
 
         public void LoadPreset(MateriaPreset preset)
         {
-            Materia materia;
+            if (preset == null) return;
 
-            if (preset != null)
-            {
-                for (int i = 0; i < MateriaSlots.Count; i++)
-                {
-                    for (int j = 0; j < preset.MateriaPresetItemList.Count; j++)
-                    {
-                        if (MateriaSlots[i].Tag.Name == preset.MateriaPresetItemList[j].Tag.Name)
-                        {
-                            if (MateriaSetterData != null)
-                            {
-                                materia = MateriaSetterData.MateriaSlots[i].Materia;
-                            }
-                            else
-                            {
-                                materia = MateriaSlots[i].Materia;
-                            }
-
-                            if (materia != preset.MateriaPresetItemList[j].Materia)
-                            {
-                                MateriaSlots[i].Materia = preset.MateriaPresetItemList[j].Materia;
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                for (int i = 0; i < MateriaSlots.Count; i++)
-                {
-                    MateriaSlots[i].Materia = SystemData.Settings.DefaultMateria;
-                }
-            }
+            for (int i = 0; i < MateriaSlots.Count; i++)
+                for (int j = 0; j < preset.MateriaPresetItemList.Count; j++)
+                    if (MateriaSlots[i].Tag.Name == preset.MateriaPresetItemList[j].Tag.Name)
+                        if (MateriaSlots[i].Materia != preset.MateriaPresetItemList[j].Materia)
+                            MateriaSlots[i].Materia = preset.MateriaPresetItemList[j].Materia;
         }
 
         public void LoadAtlas(MateriaAtlas atlas)
