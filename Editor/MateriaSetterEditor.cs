@@ -47,12 +47,11 @@ namespace Materiator
 
         private VisualElement _IMGUIContainer;
 
-        private VisualElement _uvIslandContainer;
-        private EnumField _uvDisplayModeEnumField;
-
         private Label _currentShaderLabel;
 
         public VisualElement Root;
+
+        private UVInspector _uvInspector;
 
         private void OnEnable()
         {
@@ -64,6 +63,8 @@ namespace Materiator
 
             if (Initialize())
             {
+                _uvInspector = new UVInspector(MateriaSetter, Root);
+
                 DrawAtlasSection();
                 DrawPresetSection();
                 DrawDataSection();
@@ -106,7 +107,7 @@ namespace Materiator
         private void Refresh()
         {
             MateriaSetter.Refresh();
-            DrawUVInspector(true);
+            _uvInspector.DrawUVInspector(true);
         }
 
         private void ResetMateriaSetter()
@@ -136,7 +137,7 @@ namespace Materiator
                 }  
             }
 
-            DrawUVInspector(true);
+            _uvInspector.DrawUVInspector(true);
 
             serializedObject.ApplyModifiedProperties();
         }
@@ -202,8 +203,6 @@ namespace Materiator
 
         private void DrawDataSection()
         {
-            DrawUVInspector(false);
-
             if (_currentShaderLabel != null)
             {
                 _currentShaderLabel.text = MateriaSetter.MaterialData.ShaderData.Shader.name;
@@ -224,93 +223,10 @@ namespace Materiator
                 OnMateriaSetterDataChanged((MateriaSetterData)e.newValue);
             });
 
-            _uvDisplayModeEnumField.RegisterCallback<ChangeEvent<System.Enum>>(e =>
-            {
-                _uvDisplayModeEnumField.value = e.newValue;
-                DrawUVInspector(true);
-            });
-
             _materialDataObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
             {
                 OnMaterialDataChanged((MaterialData)e.newValue);
             });
-        }
-
-        public enum UVDisplayMode
-        {
-            BaseColor,
-            MetallicSpecularGlossSmoothness,
-            EmissionColor
-        }
-
-        private UVDisplayMode _uvDisplayMode;
-
-        private void DrawUVInspector(bool redraw)
-        {
-            if (redraw)
-            {
-                _uvIslandContainer.Clear();
-            }
-
-            var rects = MateriaSetter.Rects;
-            var size = Mathf.Sqrt(rects.Length);
-            Color borderColor;
-
-            for (int i = 0, y = 0; y < size; y++)
-            {
-                var horizontalContainer = new VisualElement();
-                horizontalContainer.style.flexGrow = 1;
-                horizontalContainer.style.flexShrink = 0;
-                horizontalContainer.style.flexDirection = FlexDirection.Row;
-                _uvIslandContainer.Add(horizontalContainer);
-
-                for (int x = 0; x < size; x++, i++)
-                {
-                    var item = new VisualElement();
-                    item.name = "UVGridItem";
-                    item.styleSheets.Add(Resources.Load<StyleSheet>("Materiator"));
-
-                    if (MateriaSetter.FilteredRects.ContainsKey(i))
-                    {
-                        Color color = SystemData.Settings.DefaultMateria.BaseColor;
-                        switch (_uvDisplayModeEnumField.value)
-                        {
-                            case UVDisplayMode.BaseColor:
-                                color = MateriaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.BaseColor;
-                                break;
-                            case UVDisplayMode.MetallicSpecularGlossSmoothness:
-                                var metallic = MateriaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.Metallic;
-                                var metallicColor = new Color(metallic, metallic, metallic, 1f);
-                                color = metallicColor;
-                                break;
-                            case UVDisplayMode.EmissionColor:
-                                color = MateriaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.EmissionColor;
-                                break;
-                        }
-
-                        borderColor = Color.green;
-                        item.style.backgroundColor = color;
-                        item.style.borderTopColor = borderColor;
-                        item.style.borderBottomColor = borderColor;
-                        item.style.borderLeftColor = borderColor;
-                        item.style.borderRightColor = borderColor;
-                    }
-                    else
-                    {
-                        borderColor = Color.red;
-                        item.style.borderTopColor = borderColor;
-                        item.style.borderBottomColor = borderColor;
-                        item.style.borderLeftColor = borderColor;
-                        item.style.borderRightColor = borderColor;
-                    }
-
-                    horizontalContainer.Add(item);
-
-                    var label = new Label();
-                    label.text = (i + 1).ToString();
-                    item.Add(label);
-                }
-            }
         }
 
         private void DrawOutputSection()
@@ -374,7 +290,7 @@ namespace Materiator
                 MateriaSetter.UpdateColorsOfAllTextures();
             }
 
-            DrawUVInspector(true);
+            _uvInspector.DrawUVInspector(true);
         }
 
         private void MateriaReorderableList()
@@ -447,7 +363,7 @@ namespace Materiator
                         MateriaSetter.MateriaSlots[index].Materia = elementMateria;
 
                     serializedObject.Update();
-                    DrawUVInspector(true);
+                    _uvInspector.DrawUVInspector(true);
 
                     MateriaSetter.UpdateColorsOfAllTextures();
 
@@ -774,11 +690,6 @@ namespace Materiator
             _dataIndicator = root.Q<VisualElement>("DataIndicator");
 
             _IMGUIContainer = root.Q<VisualElement>("IMGUIContainer");
-
-            _uvIslandContainer = root.Q<VisualElement>("UVIslandContainer");
-
-            _uvDisplayModeEnumField = root.Q<EnumField>("UVDisplayMode");
-            _uvDisplayModeEnumField.Init(UVDisplayMode.BaseColor);
 
             _currentShaderLabel = root.Q<Label>("CurrentShaderLabel");
         }
