@@ -21,7 +21,7 @@ namespace Materiator
 
         public VisualElement Root;
 
-        private UVInspector _uvInspector;
+        public UVInspector UVInspector;
 
         public AtlasSection AtlasSection;
         public PresetSection PresetSection;
@@ -38,7 +38,7 @@ namespace Materiator
 
             if (Initialize())
             {
-                _uvInspector = new UVInspector(MateriaSetter, Root);
+                UVInspector = new UVInspector(MateriaSetter, Root);
 
                 AtlasSection = new AtlasSection(this);
                 PresetSection = new PresetSection(this);
@@ -88,7 +88,7 @@ namespace Materiator
         private void Refresh()
         {
             MateriaSetter.Refresh();
-            _uvInspector.DrawUVInspector(true);
+            UVInspector.DrawUVInspector(true);
         }
 
         public void ResetMateriaSetter()
@@ -118,7 +118,7 @@ namespace Materiator
                 }  
             }
 
-            _uvInspector.DrawUVInspector(true);
+            UVInspector.DrawUVInspector(true);
 
             serializedObject.ApplyModifiedProperties();
 
@@ -172,12 +172,12 @@ namespace Materiator
 
         private void RegisterCallbacks()
         {
-            PresetSection.OnPresetLoaded += () => _uvInspector.DrawUVInspector(true);
+            PresetSection.OnPresetLoaded += () => UVInspector.DrawUVInspector(true);
         }
 
         private void UnregisterCallbacks()
         {
-            PresetSection.OnPresetLoaded -= () => _uvInspector.DrawUVInspector(true);
+            PresetSection.OnPresetLoaded -= () => UVInspector.DrawUVInspector(true);
         }
 
         protected override void GetProperties()
