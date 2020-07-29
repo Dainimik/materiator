@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -19,32 +18,19 @@ namespace Materiator
         public Action<bool> OnDirtyChanged;
         public Action OnMateriaSetterUpdated;
 
-        #region Serialized Properties
-
         public SerializedProperty EditMode;
         public SerializedProperty IsDirty;
-        private SerializedProperty _materiaAtlas;
-        
         public SerializedProperty Material;
 
-        #endregion
-
-        private ObjectField _materiaAtlasObjectField;
-        
-
         private Button _reloadButton;
-        private Button _switchEditModeButton;
         
-
-        private VisualElement _atlasIndicator;
-        
-
         private VisualElement _IMGUIContainer;
 
         public VisualElement Root;
 
         private UVInspector _uvInspector;
 
+        public AtlasSection AtlasSection;
         public PresetSection PresetSection;
         public DataSection DataSection;
         public OutputSection OutputSection;
@@ -61,7 +47,7 @@ namespace Materiator
             {
                 _uvInspector = new UVInspector(MateriaSetter, Root);
 
-                DrawAtlasSection();
+                AtlasSection = new AtlasSection(this);
                 PresetSection = new PresetSection(this);
                 DataSection = new DataSection(this);
                 OutputSection = new OutputSection(this);
@@ -140,18 +126,6 @@ namespace Materiator
             OnDirtyChanged?.Invoke(value);
         }
 
-        private void SwitchEditMode()
-        {
-            if (MateriaSetter.EditMode == Materiator.EditMode.Native)
-            {
-                LoadAtlas(MateriaSetter.MateriaSetterData.MateriaAtlas);
-            }
-            else if (MateriaSetter.EditMode == Materiator.EditMode.Atlas)
-            {
-                UnloadAtlas();
-            }
-        }
-
         private void DrawIMGUI()
         {
             IMGUIContainer defaultInspector = new IMGUIContainer(() => IMGUI());
@@ -166,33 +140,6 @@ namespace Materiator
         private void IMGUI()
         {
             DrawDefaultInspector();
-        }
-
-        private void DrawAtlasSection()
-        {
-            OnMateriaAtlasChanged();
-
-            _materiaAtlasObjectField.RegisterCallback<ChangeEvent<UnityEngine.Object>>(e =>
-            {
-                OnMateriaAtlasChanged();
-            });
-        }
-
-        public void LoadAtlas(MateriaAtlas atlas)
-        {
-            if (atlas != null)
-            {
-                MateriaSetter.MateriaSlots = MateriaSetter.MateriaSetterData.MateriaSlots;
-
-                MateriaSetter.LoadAtlas(atlas);
-            }
-
-            SetMateriaSetterDirty(false);
-        }
-
-        public void UnloadAtlas()
-        {
-            MateriaSetter.UnloadAtlas();
         }
 
         private void MateriaReorderableList()
@@ -378,36 +325,6 @@ namespace Materiator
             }
         }
 
-        private void OnMateriaAtlasChanged()
-        {
-            if (MateriaSetter.MateriaSetterData != null)
-            {
-                if (MateriaSetter.MateriaAtlas != null)
-                {
-                    _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIGreen;
-                }
-                else
-                {
-                    _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
-                }
-            }
-            else
-            {
-                _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
-            }
-
-            if (MateriaSetter.MateriaAtlas == null)
-            {
-                _switchEditModeButton.SetEnabled(false);
-            }
-            else
-            {
-                _switchEditModeButton.SetEnabled(true);
-            }
-
-            _switchEditModeButton.text = EditMode.enumNames[EditMode.enumValueIndex] + " Mode";
-        }
-
         private void RegisterCallbacks()
         {
             PresetSection.OnPresetLoaded += () => _uvInspector.DrawUVInspector(true);
@@ -422,30 +339,16 @@ namespace Materiator
         {
             EditMode = serializedObject.FindProperty("EditMode");
             IsDirty = serializedObject.FindProperty("IsDirty");
-            _materiaAtlas = serializedObject.FindProperty("MateriaAtlas");
             Material = serializedObject.FindProperty("Material");
 
-            _materiaAtlasObjectField = root.Q<ObjectField>("MateriaAtlasObjectField");
-            _materiaAtlasObjectField.objectType = typeof(MateriaAtlas);
-            _materiaAtlasObjectField.SetEnabled(false);
-
             _reloadButton = root.Q<Button>("ReloadButton");
-            _switchEditModeButton = root.Q<Button>("SwitchEditMode");
-
-            _atlasIndicator = root.Q<VisualElement>("AtlasIndicator");
 
             _IMGUIContainer = root.Q<VisualElement>("IMGUIContainer");
-        }
-
-        protected override void BindProperties()
-        {
-            _materiaAtlasObjectField.BindProperty(_materiaAtlas);
         }
 
         protected override void RegisterButtons()
         {
             _reloadButton.clicked += Refresh;
-            _switchEditModeButton.clicked += SwitchEditMode;
         }
     }
 }

@@ -95,12 +95,12 @@ namespace Materiator
                 {
                     if (data.MateriaAtlas != null)
                     {
-                        _editor.LoadAtlas(data.MateriaAtlas);
+                        _editor.AtlasSection.LoadAtlas(data.MateriaAtlas);
                         _materiaSetter.AnalyzeMesh(); // not sure why this is needed here
                     }
                     else
                     {
-                        _editor.UnloadAtlas();
+                        _editor.AtlasSection.UnloadAtlas();
                     }
                 }
 
