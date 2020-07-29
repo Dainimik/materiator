@@ -35,13 +35,9 @@ namespace Materiator
         private Button _reloadButton;
         private Button _switchEditModeButton;
         private Button _reloadMateriaPresetButton;
-        
-        private Button _overwriteMateriaSetterData;
-        private Button _saveAsNewMateriaSetterData;
 
         private VisualElement _atlasIndicator;
         private VisualElement _presetIndicator;
-        private VisualElement _outputIndicator;
         
 
         private VisualElement _IMGUIContainer;
@@ -51,6 +47,7 @@ namespace Materiator
         private UVInspector _uvInspector;
 
         public DataSection DataSection;
+        public OutputSection OutputSection;
 
         private void OnEnable()
         {
@@ -67,7 +64,8 @@ namespace Materiator
                 DrawAtlasSection();
                 DrawPresetSection();
                 DataSection = new DataSection(this);
-                DrawOutputSection();
+                OutputSection = new OutputSection(this);
+
                 DrawIMGUI();
             }
         }
@@ -163,15 +161,6 @@ namespace Materiator
 
         private void IMGUI()
         {
-            if (IsDirty.boolValue == true)
-            {
-                _outputIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
-            }
-            else
-            {
-                _outputIndicator.style.backgroundColor = SystemData.Settings.GUIGreen;
-            }
-
             DrawDefaultInspector();
         }
 
@@ -193,18 +182,6 @@ namespace Materiator
             {
                 OnMateriaPresetChanged();
             });
-        }
-
-        private void DrawOutputSection()
-        {
-            if (DataSection.MateriaSetterData.objectReferenceValue == null)
-            {
-                _overwriteMateriaSetterData.SetEnabled(false);
-            }
-            else
-            {
-                _overwriteMateriaSetterData.SetEnabled(true);
-            }
         }
 
         public void LoadAtlas(MateriaAtlas atlas)
@@ -530,23 +507,6 @@ namespace Materiator
             return same;
         }
 
-        private void OverwriteMateriaSetterData()
-        {
-            if (EditorUtility.DisplayDialog("Overwrite current data?", "Are you sure you want to overwrite " +  DataSection.MateriaSetterData.objectReferenceValue.name + " with current settings?", "Yes", "No"))
-            {
-                MateriaDataFactory.WriteAssetsToDisk(this, AssetDatabase.GetAssetPath(MateriaSetter.MateriaSetterData), SystemData.Settings.PackAssets);
-                
-            }
-        }
-        private void SaveAsNewMateriaSetterData()
-        {
-            var path = EditorUtility.SaveFilePanelInProject("Save data", MateriaSetter.gameObject.name, "asset", "asset");
-            if (path.Length != 0)
-            {
-                MateriaDataFactory.WriteAssetsToDisk(this, path, SystemData.Settings.PackAssets);
-            }    
-        }
-
         protected override void GetProperties()
         {
             EditMode = serializedObject.FindProperty("EditMode");
@@ -564,12 +524,9 @@ namespace Materiator
             _reloadButton = root.Q<Button>("ReloadButton");
             _switchEditModeButton = root.Q<Button>("SwitchEditMode");
             _reloadMateriaPresetButton = root.Q<Button>("ReloadMateriaPresetButton");
-            _overwriteMateriaSetterData = root.Q<Button>("OverwriteMateriaSetterDataButton");
-            _saveAsNewMateriaSetterData = root.Q<Button>("SaveAsNewMateriaSetterDataButton");
 
             _atlasIndicator = root.Q<VisualElement>("AtlasIndicator");
             _presetIndicator = root.Q<VisualElement>("PresetIndicator");
-            _outputIndicator = root.Q<VisualElement>("OutputIndicator");
 
             _IMGUIContainer = root.Q<VisualElement>("IMGUIContainer");
         }
@@ -585,8 +542,6 @@ namespace Materiator
             _reloadButton.clicked += Refresh;
             _switchEditModeButton.clicked += SwitchEditMode;
             _reloadMateriaPresetButton.clicked += ReloadPreset;
-            _overwriteMateriaSetterData.clicked += OverwriteMateriaSetterData;
-            _saveAsNewMateriaSetterData.clicked += SaveAsNewMateriaSetterData;
         }
     }
 }
