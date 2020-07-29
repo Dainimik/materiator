@@ -23,6 +23,8 @@ namespace Materiator
 
         public VisualElement _dataIndicator;
 
+        private MateriaSection _materiaSection;
+
         public DataSection(MateriaSetterEditor editor)
         {
             _editor = editor;
@@ -41,6 +43,8 @@ namespace Materiator
             {
                 _editor.SetMateriaSetterDirty(true);
             }
+
+            _materiaSection = new MateriaSection(_editor);
         }
 
         private void SetReloadDataButtonState(MateriaSetterData data)
