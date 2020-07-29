@@ -62,7 +62,6 @@ namespace Materiator
                 fields[i].SetValue(this, null);
 
             Initialize();
-            IsDirty = true;
         }
 
         public void GetMeshReferences()
