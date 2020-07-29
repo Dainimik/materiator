@@ -17,27 +17,26 @@ namespace Materiator
         private ReorderableList _materiaReorderableList;
 
         public Action<bool> OnDirtyChanged;
+        public Action OnMateriaSetterUpdated;
 
         #region Serialized Properties
 
         public SerializedProperty EditMode;
         public SerializedProperty IsDirty;
         private SerializedProperty _materiaAtlas;
-        public SerializedProperty MateriaPreset;
         
         public SerializedProperty Material;
 
         #endregion
 
         private ObjectField _materiaAtlasObjectField;
-        private ObjectField _materiaPresetObjectField;
+        
 
         private Button _reloadButton;
         private Button _switchEditModeButton;
-        private Button _reloadMateriaPresetButton;
+        
 
         private VisualElement _atlasIndicator;
-        private VisualElement _presetIndicator;
         
 
         private VisualElement _IMGUIContainer;
@@ -46,6 +45,7 @@ namespace Materiator
 
         private UVInspector _uvInspector;
 
+        public PresetSection PresetSection;
         public DataSection DataSection;
         public OutputSection OutputSection;
 
@@ -62,17 +62,21 @@ namespace Materiator
                 _uvInspector = new UVInspector(MateriaSetter, Root);
 
                 DrawAtlasSection();
-                DrawPresetSection();
+                PresetSection = new PresetSection(this);
                 DataSection = new DataSection(this);
                 OutputSection = new OutputSection(this);
 
                 DrawIMGUI();
+
+                RegisterCallbacks();
             }
         }
 
         private void OnDisable()
         {
             MateriaSetter = (MateriaSetter)target;
+
+            UnregisterCallbacks();
         }
 
         public override VisualElement CreateInspectorGUI()
@@ -174,16 +178,6 @@ namespace Materiator
             });
         }
 
-        private void DrawPresetSection()
-        {
-            OnMateriaPresetChanged();
-
-            _materiaPresetObjectField.RegisterCallback<ChangeEvent<UnityEngine.Object>>(e =>
-            {
-                OnMateriaPresetChanged();
-            });
-        }
-
         public void LoadAtlas(MateriaAtlas atlas)
         {
             if (atlas != null)
@@ -199,41 +193,6 @@ namespace Materiator
         public void UnloadAtlas()
         {
             MateriaSetter.UnloadAtlas();
-        }
-
-        private void LoadPreset(MateriaPreset preset)
-        {
-            List<MateriaSlot> materiaSlots;
-            if (MateriaSetter.MateriaSetterData != null)
-            {
-                materiaSlots = MateriaSetter.MateriaSetterData.MateriaSlots;
-            }
-            else
-            {
-                materiaSlots = MateriaSetter.MateriaSlots;
-            }
-            var same = AreMateriasSameAsPreset(preset, MateriaSetter.MateriaSlots);
-
-            if (!same)
-            {
-                SetMateriaSetterDirty(true);
-
-                if (preset != null)
-                {
-                    _reloadMateriaPresetButton.visible = true;
-                    MateriaSetter.LoadPreset(preset);
-                }
-                else
-                {
-                    _reloadMateriaPresetButton.visible = false;
-                    MateriaSetter.LoadPreset(null);
-                }
-                serializedObject.Update();
-
-                MateriaSetter.UpdateColorsOfAllTextures();
-            }
-
-            _uvInspector.DrawUVInspector(true);
         }
 
         private void MateriaReorderableList()
@@ -291,6 +250,7 @@ namespace Materiator
                     Undo.RegisterCompleteObjectUndo(MateriaSetter, "Change Materia Tag");
                     MateriaSetter.MateriaSlots[index].Tag = newTag;
                     serializedObject.Update();
+                    OnMateriaSetterUpdated?.Invoke();
                 }
 
                 EditorGUI.BeginChangeCheck();
@@ -311,6 +271,7 @@ namespace Materiator
                     MateriaSetter.UpdateColorsOfAllTextures();
 
                     serializedObject.ApplyModifiedProperties();
+                    OnMateriaSetterUpdated?.Invoke();
                     //_emissionInUse = IsEmissionInUse(_materiaSetter.Materia);
                 }
 
@@ -417,13 +378,6 @@ namespace Materiator
             }
         }
 
-        private void ReloadPreset()
-        {
-            LoadPreset((MateriaPreset)_materiaPresetObjectField.value);
-
-            OnMateriaPresetChanged();
-        }
-
         private void OnMateriaAtlasChanged()
         {
             if (MateriaSetter.MateriaSetterData != null)
@@ -454,57 +408,14 @@ namespace Materiator
             _switchEditModeButton.text = EditMode.enumNames[EditMode.enumValueIndex] + " Mode";
         }
 
-        private void OnMateriaPresetChanged()
+        private void RegisterCallbacks()
         {
-            if (_materiaPresetObjectField.value == null)
-            {
-                _reloadMateriaPresetButton.SetEnabled(false);
-                _presetIndicator.style.backgroundColor = SystemData.Settings.GUIGray;
-            }
-            else
-            {
-                _reloadMateriaPresetButton.SetEnabled(true);
-                
-                if (AreMateriasSameAsPreset((MateriaPreset)_materiaPresetObjectField.value, MateriaSetter.MateriaSlots))
-                {
-                    _presetIndicator.style.backgroundColor = SystemData.Settings.GUIGreen;
-                }
-                else
-                {
-                    _presetIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
-                }
-            }
+            PresetSection.OnPresetLoaded += () => _uvInspector.DrawUVInspector(true);
         }
 
-        private bool AreMateriasSameAsPreset(MateriaPreset preset, List<MateriaSlot> materiaSlots)
+        private void UnregisterCallbacks()
         {
-            var numberOfDifferentMateria = 0;
-
-            if (preset != null)
-            {
-                for (int i = 0; i < materiaSlots.Count; i++)
-                {
-                    for (int j = 0; j < preset.MateriaPresetItemList.Count; j++)
-                    {
-                        if (materiaSlots[i].Tag.Name == preset.MateriaPresetItemList[j].Tag.Name)
-                        {
-                            if (materiaSlots[i].Materia != preset.MateriaPresetItemList[j].Materia)
-                            {
-                                numberOfDifferentMateria++;
-                            }
-                        }
-                    }
-                }
-            }
-
-            var same = false;
-
-            if (numberOfDifferentMateria == 0)
-            {
-                same = true;
-            }
-
-            return same;
+            PresetSection.OnPresetLoaded -= () => _uvInspector.DrawUVInspector(true);
         }
 
         protected override void GetProperties()
@@ -512,21 +423,16 @@ namespace Materiator
             EditMode = serializedObject.FindProperty("EditMode");
             IsDirty = serializedObject.FindProperty("IsDirty");
             _materiaAtlas = serializedObject.FindProperty("MateriaAtlas");
-            MateriaPreset = serializedObject.FindProperty("MateriaPreset");
             Material = serializedObject.FindProperty("Material");
 
             _materiaAtlasObjectField = root.Q<ObjectField>("MateriaAtlasObjectField");
             _materiaAtlasObjectField.objectType = typeof(MateriaAtlas);
             _materiaAtlasObjectField.SetEnabled(false);
-            _materiaPresetObjectField = root.Q<ObjectField>("MateriaPresetObjectField");
-            _materiaPresetObjectField.objectType = typeof(MateriaPreset);
 
             _reloadButton = root.Q<Button>("ReloadButton");
             _switchEditModeButton = root.Q<Button>("SwitchEditMode");
-            _reloadMateriaPresetButton = root.Q<Button>("ReloadMateriaPresetButton");
 
             _atlasIndicator = root.Q<VisualElement>("AtlasIndicator");
-            _presetIndicator = root.Q<VisualElement>("PresetIndicator");
 
             _IMGUIContainer = root.Q<VisualElement>("IMGUIContainer");
         }
@@ -534,14 +440,12 @@ namespace Materiator
         protected override void BindProperties()
         {
             _materiaAtlasObjectField.BindProperty(_materiaAtlas);
-            _materiaPresetObjectField.BindProperty(MateriaPreset);
         }
 
         protected override void RegisterButtons()
         {
             _reloadButton.clicked += Refresh;
             _switchEditModeButton.clicked += SwitchEditMode;
-            _reloadMateriaPresetButton.clicked += ReloadPreset;
         }
     }
 }
