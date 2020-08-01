@@ -79,7 +79,7 @@ namespace Materiator
                         [ContextActions.Retry] = "Retry"
                     });
             }
-            else if (materiaSetter.MeshRenderer.sharedMaterials.Count() > 1)
+            else if (materiaSetter.Renderer.sharedMaterials.Count() > 1)
             {
                 return ErrorMessage(
                     editor,
