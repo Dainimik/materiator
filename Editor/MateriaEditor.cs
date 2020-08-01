@@ -39,6 +39,7 @@ namespace Materiator
             _materia = (Materia)target;
 
             SetUpPreview();
+            UpdatePreview(_previewMaterial);
 
             EditorUtils.GenerateMateriaPreviewIcons(_materia, _previewMaterial);
         }
