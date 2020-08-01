@@ -41,7 +41,7 @@ namespace Materiator
             SetUpPreview();
             UpdatePreview(_previewMaterial);
 
-            EditorUtils.GenerateMateriaPreviewIcons(_materia, _previewMaterial);
+            //EditorUtils.GenerateMateriaPreviewIcons(_materia, _previewMaterial);
         }
 
         private void OnDisable()
