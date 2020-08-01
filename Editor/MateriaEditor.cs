@@ -71,25 +71,11 @@ namespace Materiator
 
         private void DrawEmissionSection()
         {
-            if (_isEmissiveToggle.value)
-            {
-                _emissionColorField.SetEnabled(true);
-            }
-            else
-            {
-                _emissionColorField.SetEnabled(false);
-            }
+            _emissionColorField.SetEnabled(_isEmissiveToggle.value);
 
             _isEmissiveToggle.RegisterCallback<ChangeEvent<bool>>(e =>
             {
-                if (e.newValue)
-                {
-                    _emissionColorField.SetEnabled(true);
-                }
-                else
-                {
-                    _emissionColorField.SetEnabled(false);
-                }
+                _emissionColorField.SetEnabled(e.newValue);
 
                 OnValueChanged();
             });
@@ -123,24 +109,6 @@ namespace Materiator
             UpdatePreview(_previewMaterial);
             UpdateSceneMateriaSettersColors();
             UpdatePrefabMateriaSettersColors();
-        }
-
-        private void UpdatePreview(Material material)
-        {
-            material.SetColor(SystemData.Settings.DefaultShaderData.BaseColorPropertyName, _materia.BaseColor);
-            material.SetFloat("_Metallic", _materia.Metallic);
-            material.SetFloat("_Smoothness", _materia.Smoothness);
-            if (_materia.IsEmissive)
-            {
-                material.EnableKeyword(SystemData.Settings.DefaultShaderData.EmissionKeywordName);
-                //material.globalIlluminationFlags = SystemData.Settings.GlobalIlluminationFlag;
-                material.SetColor(SystemData.Settings.DefaultShaderData.EmissionColorPropertyName, _materia.EmissionColor);
-            }
-            else
-            {
-                material.DisableKeyword(SystemData.Settings.DefaultShaderData.EmissionKeywordName);
-                material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
-            }
         }
 
         private void UpdateSceneMateriaSettersColors()
@@ -190,6 +158,24 @@ namespace Materiator
             _previewMaterial = new Material(SystemData.Settings.DefaultShaderData.Shader);
 
             _drag = new Vector2(35f, 35f);
+        }
+
+        private void UpdatePreview(Material material)
+        {
+            material.SetColor(SystemData.Settings.DefaultShaderData.BaseColorPropertyName, _materia.BaseColor);
+            material.SetFloat("_Metallic", _materia.Metallic);
+            material.SetFloat("_Smoothness", _materia.Smoothness);
+            if (_materia.IsEmissive)
+            {
+                material.EnableKeyword(SystemData.Settings.DefaultShaderData.EmissionKeywordName);
+                //material.globalIlluminationFlags = SystemData.Settings.GlobalIlluminationFlag;
+                material.SetColor(SystemData.Settings.DefaultShaderData.EmissionColorPropertyName, _materia.EmissionColor);
+            }
+            else
+            {
+                material.DisableKeyword(SystemData.Settings.DefaultShaderData.EmissionKeywordName);
+                material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
+            }
         }
 
         public override void OnPreviewGUI(Rect r, GUIStyle background)
