@@ -57,17 +57,11 @@ namespace Materiator
         {
             InitializeEditor<Materia>();
 
-            _baseColorField.RegisterCallback<ChangeEvent<Color>>(e =>
-            {
-                OnValueChanged();
-            });
-
             DrawEmissionSection();
 
-            _emissionColorField.RegisterCallback<ChangeEvent<Color>>(e =>
-            {
-                OnValueChanged();
-            });
+            _baseColorField.RegisterCallback<ChangeEvent<Color>>(e => OnValueChanged());
+            _isEmissiveToggle.RegisterCallback<ChangeEvent<bool>>(e => OnValueChanged());
+            _emissionColorField.RegisterCallback<ChangeEvent<Color>>(e => OnValueChanged());
 
             IMGUIContainer defaultInspector = new IMGUIContainer(() => IMGUI());
             _IMGUIContainer.Add(defaultInspector);
@@ -126,8 +120,27 @@ namespace Materiator
 
         private void OnValueChanged()
         {
+            UpdatePreview(_previewMaterial);
             UpdateSceneMateriaSettersColors();
             UpdatePrefabMateriaSettersColors();
+        }
+
+        private void UpdatePreview(Material material)
+        {
+            material.SetColor(SystemData.Settings.DefaultShaderData.BaseColorPropertyName, _materia.BaseColor);
+            material.SetFloat("_Metallic", _materia.Metallic);
+            material.SetFloat("_Smoothness", _materia.Smoothness);
+            if (_materia.IsEmissive)
+            {
+                material.EnableKeyword(SystemData.Settings.DefaultShaderData.EmissionKeywordName);
+                //material.globalIlluminationFlags = SystemData.Settings.GlobalIlluminationFlag;
+                material.SetColor(SystemData.Settings.DefaultShaderData.EmissionColorPropertyName, _materia.EmissionColor);
+            }
+            else
+            {
+                material.DisableKeyword(SystemData.Settings.DefaultShaderData.EmissionKeywordName);
+                material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
+            }
         }
 
         private void UpdateSceneMateriaSettersColors()
@@ -229,6 +242,7 @@ namespace Materiator
                 _previewRenderUtility.lights[0].color = Color.white;
                 _previewRenderUtility.lights[0].intensity = 0.5f;
                 _previewRenderUtility.lights[1].intensity = 0.75f;
+                _previewRenderUtility.lights[1].transform.rotation = Quaternion.Euler(new Vector3(20f, -175f, 0f));
             }
         }
 #endregion
