@@ -62,5 +62,21 @@ namespace Materiator
 
             return rects;
         }
+
+        public static Vector2[] RemapUVs(Vector2[] uvs, Rect rectToRemapTo)
+        {
+            var remappedUVs = uvs;
+            for (var i = 0; i < remappedUVs.Length; i++)
+            {
+                var uv = remappedUVs[i];
+
+                uv.x = rectToRemapTo.x + (uv.x * rectToRemapTo.width);
+                uv.y = rectToRemapTo.y + (uv.y * rectToRemapTo.height);
+
+                remappedUVs[i] = uv;
+            }
+
+            return remappedUVs;
+        }
     }
 }
