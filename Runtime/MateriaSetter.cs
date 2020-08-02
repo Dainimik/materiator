@@ -234,7 +234,8 @@ namespace Materiator
                 Mesh = MateriaSetterData.AtlasedMesh;
                 MaterialData = atlas.MaterialData;
                 Material = atlas.Material;
-                Textures.Assign(atlas.Textures);
+                Textures = atlas.Textures;
+                //Textures.Assign(atlas.Textures);
 
                 GridSize = MateriaSetterData.AtlasedGridSize;
                 UVRect = MateriaSetterData.AtlasedUVRect;
@@ -256,7 +257,8 @@ namespace Materiator
             Mesh = MateriaSetterData.NativeMesh;
             MaterialData = MateriaSetterData.MaterialData;
             Material = MateriaSetterData.Material;
-            Textures.Assign(MateriaSetterData.Textures);
+            Textures = MateriaSetterData.Textures;
+            //Textures.Assign(MateriaSetterData.Textures);
 
             GridSize = MateriaSetterData.NativeGridSize;
             UVRect = SystemData.Settings.UVRect;
