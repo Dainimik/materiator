@@ -49,6 +49,11 @@ namespace Materiator
 
                 RegisterCallbacks();
             }
+
+            if (MateriaSetter.Textures.ID == 0)
+            {
+                MateriaSetter.Textures.ID = UnityEngine.Random.Range(-999999, 9999999);
+            }
         }
 
         private void DrawDefaultGUI()
@@ -127,24 +132,24 @@ namespace Materiator
 
         private void CreateEditModeData(int editMode)
         {
-            if (DataSection.MateriaSetterData.objectReferenceValue != null)
+            if (MateriaSetter.MateriaSetterData != null)
             {
                 var newTextures = new Textures();
 
-                Textures textures = null;
+                Textures sourceTextures = null;
 
                 if (editMode == 0)
                 {
-                    textures = MateriaSetter.MateriaSetterData.Textures;
+                    sourceTextures = MateriaSetter.MateriaSetterData.Textures;
                 }
                 else if (editMode == 1)
                 {
-                    textures = MateriaSetter.MateriaSetterData.MateriaAtlas.Textures;
+                    sourceTextures = MateriaSetter.MateriaSetterData.MateriaAtlas.Textures;
                 }
 
-                newTextures.CreateTextures(textures.Size.x, textures.Size.y);
+                newTextures.CreateTextures(sourceTextures.Size.x, sourceTextures.Size.y);
                 var mat = Instantiate(Material.objectReferenceValue);
-                newTextures.CopyPixelColors(textures, textures.Size, SystemData.Settings.UVRect, newTextures.Size, SystemData.Settings.UVRect);
+                newTextures.CopyPixelColors(sourceTextures, sourceTextures.Size, SystemData.Settings.UVRect, newTextures.Size, SystemData.Settings.UVRect);
 
                 if (name != null)
                     mat.name = name;
@@ -164,9 +169,9 @@ namespace Materiator
                 }
 
                 MateriaSetter.MateriaSlots = newMateriaSlots;
-                serializedObject.Update();
+                serializedObject.Update(); // Why are two updates here necessary?
                 MateriaSetter.UpdateRenderer();
-                serializedObject.Update();
+                serializedObject.Update(); // Why are two updates here necessary?
             }
         }
 
@@ -177,7 +182,8 @@ namespace Materiator
 
         private void UnregisterCallbacks()
         {
-            PresetSection.OnPresetLoaded -= () => UVInspector.DrawUVInspector(true);
+            if (UVInspector != null)
+                PresetSection.OnPresetLoaded -= () => UVInspector.DrawUVInspector(true);
         }
 
         protected override void GetProperties()

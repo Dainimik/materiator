@@ -47,9 +47,7 @@ namespace Materiator
             foreach (var ms in compatibleMateriaSetters)
             {
                 if (ms.MateriaSetterData.MateriaAtlas != null && !includeAllPrefabs)
-                {
                     continue;
-                }
 
                 var root = ms.transform.root;
                 var prefabGO = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GetAssetPath(root));
@@ -66,9 +64,7 @@ namespace Materiator
             foreach (var kvp in atlas.AtlasEntries)
             {
                 if (kvp.Value.MateriaSetterData == null)
-                {
                     nullSlotIndices.Add(kvp.Key);
-                }
             }
 
             var processedPrefabs = new HashSet<GameObject>();
@@ -94,30 +90,12 @@ namespace Materiator
                             //processedPrefabs.Add(nearestPrefabInstanceRoot);
 
                             if (ms[j].MateriaSetterData.MateriaAtlas != null && !includeAllPrefabs)
-                            {
                                 continue;
-                            }
 
                             var data = ms[j].MateriaSetterData;
 
-                            Mesh atlasedMesh;
-
-                            atlasedMesh = Utils.CopyMesh(ms[j].MateriaSetterData.NativeMesh);
-
-
-                            var remappedUVs = atlasedMesh.uv;
-
-                            for (var k = 0; k < remappedUVs.Length; k++)
-                            {
-                                var uv = remappedUVs[k];
-
-                                uv.x = rects[rectIndex].x + (uv.x * rects[rectIndex].width);
-                                uv.y = rects[rectIndex].y + (uv.y * rects[rectIndex].height);
-
-                                remappedUVs[k] = uv;
-                            }
-
-                            atlasedMesh.uv = remappedUVs;
+                            var atlasedMesh = Utils.CopyMesh(ms[j].MateriaSetterData.NativeMesh);
+                            atlasedMesh.uv = MeshAnalyzer.RemapUVs(atlasedMesh.uv, rects[rectIndex]);
 
                             var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.MateriaSetterData == data).FirstOrDefault();
                             if (nullSlotIndices.Count > 0)
@@ -130,9 +108,7 @@ namespace Materiator
                             else
                             {
                                 if (!atlas.AtlasEntries.ContainsKey(i))
-                                {
                                     atlas.AtlasEntries.Add(i, new MateriaAtlasEntry(prefabMS, data));
-                                }
                             }
 
                             atlas.MaterialData = group.Key;
@@ -150,10 +126,7 @@ namespace Materiator
 
 
                             if (data.AtlasedMesh != null)
-                            {
                                 AssetDatabase.RemoveObjectFromAsset(data.AtlasedMesh);
-
-                            }
 
                             AssetDatabase.AddObjectToAsset(atlasedMesh, data);
 
