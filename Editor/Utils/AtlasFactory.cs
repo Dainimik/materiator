@@ -102,14 +102,7 @@ namespace Materiator
 
                             Mesh atlasedMesh;
 
-                            if (data.AtlasedMesh != null)
-                            {
-                                atlasedMesh = data.AtlasedMesh;
-                            }
-                            else
-                            {
-                                atlasedMesh = Utils.CopyMesh(ms[j].MateriaSetterData.NativeMesh);
-                            }
+                            atlasedMesh = Utils.CopyMesh(ms[j].MateriaSetterData.NativeMesh);
 
 
                             var remappedUVs = atlasedMesh.uv;
