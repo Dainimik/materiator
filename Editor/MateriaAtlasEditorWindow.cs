@@ -116,9 +116,9 @@ namespace Materiator
 
                         item.UnloadAtlas(true);
 
-                        var kvpToRemove = item.MateriaSetterData.MateriaAtlas.AtlasEntries.Where(kvp => kvp.Value.MateriaSetter == item).FirstOrDefault().Key;
-                        item.MateriaSetterData.MateriaAtlas.AtlasEntries[kvpToRemove].MateriaSetter = null;
-                        item.MateriaSetterData.MateriaAtlas.AtlasEntries[kvpToRemove].MateriaSetterData = null;
+                        var atlasEntryIndex = item.MateriaSetterData.MateriaAtlas.AtlasEntries.Where(kvp => kvp.Value.MateriaSetter == item).FirstOrDefault().Key;
+                        item.MateriaSetterData.MateriaAtlas.AtlasEntries[atlasEntryIndex].MateriaSetter = null;
+                        item.MateriaSetterData.MateriaAtlas.AtlasEntries[atlasEntryIndex].MateriaSetterData = null;
 
                         itemData.MateriaAtlas = null;
 
