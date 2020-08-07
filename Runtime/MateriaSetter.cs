@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Materiator
 {
+    [DisallowMultipleComponent]
     public class MateriaSetter : MonoBehaviour
     {
         public bool IsDirty = true;
@@ -223,6 +224,7 @@ namespace Materiator
                             MateriaSlots[i].Materia = preset.MateriaPresetItemList[j].Materia;
         }
 
+        // Texture assigning needs to be figured out here
         public void LoadAtlas(MateriaAtlas atlas)
         {
             if (atlas != null)
@@ -234,8 +236,8 @@ namespace Materiator
                 Mesh = MateriaSetterData.AtlasedMesh;
                 MaterialData = atlas.MaterialData;
                 Material = atlas.Material;
-                Textures = atlas.Textures;
-                //Textures.Assign(atlas.Textures);
+                //Textures = atlas.Textures;
+                Textures.Assign(atlas.Textures);
 
                 GridSize = MateriaSetterData.AtlasedGridSize;
                 UVRect = MateriaSetterData.AtlasedUVRect;

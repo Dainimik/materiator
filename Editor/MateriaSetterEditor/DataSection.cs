@@ -88,12 +88,16 @@ namespace Materiator
             {
                 MateriaSetterData.objectReferenceValue = data;
                 _editor.serializedObject.ApplyModifiedProperties();
+                _editor.serializedObject.Update();
 
                 Utils.ShallowCopyFields(data, _materiaSetter);
+                _editor.serializedObject.ApplyModifiedProperties();
 
                 if (_editor.EditMode.enumValueIndex == 0)
                 {
                     _materiaSetter.Mesh = data.NativeMesh;
+                    //_materiaSetter.MateriaSlots = data.MateriaSlots;
+
                 }
                 else if (_editor.EditMode.enumValueIndex == 1)
                 {

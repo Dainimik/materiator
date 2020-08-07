@@ -12,7 +12,7 @@ namespace Materiator
             {
                 for (int r = 0; r < rects.Length; r++)
                 {
-                    if (rects[r].Contains(uvs[i]))
+                    if (rects[r].Contains(uvs[i])) // If uv points are outside a rect, it will return false, even if face or edge of those points fall inside the rect!!!
                     {
                         if (!filteredRects.ContainsKey(r))
                         {

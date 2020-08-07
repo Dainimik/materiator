@@ -16,9 +16,10 @@ namespace Materiator
         public Texture2D Color;
         public Texture2D MetallicSmoothness;
         public Texture2D Emission;
+        public int ID;
 
         public FilterMode FilterMode { get; private set; }
-
+                                      
         public string[] Names
         {
             get
