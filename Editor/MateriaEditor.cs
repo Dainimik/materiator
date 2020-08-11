@@ -133,7 +133,7 @@ namespace Materiator
                 return propertyHeight + spacing;
             };
 
-            _materiaPropertyList.onAddCallback = (ReorderableList list) =>
+            /*_materiaPropertyList.onAddCallback = (ReorderableList list) =>
             {
                 var index = list.serializedProperty.arraySize;
                 list.serializedProperty.arraySize++;
@@ -141,7 +141,7 @@ namespace Materiator
                 var element = list.serializedProperty.GetArrayElementAtIndex(index);
                 serializedObject.ApplyModifiedProperties();
                 serializedObject.Update();
-            };
+            };*/
         }
 
         public override Texture2D RenderStaticPreview(string assetPath, UnityEngine.Object[] subAssets, int width, int height)
@@ -205,24 +205,28 @@ namespace Materiator
         #region Preview
         private void SetUpPreview()
         {
-            _previewMesh = AssetUtils.LoadAssetFromUniqueAssetPath<Mesh>("Library/unity default resources::Sphere");
-            _previewMaterial = new Material(_materia.ShaderData.Shader);
+            if (_materia.ShaderData)
+            {
+                _previewMesh = AssetUtils.LoadAssetFromUniqueAssetPath<Mesh>("Library/unity default resources::Sphere");
+                _previewMaterial = new Material(_materia.ShaderData.Shader);
+                _previewTextures = new Textures();
 
-            _previewTextures = new Textures();
-            _previewTextures.CreateTextures(_materia.ShaderData.Properties, 4, 4);
-
-            _drag = new Vector2(35f, 35f);
+                _drag = new Vector2(35f, 35f);
+            }
         }
 
         private void UpdatePreview(Material material)
         {
-            
-            foreach (var item in _previewTextures.Texs)
+            if (_materia.ShaderData)
             {
-                Debug.Log(item.Key + "        " + item.Value);
+                if (_previewTextures.Texs.Count != _materia.Properties.Count)
+                {
+                    _previewTextures.CreateTextures(_materia.Properties, 4, 4);
+                    _previewTextures.SetTexturesToMaterial(_previewMaterial, _materia.ShaderData);
+                }
+
+                _previewTextures.UpdateColor(new Vector2Int(4, 4), _materia.Properties);
             }
-            
-            _previewTextures.SetTexturesToMaterial(_previewMaterial, _materia.ShaderData);
         }
 
         public override void OnPreviewGUI(Rect r, GUIStyle background)

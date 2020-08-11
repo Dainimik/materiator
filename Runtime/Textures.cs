@@ -138,6 +138,54 @@ namespace Materiator
             Apply();
         }
 
+        // TODO: This function is a modified copy!!! Merge with original!
+        public void UpdateColor(Vector2Int gridSize, List<ShaderProperty> shaderProperties)
+        {
+            var rectInt = Utils.GetRectIntFromRect(gridSize, SystemData.Settings.UVRect);
+            var numberOfColors = rectInt.width * rectInt.height;
+
+            var colors = new Dictionary<Texture2D, Color32[]>();
+            foreach (var tex in Texs)
+            {
+                colors.Add(tex.Value, new Color32[numberOfColors]);
+
+                for (int i = 0; i < numberOfColors; i++)
+                {
+                    foreach (var prop in shaderProperties)
+                    {
+                        if (prop.GetType() == typeof(ColorShaderProperty))
+                        {
+                            var colorProp = (ColorShaderProperty)prop;
+                            if (colorProp.Name == tex.Key)
+                            {
+                                colors[tex.Value][i] = colorProp.Value;
+                            }
+                        }
+                        else if (prop.GetType() == typeof(FloatShaderProperty))
+                        {
+                            var floatProp = (FloatShaderProperty)prop;
+                            if (floatProp.Name == tex.Key)
+                            {
+                                var r = (byte)(floatProp.R * 255);
+                                var g = (byte)(floatProp.G * 255);
+                                var b = (byte)(floatProp.B * 255);
+                                var a = (byte)(floatProp.A * 255);
+
+                                colors[tex.Value][i].r = r;
+                                colors[tex.Value][i].g = g;
+                                colors[tex.Value][i].b = b;
+                                colors[tex.Value][i].a = a;
+                            }
+                        }
+                    }
+                }
+
+                tex.Value.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, colors[tex.Value]);
+            }
+
+            Apply();
+        }
+
         private Texture2D CreateTexture2D(int x, int y, TextureFormat textureFormat, FilterMode filterMode, Color? color = null)
         {
             var tex = new Texture2D(x, y, textureFormat, false);
