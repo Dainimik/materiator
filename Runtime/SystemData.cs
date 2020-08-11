@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -62,12 +63,12 @@ namespace Materiator
             var renderPipelineType = RenderPipelineUtils.GetActivePipelineType();
             if (renderPipelineType == RenderPipelineUtils.PipelineType.Universal)
             {
-                //_settings.DefaultShaderData = AssetDatabase.LoadAssetAtPath<ShaderData>(shaderDataPath + "Lit_UniversalRenderPipeline");
+                //_settings.DefaultShaderData = AssetDatabase.LoadAssetAtPath<ShaderData>(shaderDataPath + "Universal_Render_Pipeline_Lit");
                 _settings.DefaultShaderData = shaderDatas.Where(sd => sd.Shader == Shader.Find("Universal Render Pipeline/Lit")).FirstOrDefault();
             }
             else if (renderPipelineType == RenderPipelineUtils.PipelineType.BuiltIn)
             {
-                _settings.DefaultShaderData = AssetDatabase.LoadAssetAtPath<ShaderData>(shaderDataPath + "Standard_BuiltInRenderPipeline.asset");
+                //_settings.DefaultShaderData = AssetDatabase.LoadAssetAtPath<ShaderData>(shaderDataPath + "Standard_BuiltInRenderPipeline.asset");
             }
 
             _settings.DefaultMateria = CreateDefaultMateria("DefaultMateria");
@@ -83,7 +84,9 @@ namespace Materiator
         {
             var materia = ScriptableObject.CreateInstance<Materia>();
             materia.name = name;
-            materia.BaseColor = Color.gray;
+
+            materia.ShaderData = _settings.DefaultShaderData;
+            materia.AddProperties(_settings.DefaultShaderData.Properties);
 
             AssetDatabase.AddObjectToAsset(materia, _settings);
 
@@ -92,30 +95,90 @@ namespace Materiator
 
         private static string CreateDefaultShaderDataAssets()
         {
-            CreateShaderData("Universal Render Pipeline/Lit", "_BaseColor", "_BaseMap", "_MetallicGlossMap", "_SpecGlossMap", "_EmissionColor", "_EmissionMap", "_METALLICSPECGLOSSMAP", "_EMISSION", "Lit_UniversalRenderPipeline");
-            CreateShaderData("Universal Render Pipeline/Simple Lit", "_BaseColor", "_BaseMap", null, "_SpecGlossMap", "_EmissionColor", "_EmissionMap", "_METALLICSPECGLOSSMAP", "_EMISSION", "SimpleLit_UniversalRenderPipeline");
-            CreateShaderData("Standard", "_Color", "_MainTex", "_MetallicGlossMap", null, "_EmissionColor", "_EmissionMap", "_METALLICGLOSSMAP", "_EMISSION", "Standard_BuiltInRenderPipeline");
-            CreateShaderData("Standard (Specular setup)", "_Color", "_MainTex", null, "_SpecGlossMap", "_EmissionColor", "_EmissionMap", "_METALLICGLOSSMAP", "_EMISSION", "StandardSpecular_BuiltInRenderPipeline");
+            var defaultFloatValues = new Vector4(0f, 0f, 0f, 0f);
+            var valueNames = new string[] { "Metallic", "", "", "Smoothness" };
+
+            CreateShaderData(
+                Shader.Find("Universal Render Pipeline/Lit"),
+                new List<ShaderProperty>
+                {
+                    new ColorShaderProperty("_BaseMap"),
+                    new FloatShaderProperty("_MetallicGlossMap", defaultFloatValues, valueNames), // Combine into one
+                    new FloatShaderProperty("_SpecGlossMap", defaultFloatValues, valueNames), // Combine into one
+                    new ColorShaderProperty("_EmissionMap")
+                },
+                new List<string>
+                {
+                    "_METALLICSPECGLOSSMAP",
+                    "_EMISSION"
+                });
+
+            CreateShaderData(
+                Shader.Find("Universal Render Pipeline/Simple Lit"),
+                new List<ShaderProperty>
+                {
+                    new ColorShaderProperty("_BaseMap"),
+                    new FloatShaderProperty("_SpecGlossMap", defaultFloatValues, valueNames),
+                    new ColorShaderProperty("_EmissionMap")
+                },
+                new List<string>
+                {
+                    "_METALLICSPECGLOSSMAP",
+                    "_EMISSION"
+                });
+
+            CreateShaderData(
+                Shader.Find("Standard"),
+                new List<ShaderProperty>
+                {
+                    new ColorShaderProperty("_MainTex"),
+                    new FloatShaderProperty("_MetallicGlossMap", defaultFloatValues, valueNames),
+                    new ColorShaderProperty("_EmissionMap")
+                },
+                new List<string>
+                {
+                    "_METALLICGLOSSMAP",
+                    "_EMISSION"
+                });
+
+            CreateShaderData(
+                Shader.Find("Standard (Specular setup)"),
+                new List<ShaderProperty>
+                {
+                    new ColorShaderProperty("_MainTex"),
+                    new FloatShaderProperty("_SpecGlossMap", defaultFloatValues, valueNames),
+                    new ColorShaderProperty("_EmissionMap")
+                },
+                new List<string>
+                {
+                    "_METALLICGLOSSMAP",
+                    "_EMISSION"
+                });
 
             AssetDatabase.SaveAssets();
 
             return AssetDatabase.GetAssetPath(_settings);
         }
 
-        private static void CreateShaderData(string shaderName, string mainColorPropertyName, string mainTexturePropertyName, string metallicSmoothnessTexturePropertyName, string specularGlossTExturePropertyName, string emissionColorPropertyName, string emissionTexturePropertyName, string metallicSmoothnessKeywordName, string emissionKeywordName, string shaderDataName)
+        private static void CreateShaderData(Shader shader, List<ShaderProperty> properties, List<string> keywords)
         {
             var shaderData = ScriptableObject.CreateInstance<ShaderData>();
-            shaderData.name = shaderDataName;
+            shaderData.name = shader.name;
+            shaderData.name.Replace(' ', '_');
+            shaderData.name.Replace('/', '_');
 
-            shaderData.Shader = Shader.Find(shaderName);
-            shaderData.BaseColorPropertyName = mainColorPropertyName;
-            shaderData.MainTexturePropertyName = mainTexturePropertyName;
-            shaderData.MetallicSmoothnessTexturePropertyName = metallicSmoothnessTexturePropertyName;
-            shaderData.SpecularGlossTexturePropertyName = specularGlossTExturePropertyName;
-            shaderData.EmissionColorPropertyName = emissionColorPropertyName;
-            shaderData.EmissionTexturePropertyName = emissionTexturePropertyName;
-            shaderData.MetallicSmoothnessKeywordName = metallicSmoothnessKeywordName;
-            shaderData.EmissionKeywordName = emissionKeywordName;
+            shaderData.Shader = shader;
+
+            foreach (var prop in properties)
+            {
+                shaderData.Properties.Add(prop);
+            }
+
+            foreach (var kw in keywords)
+            {
+                shaderData.Keywords.Add(kw);
+            }
+
             shaderData.IsEditable = false;
 
             AssetDatabase.AddObjectToAsset(shaderData, _settings);

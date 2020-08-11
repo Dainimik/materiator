@@ -343,7 +343,7 @@ namespace Materiator
             if (EditorUtility.DisplayDialog("Overwrite current atlas?", "Are you sure you want to overwrite " + _atlasObjectField.value.name + " with current settings?", "Yes", "No"))
             {
                 var kvp = new KeyValuePair<MaterialData, List<MateriaSetter>>(_atlas.MaterialData, _compatibleMateriaSetters);
-                AtlasFactory.CreateAtlas(kvp, kvp.Key.Material, AssetDatabase.GetAssetPath(_atlas), _atlas);
+                AtlasFactory.CreateAtlas(kvp, kvp.Key, AssetDatabase.GetAssetPath(_atlas), _atlas);
             }
         }
 
@@ -355,7 +355,7 @@ namespace Materiator
                 var i = 0;
                 foreach (var kvp in _groupsList)
                 {
-                    AtlasFactory.CreateAtlas(kvp, _materialDataMaterialGroups[kvp.Key], path, null);
+                    //AtlasFactory.CreateAtlas(kvp, _materialDataMaterialGroups[kvp.Key], path, null);
                     i++;
                 }
             }

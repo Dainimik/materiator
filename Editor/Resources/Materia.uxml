@@ -2,19 +2,16 @@
     <ui:Label text="Materia" class="title-header">
         <Style src="Materiator.uss" />
     </ui:Label>
-    <uie:ColorField label="Base Color" value="RGBA(0.000, 1.000, 1.000, 1.000)" name="BaseColorField">
+    <uie:ObjectField label="Shader Data" name="ShaderDataObjectField" allow-scene-objects="false">
         <Style src="Materiator.uss" />
-    </uie:ColorField>
+    </uie:ObjectField>
     <ui:VisualElement name="IMGUIContainer" style="margin-left: 3px; margin-top: 3px; margin-bottom: 3px;">
         <Style src="Materiator.uss" />
     </ui:VisualElement>
-    <ui:Toggle label="Is Emissive" name="IsEmissiveToggle">
-        <Style src="Materiator.uss" />
-    </ui:Toggle>
-    <uie:ColorField label="Emission Color" value="RGBA(0.000, 1.000, 1.000, 1.000)" name="EmissionColorField" show-alpha="false">
-        <Style src="Materiator.uss" />
-    </uie:ColorField>
     <ui:TextField picking-mode="Ignore" label="Description" multiline="true" name="DescriptionTextField" style="align-items: flex-start; flex-grow: 1;">
         <Style src="Materiator.uss" />
     </ui:TextField>
+    <ui:Button text="Create" name="CreateMateriaButton">
+        <Style src="Materiator.uss" />
+    </ui:Button>
 </ui:UXML>

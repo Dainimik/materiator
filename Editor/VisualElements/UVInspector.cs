@@ -70,24 +70,24 @@ namespace Materiator
 
                     if (_materiaSetter.FilteredRects.ContainsKey(i))
                     {
-                        Color color = SystemData.Settings.DefaultMateria.BaseColor;
+                        //Color color = SystemData.Settings.DefaultMateria.BaseColor;
                         switch (DisplayModeEnumField.value)
                         {
                             case UVDisplayMode.BaseColor:
-                                color = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.BaseColor;
+                                //color = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.BaseColor;
                                 break;
                             case UVDisplayMode.MetallicSpecularGlossSmoothness:
-                                var metallic = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.Metallic;
-                                var metallicColor = new Color(metallic, metallic, metallic, 1f);
-                                color = metallicColor;
+                                //var metallic = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.Metallic;
+                                //var metallicColor = new Color(metallic, metallic, metallic, 1f);
+                                //color = metallicColor;
                                 break;
                             case UVDisplayMode.EmissionColor:
-                                color = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.EmissionColor;
+                                //color = _materiaSetter.MateriaSlots.Where(ms => ms.ID == i).First().Materia.EmissionColor;
                                 break;
                         }
 
                         borderColor = Color.green;
-                        item.style.backgroundColor = color;
+                        //item.style.backgroundColor = color;
                         item.style.borderTopColor = borderColor;
                         item.style.borderBottomColor = borderColor;
                         item.style.borderLeftColor = borderColor;

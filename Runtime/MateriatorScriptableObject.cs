@@ -4,6 +4,7 @@ namespace Materiator
 {
     public abstract class MateriatorScriptableObject : ScriptableObject
     {
-        public string Description;
+        [SerializeField, TextArea(3, 0)]
+        private string _description;
     }
 }

@@ -58,19 +58,6 @@ namespace Materiator
 
                 Rect r = new Rect(rect.x, rect.y, 22f, 22f);
 
-                var color = elementMateria.BaseColor;
-                var emission = elementMateria.EmissionColor;
-
-                color.a = 255;
-                emission.a = 255;
-
-                if (elementMateria.IsEmissive)
-                {
-                    var texE = new Texture2D(4, 4);
-                    Rect texRE = new Rect(rect.x + 145f, rect.y, 20f, 20f);
-                    GUI.DrawTexture(texRE, texE, ScaleMode.StretchToFill, false, 0, emission, 0, 0);
-                }
-
                 var tex = new Texture2D(4, 4);
 
                 EditorGUI.LabelField(r, new GUIContent((elementID.intValue + 1).ToString()));
@@ -122,7 +109,7 @@ namespace Materiator
             {
                 var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(list.index).FindPropertyRelative("ID");
 
-                HandleMateriaSlotSelection(element.intValue, true);
+                //HandleMateriaSlotSelection(element.intValue, true);
             };
 
             _materiaReorderableList.onMouseUpCallback = (ReorderableList list) =>
@@ -130,7 +117,7 @@ namespace Materiator
                 var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(list.index).FindPropertyRelative("ID");
                 //if (Utils.Settings.HighlightMode == HighlightMode.WhileLMBHeld) Reload();
 
-                HandleMateriaSlotSelection(element.intValue, false);
+                //HandleMateriaSlotSelection(element.intValue, false);
 
             };
         }
@@ -138,7 +125,7 @@ namespace Materiator
         Texture2D _highlightedTexture;
         private void HandleMateriaSlotSelection(int index, bool selected)
         {
-            var originalTexture = _materiaSetter.Textures.Color;
+            /*var originalTexture = _materiaSetter.Textures.Color;
 
             if (_highlightedTexture == null)
             {
@@ -168,7 +155,7 @@ namespace Materiator
                 _highlightedTexture.Apply();
 
                 _materiaSetter.Renderer.sharedMaterial.SetTexture(_materiaSetter.MaterialData.ShaderData.MainTexturePropertyName, originalTexture);
-            }
+            }*/
         }
 
         private void GetProperties()

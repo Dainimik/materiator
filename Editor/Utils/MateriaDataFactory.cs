@@ -73,7 +73,7 @@ namespace Materiator
             else
             {
                 outputTextures = new Textures();
-                outputTextures.CreateTextures(materiaSetter.Textures.Size.x, materiaSetter.Textures.Size.y);
+                outputTextures.CreateTextures(materiaSetter.MaterialData.ShaderData.Properties, materiaSetter.Textures.Size.x, materiaSetter.Textures.Size.y);
 
                 material = Material.Instantiate(materiaSetter.Material); // I'm instantiating here because Unity can't add an object to asset if it is already a part of an asset
             }

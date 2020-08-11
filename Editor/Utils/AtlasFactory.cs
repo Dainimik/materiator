@@ -8,7 +8,7 @@ namespace Materiator
 {
     public static class AtlasFactory
     {
-        public static void CreateAtlas(KeyValuePair<MaterialData, List<MateriaSetter>> group, Material material, string path, MateriaAtlas existingAtlas = null)
+        public static void CreateAtlas(KeyValuePair<MaterialData, List<MateriaSetter>> group, MaterialData materialData, string path, MateriaAtlas existingAtlas = null)
         {
             var compatibleMateriaSettersCount = 0;
             var compatibleMateriaSetters = new List<MateriaSetter>();
@@ -36,7 +36,7 @@ namespace Materiator
 
             if (existingAtlas == null || existingAtlas.GridSize.x < atlasGridSize.x || existingAtlas.GridSize.y < atlasGridSize.y)
             {
-                atlas = CreateMateriaAtlasAsset(dir, atlasName, material, atlasGridSize);
+                //atlas = CreateMateriaAtlasAsset(dir, atlasName, materialData, atlasGridSize);
                 includeAllPrefabs = true;
             }
             else
@@ -114,16 +114,13 @@ namespace Materiator
                             atlas.MaterialData = group.Key;
                             atlas.GridSize = atlasGridSize;
 
-                            var baseCol = data.Textures.Color.GetPixels32();
-                            var metallic = data.Textures.MetallicSmoothness.GetPixels32();
-                            var emission = data.Textures.Emission.GetPixels32();
-
                             var rectInt = Utils.GetRectIntFromRect(atlasGridSize, rects[rectIndex]);
 
-                            atlas.Textures.Color.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, baseCol);
-                            atlas.Textures.MetallicSmoothness.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, metallic);
-                            atlas.Textures.Emission.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, emission);
-
+                            foreach (var tex in data.Textures.Texs)
+                            {
+                                var colors = tex.Value.GetPixels32();
+                                atlas.Textures.Texs.Where(t => t.Key == tex.Key).FirstOrDefault().Value.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, colors);
+                            }
 
                             if (data.AtlasedMesh != null)
                                 AssetDatabase.RemoveObjectFromAsset(data.AtlasedMesh);
@@ -186,7 +183,7 @@ namespace Materiator
         private static MateriaAtlas CreateMateriaAtlasAsset(string directory, string name, Material material, Vector2Int size)
         {
             var atlas = AssetUtils.CreateScriptableObjectAsset<MateriaAtlas>(directory, name);
-            atlas.Textures.CreateTextures(size.x, size.y);
+            //atlas.Textures.CreateTextures(size.x, size.y);
             atlas.Textures.SetNames(name);
             atlas.Material = UnityEngine.Object.Instantiate(material);
             atlas.Material.name = name;

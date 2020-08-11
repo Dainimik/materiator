@@ -127,7 +127,6 @@ namespace Materiator
 
         private void OnMaterialDataChanged(MaterialData materialData)
         {
-
             if (materialData.Material.shader != materialData.ShaderData.Shader)
                 materialData.Material.shader = materialData.ShaderData.Shader;
 

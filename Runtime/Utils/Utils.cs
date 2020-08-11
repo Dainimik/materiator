@@ -10,8 +10,8 @@ namespace Materiator
             if (name != null)
                 mat.name = name;
 
-            mat.SetColor(SystemData.Settings.DefaultShaderData.BaseColorPropertyName, Color.white);
-            mat.EnableKeyword(SystemData.Settings.DefaultShaderData.MetallicSmoothnessKeywordName);
+            //mat.SetColor(SystemData.Settings.DefaultShaderData.BaseColorPropertyName, Color.white);
+            //mat.EnableKeyword(SystemData.Settings.DefaultShaderData.MetallicSmoothnessKeywordName);
             return mat;
         }
 

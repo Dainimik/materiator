@@ -5,6 +5,7 @@ using UnityEngine.UIElements;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.SceneManagement;
 using System.Linq;
+using UnityEditorInternal;
 
 namespace Materiator
 {
@@ -16,21 +17,20 @@ namespace Materiator
 
         private VisualElement _IMGUIContainer;
 
-        private SerializedProperty _baseColor;
-        private SerializedProperty _metallic;
-        private SerializedProperty _smoothness;
-        private SerializedProperty _isEmissive;
-        private SerializedProperty _emissionColor;
+        private SerializedProperty _shaderData;
+
+        private ReorderableList _materiaPropertyList;
+
         private SerializedProperty _description;
 
-        private ColorField _baseColorField;
-        private Toggle _isEmissiveToggle;
-        private ColorField _emissionColorField;
+        private ObjectField _shaderDataObjectField;
         private TextField _descriptionTextField;
+        private Button _createMateriaButton;
 
         private PreviewRenderUtility _previewRenderUtility;
         private Mesh _previewMesh;
         private Material _previewMaterial;
+        private Textures _previewTextures;
         private Texture _previewTexture;
         private Vector2 _drag;
 
@@ -58,43 +58,93 @@ namespace Materiator
         {
             InitializeEditor<Materia>();
 
-            DrawEmissionSection();
-
-            _baseColorField.RegisterCallback<ChangeEvent<Color>>(e => OnValueChanged());
-            _isEmissiveToggle.RegisterCallback<ChangeEvent<bool>>(e => OnValueChanged());
-            _emissionColorField.RegisterCallback<ChangeEvent<Color>>(e => OnValueChanged());
+            _materiaPropertyList = new ReorderableList(serializedObject, serializedObject.FindProperty("Properties"), true, true, true, true);
+            SetUpList();
 
             IMGUIContainer defaultInspector = new IMGUIContainer(() => IMGUI());
             _IMGUIContainer.Add(defaultInspector);
 
-            return root;
-        }
-
-        private void DrawEmissionSection()
-        {
-            _emissionColorField.SetEnabled(_isEmissiveToggle.value);
-
-            _isEmissiveToggle.RegisterCallback<ChangeEvent<bool>>(e =>
+            // This should not be here
+            if (_materia.Properties.Count > 0)
             {
-                _emissionColorField.SetEnabled(e.newValue);
+                _shaderDataObjectField.SetEnabled(false);
+            }
 
-                OnValueChanged();
-            });
+            return root;
         }
 
         private void IMGUI()
         {
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(_metallic);
-            EditorGUILayout.PropertyField(_smoothness);
-            if (EditorGUI.EndChangeCheck())
-            {
-                serializedObject.ApplyModifiedProperties();
-                OnValueChanged();
-            }
+            serializedObject.Update();
+            
+            _materiaPropertyList.DoLayoutList();           
+
+            serializedObject.ApplyModifiedProperties();
         }
 
-        public override Texture2D RenderStaticPreview(string assetPath, Object[] subAssets, int width, int height)
+        private void CreateMateria()
+        {
+            var shaderData = _materia.ShaderData;
+            if (!shaderData) return;
+
+            var shaderDataProperties = _materia.ShaderData.Properties;
+
+            _materia.Properties.Clear();
+            _materia.AddProperties(shaderDataProperties);
+
+            // TODO: This should not be here
+            _shaderDataObjectField.SetEnabled(false);
+        }
+
+        private void SetUpList()
+        {
+            _materiaPropertyList.drawHeaderCallback = (Rect rect) =>
+            {
+                EditorGUI.LabelField(new Rect(rect.x + 25f, rect.y, 200f, 20f), new GUIContent("Shader Properties", "Shader Properties"), EditorStyles.boldLabel);
+            };
+
+            _materiaPropertyList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+            {
+                var element = _materiaPropertyList.serializedProperty.GetArrayElementAtIndex(index);
+
+                Rect r = new Rect(rect.x, rect.y, rect.width, rect.height);
+
+                EditorGUI.BeginChangeCheck();
+                EditorGUI.PropertyField(r, element);
+                serializedObject.Update();
+                if (EditorGUI.EndChangeCheck())
+                {
+                    serializedObject.ApplyModifiedProperties();
+                    OnValueChanged();
+                }
+            };
+
+            _materiaPropertyList.elementHeightCallback = (int index) =>
+            {
+                var element = _materiaPropertyList.serializedProperty.GetArrayElementAtIndex(index);
+                float propertyHeight = EditorGUI.GetPropertyHeight(element, true);
+                float spacing = EditorGUIUtility.singleLineHeight;
+
+                if (element.managedReferenceFullTypename == "")
+                {
+                    spacing += 20;
+                }
+
+                return propertyHeight + spacing;
+            };
+
+            _materiaPropertyList.onAddCallback = (ReorderableList list) =>
+            {
+                var index = list.serializedProperty.arraySize;
+                list.serializedProperty.arraySize++;
+                list.index = index;
+                var element = list.serializedProperty.GetArrayElementAtIndex(index);
+                serializedObject.ApplyModifiedProperties();
+                serializedObject.Update();
+            };
+        }
+
+        public override Texture2D RenderStaticPreview(string assetPath, UnityEngine.Object[] subAssets, int width, int height)
         {
             if (_materia == null || _materia.PreviewIcon == null)
                 return null;
@@ -156,27 +206,23 @@ namespace Materiator
         private void SetUpPreview()
         {
             _previewMesh = AssetUtils.LoadAssetFromUniqueAssetPath<Mesh>("Library/unity default resources::Sphere");
-            _previewMaterial = new Material(SystemData.Settings.DefaultShaderData.Shader);
+            _previewMaterial = new Material(_materia.ShaderData.Shader);
+
+            _previewTextures = new Textures();
+            _previewTextures.CreateTextures(_materia.ShaderData.Properties, 4, 4);
 
             _drag = new Vector2(35f, 35f);
         }
 
         private void UpdatePreview(Material material)
         {
-            material.SetColor(SystemData.Settings.DefaultShaderData.BaseColorPropertyName, _materia.BaseColor);
-            material.SetFloat("_Metallic", _materia.Metallic);
-            material.SetFloat("_Smoothness", _materia.Smoothness);
-            if (_materia.IsEmissive)
+            
+            foreach (var item in _previewTextures.Texs)
             {
-                material.EnableKeyword(SystemData.Settings.DefaultShaderData.EmissionKeywordName);
-                //material.globalIlluminationFlags = SystemData.Settings.GlobalIlluminationFlag;
-                material.SetColor(SystemData.Settings.DefaultShaderData.EmissionColorPropertyName, _materia.EmissionColor);
+                Debug.Log(item.Key + "        " + item.Value);
             }
-            else
-            {
-                material.DisableKeyword(SystemData.Settings.DefaultShaderData.EmissionKeywordName);
-                material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
-            }
+            
+            _previewTextures.SetTexturesToMaterial(_previewMaterial, _materia.ShaderData);
         }
 
         public override void OnPreviewGUI(Rect r, GUIStyle background)
@@ -188,7 +234,7 @@ namespace Materiator
                 _previewRenderUtility.BeginPreview(r, background);
 
                 _previewRenderUtility.DrawMesh(_previewMesh, Vector3.zero, new Vector3(1, 1, 1), Quaternion.identity, _previewMaterial, 0, null, null, false);
-
+                Debug.Log(_previewMaterial);
                 _previewRenderUtility.camera.transform.position = Vector2.zero;
                 _previewRenderUtility.camera.transform.rotation = Quaternion.Euler(new Vector3(-_drag.y, -_drag.x, 0));
                 _previewRenderUtility.camera.transform.position = _previewRenderUtility.camera.transform.forward * -4f;
@@ -236,34 +282,32 @@ namespace Materiator
 
         protected override void GetProperties()
         {
-            _baseColor = serializedObject.FindProperty("BaseColor");
-            _metallic = serializedObject.FindProperty("Metallic");
-            _smoothness = serializedObject.FindProperty("Smoothness");
-            _isEmissive = serializedObject.FindProperty("IsEmissive");
-            _emissionColor = serializedObject.FindProperty("EmissionColor");
-            _description = serializedObject.FindProperty("Description");
+            _shaderData = serializedObject.FindProperty("ShaderData");
+
+            _description = serializedObject.FindProperty("_description");
 
             _IMGUIContainer = root.Q<IMGUIContainer>("IMGUIContainer");
 
-            _baseColorField = root.Q<ColorField>("BaseColorField");
-            _isEmissiveToggle = root.Q<Toggle>("IsEmissiveToggle");
-            _emissionColorField = root.Q<ColorField>("EmissionColorField");
+            _shaderDataObjectField = root.Q<ObjectField>("ShaderDataObjectField");
+            _shaderDataObjectField.objectType = typeof(ShaderData);
+
             _descriptionTextField = root.Q<TextField>("DescriptionTextField");
 
             _IMGUIContainer = root.Q<VisualElement>("IMGUIContainer");
+
+            _createMateriaButton = root.Q<Button>("CreateMateriaButton");
         }
 
         protected override void BindProperties()
         {
-            _baseColorField.BindProperty(_baseColor);
-            _isEmissiveToggle.BindProperty(_isEmissive);
-            _emissionColorField.BindProperty(_emissionColor);
+            _shaderDataObjectField.BindProperty(_shaderData);
+
             _descriptionTextField.BindProperty(_description);
         }
 
         protected override void RegisterButtons()
         {
-
+            _createMateriaButton.clicked += CreateMateria;
         }
     }
 }

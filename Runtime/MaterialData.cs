@@ -3,7 +3,7 @@
 namespace Materiator
 {
     [CreateAssetMenu(menuName = "Materiator/Material Data", fileName = "MaterialData")]
-    public class MaterialData : ScriptableObject
+    public class MaterialData : MateriatorScriptableObject
     {
         public ShaderData ShaderData { get { return _shaderData; } }
         public Material Material { get { return _material; } }

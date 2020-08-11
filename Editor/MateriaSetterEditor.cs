@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Materiator
@@ -94,6 +95,14 @@ namespace Materiator
         {
             MateriaSetter.Refresh();
             UVInspector.DrawUVInspector(true);
+
+            var shader = MateriaSetter.MaterialData.ShaderData.Shader;
+
+            for (int i = 0; i < ShaderUtil.GetPropertyCount(shader); i++)
+            {
+                Debug.Log("Name: " + ShaderUtil.GetPropertyName(shader, i) + "     Type: " + ShaderUtil.GetPropertyType(shader, i));
+            }
+            
         }
 
         public void ResetMateriaSetter()
@@ -147,7 +156,7 @@ namespace Materiator
                     sourceTextures = MateriaSetter.MateriaSetterData.MateriaAtlas.Textures;
                 }
 
-                newTextures.CreateTextures(sourceTextures.Size.x, sourceTextures.Size.y);
+                newTextures.CreateTextures(MateriaSetter.MaterialData.ShaderData.Properties, sourceTextures.Size.x, sourceTextures.Size.y);
                 var mat = Instantiate(Material.objectReferenceValue);
                 newTextures.CopyPixelColors(sourceTextures, sourceTextures.Size, SystemData.Settings.UVRect, newTextures.Size, SystemData.Settings.UVRect);
 

@@ -134,11 +134,34 @@ namespace Materiator
 
         private void InitializeTextures()
         {
+            var shaderProps = MaterialData.ShaderData.Properties;
+
             if (Textures == null)
                 Textures = new Textures();
 
-            if (Textures.Color == null || Textures.MetallicSmoothness == null || Textures.Emission == null)
-                Textures.CreateTextures(GridSize.x, GridSize.y);
+            // Filter textures that don't have current material data's property name as key
+            var itemsToRemove = new List<KeyValuePair<string, Texture2D>>();
+            foreach (var tex in Textures.Texs)
+            {
+                if (!shaderProps.Select(prop => prop.Name).ToArray().Contains(tex.Key))
+                {
+                    itemsToRemove.Add(tex);
+                }
+            }
+            // Delete textures that don't have current material data's property name as key
+            foreach (var item in itemsToRemove)
+            {
+                Textures.Texs.Remove(item.Key);
+            }
+
+            // Craete new textures if current textures don't have shader property in keys
+            foreach (var prop in shaderProps)
+            {
+                if (!Textures.Texs.Keys.Contains(prop.Name))
+                {
+                    Textures.CreateTextures(new List<ShaderProperty> { prop }, GridSize.x, GridSize.y);
+                }
+            }
 
             SetTextures();
         }
@@ -148,6 +171,15 @@ namespace Materiator
             if (Material == null) return;
 
             Textures.SetTexturesToMaterial(Material, MaterialData.ShaderData);
+
+            // Is this the best place for this?
+            foreach (var kw in MaterialData.ShaderData.Keywords)
+            {
+                if (!Material.IsKeywordEnabled(kw))
+                {
+                    Material.EnableKeyword(kw);
+                }
+            }
         }
 
         public void AnalyzeMesh()

@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement>
+        <uie:ObjectField label="Shader" name="ShaderObjectField" allow-scene-objects="false" />
+        <ui:IMGUIContainer name="IMGUIContainer" />
+        <ui:Button text="Update Properties" name="UpdateShaderProperties" tooltip="Selects shader properties with [Materia] attribute and adds them to Properties list" />
+    </ui:VisualElement>
+</ui:UXML>

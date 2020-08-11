@@ -69,7 +69,7 @@ namespace Materiator
             if (materia.PreviewIcon != null)
                 Object.DestroyImmediate(materia.PreviewIcon);
 
-            material.SetColor(SystemData.Settings.DefaultShaderData.BaseColorPropertyName, materia.BaseColor);
+            /*material.SetColor(SystemData.Settings.DefaultShaderData.BaseColorPropertyName, materia.BaseColor);
             material.SetFloat("_Metallic", materia.Metallic);
             material.SetFloat("_Smoothness", materia.Smoothness);
             if (materia.IsEmissive)
@@ -82,7 +82,7 @@ namespace Materiator
             {
                 material.DisableKeyword(SystemData.Settings.DefaultShaderData.EmissionKeywordName);
                 material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
-            }
+            }*/
 
             materia.PreviewIcon = GenerateThumbnail(material, Color.black);
         }

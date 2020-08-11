@@ -13,9 +13,8 @@ namespace Materiator
     [Serializable]
     public class Textures
     {
-        public Texture2D Color;
-        public Texture2D MetallicSmoothness;
-        public Texture2D Emission;
+        public SerializableDictionary<string, Texture2D> Texs = new SerializableDictionary<string, Texture2D>();
+
         public int ID;
 
         public FilterMode FilterMode { get; private set; }
@@ -24,68 +23,69 @@ namespace Materiator
         {
             get
             {
-                return new string[]
-                {
-                    Color.name,
-                    MetallicSmoothness.name,
-                    Emission.name
-                };
-            }
+                var names = new string[Texs.Count];
 
-            set
-            {
-                Color.name = value[0];
-                MetallicSmoothness.name = value[1];
-                Emission.name = value[2];
+                var i = 0;
+                foreach (var tex in Texs)
+                {
+                    names[i] = tex.Value.name;
+                    i++;
+                }
+
+                return names;
             }
         }
 
+        // This return size of the first texture because only textures of the same size are supported
         public Vector2Int Size
         {
             get
             {
-                return new Vector2Int(Color.width, Color.height);
+                var tex = Texs.FirstOrDefault();
+                return new Vector2Int(tex.Value.width, tex.Value.height);
             }
         }
 
         public void Assign(Textures textures)
         {
-            Color = textures.Color;
-            MetallicSmoothness = textures.MetallicSmoothness;
-            Emission = textures.Emission;
+            foreach (var tex in textures.Texs)
+                Texs[tex.Key] = tex.Value;
         }
 
-        public void CreateTextures(int width, int height)
+        public void CreateTextures(List<ShaderProperty> shaderProps, int width, int height)
         {
             FilterMode = SystemData.Settings.FilterMode;
 
-            Color = CreateTexture2D(width, height, TextureFormat.RGBA32, FilterMode);
-            MetallicSmoothness = CreateTexture2D(width, height, TextureFormat.RGBA32, FilterMode);
-            Emission = CreateTexture2D(width, height, TextureFormat.RGBA32, FilterMode, UnityEngine.Color.black);
+            for (int i = 0; i < shaderProps.Count; i++)
+            {
+                if (shaderProps[i].GetType() == typeof(ColorShaderProperty) || shaderProps[i].GetType() == typeof(FloatShaderProperty))
+                {
+                    if (!Texs.ContainsKey(shaderProps[i].Name))
+                    {
+                        Texs.Add(shaderProps[i].Name, CreateTexture2D(width, height, TextureFormat.RGBA32, FilterMode));
+                    }
+                }
+            }
         }
 
         public void SetNames(string name)
         {
-            Color.name = name + "_Color";
-            MetallicSmoothness.name = name + "_MetallicSmoothness";
-            Emission.name = name + "_Emission";
+            foreach (var tex in Texs)
+                tex.Value.name = name + tex.Key;
         }
 
         public void Apply()
         {
-            Color.Apply();
-            MetallicSmoothness.Apply();
-            Emission.Apply();
+            foreach (var tex in Texs)
+                tex.Value.Apply();
         }
 
         public void SetTexturesToMaterial(Material material, ShaderData shaderData)
         {
             if (material == null || shaderData == null) return;
 
-            material.SetTexture(shaderData.MainTexturePropertyName, Color);
-            material.SetTexture(shaderData.MetallicSmoothnessTexturePropertyName, MetallicSmoothness);
-            material.SetTexture(shaderData.SpecularGlossTexturePropertyName, MetallicSmoothness);
-            material.SetTexture(shaderData.EmissionTexturePropertyName, Emission);
+            foreach (var tex in Texs)
+                material.SetTexture(tex.Key, tex.Value);
         }
 
         public void UpdateColors(IDictionary<int, Rect> rects, Vector2Int gridSize, List<MateriaSlot> materiaSlots)
@@ -95,23 +95,44 @@ namespace Materiator
                 var rectInt = Utils.GetRectIntFromRect(gridSize, rect.Value);
                 var numberOfColors = rectInt.width * rectInt.height;
 
-                var baseColors = new Color32[numberOfColors];
-                var metallic = new Color32[numberOfColors];
-                var emissionColors = new Color32[numberOfColors];
-
-                for (int i = 0; i < numberOfColors; i++)
+                var colors = new Dictionary<Texture2D, Color32[]>();
+                foreach (var tex in Texs)
                 {
-                    var metallic32 = (byte)(materiaSlots.Where(ms => ms.ID == rect.Key).First().Materia.Metallic * 255);
-                    var smoothness32 = (byte)(materiaSlots.Where(ms => ms.ID == rect.Key).First().Materia.Smoothness * 255);
+                    colors.Add(tex.Value, new Color32[numberOfColors]);
 
-                    baseColors[i] = materiaSlots.Where(ms => ms.ID == rect.Key).First().Materia.BaseColor;
-                    metallic[i] = new Color32(metallic32, 0, 0, smoothness32);
-                    emissionColors[i] = materiaSlots.Where(ms => ms.ID == rect.Key).First().Materia.EmissionColor;
+                    for (int i = 0; i < numberOfColors; i++)
+                    {
+                        foreach (var prop in materiaSlots.Where(ms => ms.ID == rect.Key).First().Materia.Properties)
+                        {
+                            if (prop.GetType() == typeof(ColorShaderProperty))
+                            {
+                                var colorProp = (ColorShaderProperty)prop;
+                                if (colorProp.Name == tex.Key)
+                                {
+                                    colors[tex.Value][i] = colorProp.Value;
+                                }
+                            }
+                            else if (prop.GetType() == typeof(FloatShaderProperty))
+                            {
+                                var floatProp = (FloatShaderProperty)prop;
+                                if (floatProp.Name == tex.Key)
+                                {
+                                    var r = (byte)(floatProp.R * 255);
+                                    var g = (byte)(floatProp.G * 255);
+                                    var b = (byte)(floatProp.B * 255);
+                                    var a = (byte)(floatProp.A * 255);
+
+                                    colors[tex.Value][i].r = r;
+                                    colors[tex.Value][i].g = g;
+                                    colors[tex.Value][i].b = b;
+                                    colors[tex.Value][i].a = a;
+                                }
+                            }
+                        }
+                    }
+
+                    tex.Value.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, colors[tex.Value]);
                 }
-
-                Color.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, baseColors);
-                MetallicSmoothness.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, metallic);
-                Emission.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, emissionColors);
             }
 
             Apply();
@@ -126,7 +147,7 @@ namespace Materiator
                 var colors = new Color[x * y];
                 for (int i = 0; i < colors.Length; i++)
                 {
-                    colors[i] = color.GetValueOrDefault(UnityEngine.Color.gray);
+                    colors[i] = color.GetValueOrDefault(Color.gray);
                 }
                 tex.SetPixels(colors);
             }
@@ -135,16 +156,14 @@ namespace Materiator
 
         private void SetFilterMode(FilterMode filterMode)
         {
-            Color.filterMode = filterMode;
-            MetallicSmoothness.filterMode = filterMode;
-            Emission.filterMode = filterMode;
+            foreach (var tex in Texs)
+                tex.Value.filterMode = filterMode;
         }
 
         private void SetWrapMode(TextureWrapMode wrapMode)
         {
-            Color.wrapMode = wrapMode;
-            MetallicSmoothness.wrapMode = wrapMode;
-            Emission.wrapMode = wrapMode;
+            foreach (var tex in Texs)
+                tex.Value.wrapMode = wrapMode;
         }
 
 #if UNITY_EDITOR
@@ -154,26 +173,19 @@ namespace Materiator
             var sourceRectInt = new RectInt((int)(sourceRect.x * sourceGridSize.x), (int)(sourceRect.y * sourceGridSize.y), (int)(sourceRect.width * sourceGridSize.x), (int)(sourceRect.height * sourceGridSize.y));
             var destinationRectInt = new RectInt((int)(destinationRect.x * destinationGridSize.x), (int)(destinationRect.y * destinationGridSize.y), (int)(destinationRect.width * destinationGridSize.x), (int)(destinationRect.height * destinationGridSize.y));
 
-            var baseColors = Utils.ColorToColor32Array(source.Color.GetPixels(sourceRectInt.x, sourceRectInt.y, sourceRectInt.width, sourceRectInt.height));
-            var metallicColors = Utils.ColorToColor32Array(source.MetallicSmoothness.GetPixels(sourceRectInt.x, sourceRectInt.y, sourceRectInt.width, sourceRectInt.height));
-            var emissionColors = Utils.ColorToColor32Array(source.Emission.GetPixels(sourceRectInt.x, sourceRectInt.y, sourceRectInt.width, sourceRectInt.height));
-
-            Color.SetPixels32(destinationRectInt.x, destinationRectInt.y, destinationRectInt.width, destinationRectInt.height, baseColors);
-            MetallicSmoothness.SetPixels32(destinationRectInt.x, destinationRectInt.y, destinationRectInt.width, destinationRectInt.height, metallicColors);
-            Emission.SetPixels32(destinationRectInt.x, destinationRectInt.y, destinationRectInt.width, destinationRectInt.height, emissionColors);
+            foreach (var tex in source.Texs)
+            {
+                var sourceColors = Utils.ColorToColor32Array(tex.Value.GetPixels(sourceRectInt.x, sourceRectInt.y, sourceRectInt.width, sourceRectInt.height));
+                Texs.Where(t => t.Key == tex.Key).FirstOrDefault().Value.SetPixels32(destinationRectInt.x, destinationRectInt.y, destinationRectInt.width, destinationRectInt.height, sourceColors);
+            }
 
             Apply();
         }
 
         public void AddTexturesToAsset(Object objectToAddTo)
         {
-            AssetDatabase.AddObjectToAsset(Color, objectToAddTo);
-            AssetDatabase.AddObjectToAsset(MetallicSmoothness, objectToAddTo);
-            AssetDatabase.AddObjectToAsset(Emission, objectToAddTo);
-
-            //Color = AddTextureToAsset(Color, objectToAddTo);
-            //MetallicSmoothness = AddTextureToAsset(MetallicSmoothness, objectToAddTo);
-            //Emission = AddTextureToAsset(Emission, objectToAddTo);
+            foreach (var tex in Texs)
+                AssetDatabase.AddObjectToAsset(tex.Value, objectToAddTo);
         }
 
         private Texture2D AddTextureToAsset(Texture2D texture, Object objectToAddTo)
@@ -184,7 +196,6 @@ namespace Materiator
 
             foreach (var item in assets)
             {
-                Debug.Log(item + "                 " + texture);
                 if (item == texture)
                 {
                     texture = (Texture2D)item;
@@ -196,9 +207,9 @@ namespace Materiator
 
         public Textures WriteTexturesToDisk(string dirName)
         {
-            Color = WriteTextureToDisk(Color, dirName + Color.name + ".png", SystemData.Settings.FilterMode);
-            MetallicSmoothness = WriteTextureToDisk(MetallicSmoothness, dirName + MetallicSmoothness.name + ".png", SystemData.Settings.FilterMode);
-            Emission = WriteTextureToDisk(Emission, dirName + Emission.name + ".png", SystemData.Settings.FilterMode);
+            foreach (var tex in Texs)
+                WriteTextureToDisk(tex.Value, dirName + tex.Value.name + ".png", SystemData.Settings.FilterMode);
+
             return this;
         }
 
@@ -226,9 +237,8 @@ namespace Materiator
 
         public void ImportTextureAssets()
         {
-            AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(Color));
-            AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(MetallicSmoothness));
-            AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(Emission));
+            foreach (var tex in Texs)
+                AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(tex.Value));
         }
 
         private Texture2D WriteTextureToDisk(Texture2D texture, string path, FilterMode filterMode)

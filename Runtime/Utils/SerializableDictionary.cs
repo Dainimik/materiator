@@ -17,6 +17,7 @@ namespace Materiator
         {
             _keys.Clear();
             _values.Clear();
+
             foreach (KeyValuePair<TKey, TValue> pair in this)
             {
                 _keys.Add(pair.Key);
@@ -29,7 +30,7 @@ namespace Materiator
             Clear();
 
             if (_keys.Count != _values.Count)
-                throw new System.Exception(string.Format("there are {0} keys and {1} values after deserialization. Make sure that both key and value types are serializable."));
+                throw new Exception(string.Format("there are {0} keys and {1} values after deserialization. Make sure that both key and value types are serializable."));
 
             for (int i = 0; i < _keys.Count; i++)
                 Add(_keys[i], _values[i]);
