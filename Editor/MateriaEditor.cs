@@ -58,7 +58,7 @@ namespace Materiator
         {
             InitializeEditor<Materia>();
 
-            _materiaPropertyList = new ReorderableList(serializedObject, serializedObject.FindProperty("Properties"), true, true, true, true);
+            _materiaPropertyList = new ReorderableList(serializedObject, serializedObject.FindProperty("Properties"), true, true, false, false);
             SetUpList();
 
             IMGUIContainer defaultInspector = new IMGUIContainer(() => IMGUI());
@@ -91,6 +91,8 @@ namespace Materiator
 
             _materia.Properties.Clear();
             _materia.AddProperties(shaderDataProperties);
+
+            OnValueChanged();
 
             // TODO: This should not be here
             _shaderDataObjectField.SetEnabled(false);
@@ -238,7 +240,7 @@ namespace Materiator
                 _previewRenderUtility.BeginPreview(r, background);
 
                 _previewRenderUtility.DrawMesh(_previewMesh, Vector3.zero, new Vector3(1, 1, 1), Quaternion.identity, _previewMaterial, 0, null, null, false);
-                Debug.Log(_previewMaterial);
+
                 _previewRenderUtility.camera.transform.position = Vector2.zero;
                 _previewRenderUtility.camera.transform.rotation = Quaternion.Euler(new Vector3(-_drag.y, -_drag.x, 0));
                 _previewRenderUtility.camera.transform.position = _previewRenderUtility.camera.transform.forward * -4f;
