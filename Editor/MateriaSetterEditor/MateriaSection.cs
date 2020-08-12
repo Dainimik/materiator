@@ -91,7 +91,6 @@ namespace Materiator
                         _materiaSetter.MateriaSlots[index].Materia = elementMateria;
 
                     _editor.serializedObject.Update();
-                    _editor.UVInspector.DrawUVInspector(true);
 
                     _materiaSetter.UpdateColorsOfAllTextures();
 

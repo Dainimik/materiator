@@ -22,8 +22,6 @@ namespace Materiator
 
         public VisualElement Root;
 
-        public UVInspector UVInspector;
-
         public AtlasSection AtlasSection;
         public PresetSection PresetSection;
         public DataSection DataSection;
@@ -39,18 +37,15 @@ namespace Materiator
 
             if (Initialize())
             {
-                UVInspector = new UVInspector(MateriaSetter, Root);
-
                 AtlasSection = new AtlasSection(this);
                 PresetSection = new PresetSection(this);
                 DataSection = new DataSection(this);
                 OutputSection = new OutputSection(this);
 
                 DrawDefaultGUI();
-
-                RegisterCallbacks();
             }
 
+            // Temp for debugging
             if (MateriaSetter.Textures.ID == 0)
             {
                 MateriaSetter.Textures.ID = UnityEngine.Random.Range(-999999, 9999999);
@@ -61,13 +56,6 @@ namespace Materiator
         {
             IMGUIContainer defaultInspector = new IMGUIContainer(() => DrawDefaultInspector());
             root.Add(defaultInspector);
-        }
-
-        private void OnDisable()
-        {
-            MateriaSetter = (MateriaSetter)target;
-
-            UnregisterCallbacks();
         }
 
         public override VisualElement CreateInspectorGUI()
@@ -93,16 +81,7 @@ namespace Materiator
 
         private void Refresh()
         {
-            MateriaSetter.Refresh();
-            UVInspector.DrawUVInspector(true);
-
-            var shader = MateriaSetter.MaterialData.ShaderData.Shader;
-
-            for (int i = 0; i < ShaderUtil.GetPropertyCount(shader); i++)
-            {
-                Debug.Log("Name: " + ShaderUtil.GetPropertyName(shader, i) + "     Type: " + ShaderUtil.GetPropertyType(shader, i));
-            }
-            
+            MateriaSetter.Refresh();           
         }
 
         public void ResetMateriaSetter()
@@ -131,8 +110,6 @@ namespace Materiator
                     IsDirty.boolValue = false;
                 }  
             }
-
-            UVInspector.DrawUVInspector(true);
 
             serializedObject.ApplyModifiedProperties();
 
@@ -182,17 +159,6 @@ namespace Materiator
                 MateriaSetter.UpdateRenderer();
                 serializedObject.Update(); // Why are two updates here necessary?
             }
-        }
-
-        private void RegisterCallbacks()
-        {
-            PresetSection.OnPresetLoaded += () => UVInspector.DrawUVInspector(true);
-        }
-
-        private void UnregisterCallbacks()
-        {
-            if (UVInspector != null)
-                PresetSection.OnPresetLoaded -= () => UVInspector.DrawUVInspector(true);
         }
 
         protected override void GetProperties()
