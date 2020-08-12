@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using UnityEngine.UIElements;
-using UnityEditor.UIElements;
+﻿using UnityEngine.UIElements;
 using UnityEditor;
 
 namespace Materiator

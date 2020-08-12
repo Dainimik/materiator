@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Materiator
@@ -18,14 +17,14 @@ namespace Materiator
         public SerializedProperty IsDirty;
         public SerializedProperty Material;
 
-        private Button _reloadButton;
-
         public VisualElement Root;
 
         public AtlasSection AtlasSection;
         public PresetSection PresetSection;
         public DataSection DataSection;
         public OutputSection OutputSection;
+
+        private Button _reloadButton;
 
         private void OnEnable()
         {
@@ -141,10 +140,9 @@ namespace Materiator
                     mat.name = name;
 
                 Material.objectReferenceValue = mat;
-
                 serializedObject.ApplyModifiedProperties();
 
-                MateriaSetter.Textures = newTextures;
+                MateriaSetter.Textures = newTextures; // Should this be a SerializedProperty here instead of assigning value directly?
                 MateriaSetter.SetTextures();
 
                 var newMateriaSlots = new List<MateriaSlot>();
