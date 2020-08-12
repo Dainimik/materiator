@@ -62,10 +62,10 @@ namespace Materiator
                 serializedObject.Update();
                 int _materiaTagIndex = 0;
                 EditorGUI.BeginChangeCheck();
-                _materiaTagIndex = EditorGUI.Popup(new Rect(r.x + 15, r.y, r.width, r.height), SystemData.Settings.MateriaTags.MateriaTagsList.IndexOf(SystemData.Settings.MateriaTags.MateriaTagsList.Where(t => t.Name == materiaTag.Name).FirstOrDefault()), SystemData.Settings.MateriaTags.MateriaTagNamesArray, EditorStyles.popup);
+                _materiaTagIndex = EditorGUI.Popup(new Rect(r.x + 15, r.y, r.width, r.height), SystemData.Settings.MateriaTags.MateriaTags.IndexOf(SystemData.Settings.MateriaTags.MateriaTags.Where(t => t.Name == materiaTag.Name).FirstOrDefault()), SystemData.Settings.MateriaTags.MateriaTagNames, EditorStyles.popup);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    var newTag = SystemData.Settings.MateriaTags.MateriaTagsList[_materiaTagIndex];
+                    var newTag = SystemData.Settings.MateriaTags.MateriaTags[_materiaTagIndex];
                     var canSetTag = true;
                     for (int i = 0; i < _materiaPreset.MateriaPresetItemList.Count; i++)
                     {

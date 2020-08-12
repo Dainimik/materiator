@@ -67,11 +67,11 @@ namespace Materiator
 
                 int _materiaTagIndex = 0;
                 EditorGUI.BeginChangeCheck();
-                _materiaTagIndex = EditorGUI.Popup(new Rect(rect.x + 25f, rect.y, 95f, rect.height), SystemData.Settings.MateriaTags.MateriaTagsList.IndexOf(SystemData.Settings.MateriaTags.MateriaTagsList.Where(t => t.Name == materiaTag.Name).FirstOrDefault()), SystemData.Settings.MateriaTags.MateriaTagNamesArray, EditorStyles.popup);
+                _materiaTagIndex = EditorGUI.Popup(new Rect(rect.x + 25f, rect.y, 95f, rect.height), SystemData.Settings.MateriaTags.MateriaTags.IndexOf(SystemData.Settings.MateriaTags.MateriaTags.Where(t => t.Name == materiaTag.Name).FirstOrDefault()), SystemData.Settings.MateriaTags.MateriaTagNames, EditorStyles.popup);
                 if (EditorGUI.EndChangeCheck())
                 {
                     _editor.SetMateriaSetterDirty(true);
-                    var newTag = SystemData.Settings.MateriaTags.MateriaTagsList[_materiaTagIndex];
+                    var newTag = SystemData.Settings.MateriaTags.MateriaTags[_materiaTagIndex];
                     Undo.RegisterCompleteObjectUndo(_materiaSetter, "Change Materia Tag");
                     _materiaSetter.MateriaSlots[index].Tag = newTag;
                     _editor.serializedObject.Update();

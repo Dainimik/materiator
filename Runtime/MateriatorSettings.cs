@@ -17,7 +17,7 @@ namespace Materiator
         public bool PackAssets;
 
         [HideInInspector]
-        public MateriaTags MateriaTags;
+        public MateriaTagCollection MateriaTags;
 
         [HideInInspector]
         public readonly Rect UVRect = new Rect(0f, 0f, 1f, 1f);

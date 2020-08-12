@@ -17,7 +17,7 @@ namespace Materiator
     public class SystemData
     {
         public static MateriatorSettings Settings { get { return LoadSettings(); } }
-        public static MateriaTags MateriaTags = Settings.MateriaTags;
+        public static MateriaTagCollection MateriaTags = Settings.MateriaTags;
 
         [SerializeField] private static MateriatorSettings _settings { get; set; }
 
@@ -199,12 +199,12 @@ namespace Materiator
             return materialData;
         }
 
-        private static MateriaTags CreateDefaultTagsData(string name)
+        private static MateriaTagCollection CreateDefaultTagsData(string name)
         {
-            var materiaTags = ScriptableObject.CreateInstance<MateriaTags>();
+            var materiaTags = ScriptableObject.CreateInstance<MateriaTagCollection>();
             materiaTags.name = name;
 
-            materiaTags.MateriaTagsList.Add(Settings.DefaultTag);
+            materiaTags.MateriaTags.Add(Settings.DefaultTag);
 
             AssetDatabase.AddObjectToAsset(materiaTags, _settings);
 

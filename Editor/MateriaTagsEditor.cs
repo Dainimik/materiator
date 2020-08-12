@@ -6,21 +6,21 @@ using UnityEngine.UIElements;
 
 namespace Materiator
 {
-    [CustomEditor(typeof(MateriaTags))]
+    [CustomEditor(typeof(MateriaTagCollection))]
     public class MateriaTagsEditor : MateriatorEditor
     {
-        private MateriaTags _materiaTags;
+        private MateriaTagCollection _materiaTags;
 
         private ReorderableList _tagsList;
 
         private void OnEnable()
         {
-            _materiaTags = (MateriaTags)target;
+            _materiaTags = (MateriaTagCollection)target;
         }
 
         public override VisualElement CreateInspectorGUI()
         {
-            InitializeEditor<MateriaTags>();
+            InitializeEditor<MateriaTagCollection>();
 
             _tagsList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaTagsList"), true, true, true, true);
             SetUpTagList();
@@ -55,7 +55,7 @@ namespace Materiator
                 var value = EditorGUI.TextField(rect, element.stringValue);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    if (!_materiaTags.MateriaTagsList.Select(t => t.Name).ToList().ConvertAll(s => s.ToLower()).Contains(value.ToLower()))
+                    if (!_materiaTags.MateriaTags.Select(t => t.Name).ToList().ConvertAll(s => s.ToLower()).Contains(value.ToLower()))
                     {
                         element.stringValue = value;
                     }
@@ -68,7 +68,7 @@ namespace Materiator
 
             _tagsList.onAddCallback = (ReorderableList list) =>
             {
-                _materiaTags.MateriaTagsList.Add(SystemData.Settings.DefaultTag);
+                _materiaTags.MateriaTags.Add(SystemData.Settings.DefaultTag);
             };
         }
     }

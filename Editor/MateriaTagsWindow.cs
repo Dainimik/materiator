@@ -5,7 +5,7 @@ namespace Materiator
     public class MateriaTagsWindow : EditorWindow
     {
         private Editor _editor = null;
-        private MateriaTags _materiaTags;
+        private MateriaTagCollection _materiaTags;
 
         [MenuItem("Tools/Materiator/Tag Editor")]
         public static void OpenWindow()
