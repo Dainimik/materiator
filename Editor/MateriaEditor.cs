@@ -224,10 +224,10 @@ namespace Materiator
                 if (_previewTextures.Texs.Count != _materia.Properties.Count)
                 {
                     _previewTextures.CreateTextures(_materia.Properties, 4, 4);
-                    _previewTextures.SetTexturesToMaterial(_previewMaterial, _materia.ShaderData);
+                    _previewTextures.SetTexturesToMaterial(_previewMaterial);
                 }
 
-                _previewTextures.UpdateColor(new Vector2Int(4, 4), _materia.Properties);
+                _previewTextures.UpdateColor(_materia.Properties);
             }
         }
 

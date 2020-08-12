@@ -36,7 +36,7 @@ namespace Materiator
             }
         }
 
-        // This return size of the first texture because only textures of the same size are supported
+        // This return size of the first texture because only textures of the same size are supported for now
         public Vector2Int Size
         {
             get
@@ -80,19 +80,17 @@ namespace Materiator
                 tex.Value.Apply();
         }
 
-        public void SetTexturesToMaterial(Material material, ShaderData shaderData)
+        public void SetTexturesToMaterial(Material material)
         {
-            if (material == null || shaderData == null) return;
-
             foreach (var tex in Texs)
                 material.SetTexture(tex.Key, tex.Value);
         }
 
-        public void UpdateColors(IDictionary<int, Rect> rects, Vector2Int gridSize, List<MateriaSlot> materiaSlots)
+        public void UpdateColors(IDictionary<int, Rect> rects, List<MateriaSlot> materiaSlots)
         {
             foreach (var rect in rects)
             {
-                var rectInt = Utils.GetRectIntFromRect(gridSize, rect.Value);
+                var rectInt = Utils.GetRectIntFromRect(Size, rect.Value);
                 var numberOfColors = rectInt.width * rectInt.height;
 
                 var colors = new Dictionary<Texture2D, Color32[]>();
@@ -139,9 +137,9 @@ namespace Materiator
         }
 
         // TODO: This function is a modified copy!!! Merge with original!
-        public void UpdateColor(Vector2Int gridSize, List<ShaderProperty> shaderProperties)
+        public void UpdateColor(List<ShaderProperty> shaderProperties)
         {
-            var rectInt = Utils.GetRectIntFromRect(gridSize, SystemData.Settings.UVRect);
+            var rectInt = Utils.GetRectIntFromRect(Size, SystemData.Settings.UVRect);
             var numberOfColors = rectInt.width * rectInt.height;
 
             var colors = new Dictionary<Texture2D, Color32[]>();

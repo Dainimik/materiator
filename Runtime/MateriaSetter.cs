@@ -170,7 +170,7 @@ namespace Materiator
         {
             if (Material == null) return;
 
-            Textures.SetTexturesToMaterial(Material, MaterialData.ShaderData);
+            Textures.SetTexturesToMaterial(Material);
 
             // Is this the best place for this?
             foreach (var kw in MaterialData.ShaderData.Keywords)
@@ -242,7 +242,7 @@ namespace Materiator
 
         public void UpdateColorsOfAllTextures()
         {
-            Textures.UpdateColors(FilteredRects, GridSize, MateriaSlots);
+            Textures.UpdateColors(FilteredRects, MateriaSlots);
         }
 
         public void LoadPreset(MateriaPreset preset)
@@ -274,7 +274,7 @@ namespace Materiator
                 GridSize = MateriaSetterData.AtlasedGridSize;
                 UVRect = MateriaSetterData.AtlasedUVRect;
 
-                Textures.SetTexturesToMaterial(Material, MaterialData.ShaderData);
+                Textures.SetTexturesToMaterial(Material);
                 UpdateRenderer();
             }
         }
@@ -297,7 +297,7 @@ namespace Materiator
             GridSize = MateriaSetterData.NativeGridSize;
             UVRect = SystemData.Settings.UVRect;
 
-            Textures.SetTexturesToMaterial(Material, MaterialData.ShaderData);
+            Textures.SetTexturesToMaterial(Material);
             UpdateRenderer();
         }
     }
