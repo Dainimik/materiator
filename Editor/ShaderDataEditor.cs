@@ -18,7 +18,7 @@ namespace Materiator
         private SerializedProperty _shader;
 
         private ObjectField _shaderObjectField;
-        private Button _updateShaderProperties;
+        private Button _updateShaderPropertiesButton;
 
         private void OnEnable()
         {
@@ -123,6 +123,21 @@ namespace Materiator
 
                     for (int i = 0; i < shaderDataProperties.Count; i++)
                     {
+                        var materiaProp = properties[i];
+                        var shaderDataProp = shaderDataProperties[i];
+
+                        if (shaderDataProp.GetType() == typeof(FloatShaderProperty))
+                        {
+                            var mp = (FloatShaderProperty)properties[i];
+                            var sp = (FloatShaderProperty)shaderDataProperties[i];
+
+                            mp.RChannel = sp.RChannel;
+                            mp.GChannel = sp.GChannel;
+                            mp.BChannel = sp.BChannel;
+                            mp.AChannel = sp.AChannel;
+                        }
+
+                        materiaProp.Name = shaderDataProp.Name;
                     }
                 }
             }
@@ -154,7 +169,7 @@ namespace Materiator
             _shaderObjectField = root.Q<ObjectField>("ShaderObjectField");
             _shaderObjectField.objectType = typeof(Shader);
 
-            _updateShaderProperties = root.Q<Button>("UpdateShaderProperties");
+            _updateShaderPropertiesButton = root.Q<Button>("UpdateShaderPropertiesButton");
         }
 
         protected override void BindProperties()
@@ -164,7 +179,7 @@ namespace Materiator
 
         protected override void RegisterButtons()
         {
-            _updateShaderProperties.clicked += UpdateShaderProperties;
+            _updateShaderPropertiesButton.clicked += UpdateShaderProperties;
         }
     }
 }
