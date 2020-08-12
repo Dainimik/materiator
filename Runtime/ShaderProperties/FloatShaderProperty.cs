@@ -24,7 +24,11 @@ namespace Materiator
 
         public FloatShaderProperty(string propertyName, Vector4? value = null, string[] channelNames = null) : base(propertyName)
         {
-            var val = (Vector4)value;
+            Vector4 val = Vector4.zero;
+
+            if (value != null)
+                val = (Vector4)value;
+            
             R = val.x;
             G = val.y;
             B = val.z;

@@ -38,8 +38,8 @@ namespace Materiator
         {
             _materia = (Materia)target;
 
-            SetUpPreview();
-            UpdatePreview(_previewMaterial);
+            if (_previewTextures != null)
+                SetUpPreview();
 
             //EditorUtils.GenerateMateriaPreviewIcons(_materia, _previewMaterial);
         }
@@ -221,6 +221,9 @@ namespace Materiator
         {
             if (_materia.ShaderData)
             {
+                if (_previewTextures == null)
+                    SetUpPreview();
+
                 if (_previewTextures.Texs.Count != _materia.Properties.Count)
                 {
                     _previewTextures.CreateTextures(_materia.Properties, 4, 4);
