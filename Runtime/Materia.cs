@@ -34,11 +34,12 @@ namespace Materiator
                 else if (property.GetType() == typeof(FloatShaderProperty))
                 {
                     var floatProp = (FloatShaderProperty)property;
-                    materiaProperty = new FloatShaderProperty(
+                    materiaProperty = new FloatShaderProperty
+                    (
                         floatProp.Name,
                         new Vector4(floatProp.R, floatProp.G, floatProp.B, floatProp.A),
                         new string[] { floatProp.RChannel, floatProp.GChannel, floatProp.BChannel, floatProp.AChannel }
-                        );
+                    );
                 }
 
                 Properties.Add(materiaProperty);

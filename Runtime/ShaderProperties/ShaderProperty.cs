@@ -7,9 +7,9 @@ namespace Materiator
     {
         public string Name;
 
-        public ShaderProperty(string propertyName)
+        public ShaderProperty(string name)
         {
-            Name = propertyName;
+            Name = name;
         }
     }
 }
