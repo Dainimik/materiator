@@ -19,18 +19,17 @@ namespace Materiator
         [HideInInspector]
         public MateriaTagCollection MateriaTags;
 
-        [HideInInspector]
-        public readonly Rect UVRect = new Rect(0f, 0f, 1f, 1f);
-
         public MaterialData DefaultMaterialData;
         public ShaderData DefaultShaderData;
         public Materia DefaultMateria;
         public MateriaTag DefaultTag = new MateriaTag("-");
 
-        //public MaterialGlobalIlluminationFlags GlobalIlluminationFlag;
         public Color HighlightColor;
         public HighlightMode HighlightMode;
         public FilterMode FilterMode;
+
+        [HideInInspector]
+        public readonly Rect UVRect = new Rect(0f, 0f, 1f, 1f);
 
 #if UNITY_EDITOR
         [HideInInspector] public readonly Color GUIGray = new Color(0.75f, 0.75f, 0.75f, 1f);

@@ -38,10 +38,10 @@ namespace Materiator
 #if UNITY_EDITOR
         private static void CreateDefaultSettingsData()
         {
-            if (!Directory.Exists("Assets" + "/" + "Materiator"))
+            if (!Directory.Exists("Assets/Materiator"))
                 AssetDatabase.CreateFolder("Assets", "Materiator");
 
-            if (!Directory.Exists("Assets/Materiator" + "/" + "Resources"))
+            if (!Directory.Exists("Assets/Materiator/Resources"))
                 AssetDatabase.CreateFolder("Assets/Materiator", "Resources");
 
             var path = "Assets/Materiator/Resources";
@@ -55,7 +55,6 @@ namespace Materiator
 
             _settings.PackAssets = true;
             _settings.HighlightColor = new Color(1f, 1f, 0f, 1f);
-            //_settings.GlobalIlluminationFlag = MaterialGlobalIlluminationFlags.None;
 
             var shaderDataPath = CreateDefaultShaderDataAssets();
             var shaderDatas = AssetDatabase.LoadAllAssetsAtPath(shaderDataPath).Where(asset => asset.GetType() == typeof(ShaderData)).Cast<ShaderData>().ToArray();
@@ -63,21 +62,18 @@ namespace Materiator
             var renderPipelineType = RenderPipelineUtils.GetActivePipelineType();
             if (renderPipelineType == RenderPipelineUtils.PipelineType.Universal)
             {
-                //_settings.DefaultShaderData = AssetDatabase.LoadAssetAtPath<ShaderData>(shaderDataPath + "Universal_Render_Pipeline_Lit");
                 _settings.DefaultShaderData = shaderDatas.Where(sd => sd.Shader == Shader.Find("Universal Render Pipeline/Lit")).FirstOrDefault();
             }
             else if (renderPipelineType == RenderPipelineUtils.PipelineType.BuiltIn)
             {
-                //_settings.DefaultShaderData = AssetDatabase.LoadAssetAtPath<ShaderData>(shaderDataPath + "Standard_BuiltInRenderPipeline.asset");
+                _settings.DefaultShaderData = shaderDatas.Where(sd => sd.Shader == Shader.Find("Standard")).FirstOrDefault();
             }
 
             _settings.DefaultMateria = CreateDefaultMateria("DefaultMateria");
-            _settings.DefaultMaterialData = CreateMaterialData("DefaultMaterialData");
-            _settings.MateriaTags = CreateDefaultTagsData("MateriaTags");
+            _settings.DefaultMaterialData = CreateDefaultMaterialData("DefaultMaterialData");
+            _settings.MateriaTags = CreateDefaultTagCollection("MateriaTags");
 
             AssetDatabase.SaveAssets();
-
-            return;
         }
 
         private static Materia CreateDefaultMateria(string name)
@@ -98,7 +94,7 @@ namespace Materiator
             var defaultFloatValues = new Vector4(0f, 0f, 0f, 0f);
             var valueNames = new string[] { "Metallic", "", "", "Smoothness" };
 
-            CreateShaderData(
+            CreateDefaultShaderData(
                 Shader.Find("Universal Render Pipeline/Lit"),
                 new List<ShaderProperty>
                 {
@@ -113,7 +109,7 @@ namespace Materiator
                     "_EMISSION"
                 });
 
-            CreateShaderData(
+            CreateDefaultShaderData(
                 Shader.Find("Universal Render Pipeline/Simple Lit"),
                 new List<ShaderProperty>
                 {
@@ -127,7 +123,7 @@ namespace Materiator
                     "_EMISSION"
                 });
 
-            CreateShaderData(
+            CreateDefaultShaderData(
                 Shader.Find("Standard"),
                 new List<ShaderProperty>
                 {
@@ -141,7 +137,7 @@ namespace Materiator
                     "_EMISSION"
                 });
 
-            CreateShaderData(
+            CreateDefaultShaderData(
                 Shader.Find("Standard (Specular setup)"),
                 new List<ShaderProperty>
                 {
@@ -160,7 +156,7 @@ namespace Materiator
             return AssetDatabase.GetAssetPath(_settings);
         }
 
-        private static void CreateShaderData(Shader shader, List<ShaderProperty> properties, List<string> keywords)
+        private static void CreateDefaultShaderData(Shader shader, List<ShaderProperty> properties, List<string> keywords)
         {
             var shaderData = ScriptableObject.CreateInstance<ShaderData>();
             shaderData.name = shader.name;
@@ -170,21 +166,17 @@ namespace Materiator
             shaderData.Shader = shader;
 
             foreach (var prop in properties)
-            {
                 shaderData.Properties.Add(prop);
-            }
 
             foreach (var kw in keywords)
-            {
                 shaderData.Keywords.Add(kw);
-            }
 
             shaderData.IsEditable = false;
 
             AssetDatabase.AddObjectToAsset(shaderData, _settings);
         }
 
-        private static MaterialData CreateMaterialData(string name)
+        private static MaterialData CreateDefaultMaterialData(string name)
         {
             var material = Utils.CreateMaterial(_settings.DefaultShaderData.Shader);
             material.name = "DefaultMaterial";
@@ -199,16 +191,16 @@ namespace Materiator
             return materialData;
         }
 
-        private static MateriaTagCollection CreateDefaultTagsData(string name)
+        private static MateriaTagCollection CreateDefaultTagCollection(string name)
         {
-            var materiaTags = ScriptableObject.CreateInstance<MateriaTagCollection>();
-            materiaTags.name = name;
+            var collection = ScriptableObject.CreateInstance<MateriaTagCollection>();
+            collection.name = name;
 
-            materiaTags.MateriaTags.Add(Settings.DefaultTag);
+            collection.MateriaTags.Add(Settings.DefaultTag);
 
-            AssetDatabase.AddObjectToAsset(materiaTags, _settings);
+            AssetDatabase.AddObjectToAsset(collection, _settings);
 
-            return materiaTags;
+            return collection;
         }
 #endif
     }

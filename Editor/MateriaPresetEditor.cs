@@ -54,7 +54,7 @@ namespace Materiator
             _materiaPresetItemList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
             {
                 var element = _materiaPresetItemList.serializedProperty.GetArrayElementAtIndex(index);
-                var materiaTag = _materiaPreset.MateriaPresetItemList[index].Tag;
+                var materiaTag = _materiaPreset.MateriaPresetItems[index].Tag;
                 var materia = element.FindPropertyRelative("Materia").objectReferenceValue as Materia;
 
                 Rect r = new Rect(rect.x, rect.y, 150f, 22f);
@@ -67,9 +67,9 @@ namespace Materiator
                 {
                     var newTag = SystemData.Settings.MateriaTags.MateriaTags[_materiaTagIndex];
                     var canSetTag = true;
-                    for (int i = 0; i < _materiaPreset.MateriaPresetItemList.Count; i++)
+                    for (int i = 0; i < _materiaPreset.MateriaPresetItems.Count; i++)
                     {
-                        if (_materiaPreset.MateriaPresetItemList[i].Tag == newTag)
+                        if (_materiaPreset.MateriaPresetItems[i].Tag == newTag)
                         {
                             canSetTag = false;
                         }
@@ -78,7 +78,7 @@ namespace Materiator
                     if (canSetTag)
                     {
                         Undo.RegisterCompleteObjectUndo(_materiaPreset, "Set Preset Materia Tag");
-                        _materiaPreset.MateriaPresetItemList[index].Tag = newTag;
+                        _materiaPreset.MateriaPresetItems[index].Tag = newTag;
                     }
                 }
 
@@ -89,7 +89,7 @@ namespace Materiator
                     if (materia == null)
                         materia = SystemData.Settings.DefaultMateria;
                     else
-                        _materiaPreset.MateriaPresetItemList[index].Materia = materia;
+                        _materiaPreset.MateriaPresetItems[index].Materia = materia;
                 }
             };
 
@@ -100,7 +100,7 @@ namespace Materiator
                 list.index = index;
                 var element = list.serializedProperty.GetArrayElementAtIndex(index);
                 serializedObject.ApplyModifiedProperties();
-                _materiaPreset.MateriaPresetItemList[index].Tag = SystemData.Settings.DefaultTag;
+                _materiaPreset.MateriaPresetItems[index].Tag = SystemData.Settings.DefaultTag;
                 serializedObject.Update();
             };
         }

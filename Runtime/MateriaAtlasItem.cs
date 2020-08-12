@@ -3,12 +3,12 @@
 namespace Materiator
 {
     [Serializable]
-    public class MateriaAtlasEntry
+    public class MateriaAtlasItem
     {
         public MateriaSetter MateriaSetter;
         public MateriaSetterData MateriaSetterData;
 
-        public MateriaAtlasEntry(MateriaSetter materiaSetter, MateriaSetterData materiaSetterData)
+        public MateriaAtlasItem(MateriaSetter materiaSetter, MateriaSetterData materiaSetterData)
         {
             MateriaSetter = materiaSetter;
             MateriaSetterData = materiaSetterData;

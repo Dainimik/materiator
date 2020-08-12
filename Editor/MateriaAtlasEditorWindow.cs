@@ -116,9 +116,9 @@ namespace Materiator
 
                         item.UnloadAtlas(true);
 
-                        var atlasEntryIndex = item.MateriaSetterData.MateriaAtlas.AtlasEntries.Where(kvp => kvp.Value.MateriaSetter == item).FirstOrDefault().Key;
-                        item.MateriaSetterData.MateriaAtlas.AtlasEntries[atlasEntryIndex].MateriaSetter = null;
-                        item.MateriaSetterData.MateriaAtlas.AtlasEntries[atlasEntryIndex].MateriaSetterData = null;
+                        var atlasEntryIndex = item.MateriaSetterData.MateriaAtlas.AtlasItems.Where(kvp => kvp.Value.MateriaSetter == item).FirstOrDefault().Key;
+                        item.MateriaSetterData.MateriaAtlas.AtlasItems[atlasEntryIndex].MateriaSetter = null;
+                        item.MateriaSetterData.MateriaAtlas.AtlasItems[atlasEntryIndex].MateriaSetterData = null;
 
                         itemData.MateriaAtlas = null;
 
@@ -147,7 +147,7 @@ namespace Materiator
             }
             else
             {
-                foreach (var kvp in atlas.AtlasEntries.Values)
+                foreach (var kvp in atlas.AtlasItems.Values)
                 {
                     if (kvp.MateriaSetter != null && kvp.MateriaSetterData != null)
                     {

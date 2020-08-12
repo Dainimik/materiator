@@ -61,7 +61,7 @@ namespace Materiator
 
             var nullSlotIterator = 0;
             var nullSlotIndices = new List<int>();
-            foreach (var kvp in atlas.AtlasEntries)
+            foreach (var kvp in atlas.AtlasItems)
             {
                 if (kvp.Value.MateriaSetterData == null)
                     nullSlotIndices.Add(kvp.Key);
@@ -100,15 +100,15 @@ namespace Materiator
                             var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.MateriaSetterData == data).FirstOrDefault();
                             if (nullSlotIndices.Count > 0)
                             {
-                                atlas.AtlasEntries[nullSlotIndices[nullSlotIterator]].MateriaSetter = prefabMS;
-                                atlas.AtlasEntries[nullSlotIndices[nullSlotIterator]].MateriaSetterData = data;
+                                atlas.AtlasItems[nullSlotIndices[nullSlotIterator]].MateriaSetter = prefabMS;
+                                atlas.AtlasItems[nullSlotIndices[nullSlotIterator]].MateriaSetterData = data;
 
                                 nullSlotIterator++;
                             }
                             else
                             {
-                                if (!atlas.AtlasEntries.ContainsKey(i))
-                                    atlas.AtlasEntries.Add(i, new MateriaAtlasEntry(prefabMS, data));
+                                if (!atlas.AtlasItems.ContainsKey(i))
+                                    atlas.AtlasItems.Add(i, new MateriaAtlasItem(prefabMS, data));
                             }
 
                             atlas.MaterialData = group.Key;
@@ -194,7 +194,7 @@ namespace Materiator
             AssetDatabase.SaveAssets();
 
             atlas.Textures.ImportTextureAssets();
-            atlas.AtlasEntries = new SerializableDictionary<int, MateriaAtlasEntry>();
+            atlas.AtlasItems = new SerializableDictionary<int, MateriaAtlasItem>();
 
             return atlas;
         }

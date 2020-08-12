@@ -43,7 +43,7 @@ namespace Materiator
         public void Refresh()
         {
             GetMeshReferences();
-            SetUpRenderer();
+            SetUpMaterial();
             SetUpGridSize();
             InitializeTextures();
             AnalyzeMesh();
@@ -83,7 +83,7 @@ namespace Materiator
             }
         }
 
-        private void SetUpRenderer()
+        private void SetUpMaterial()
         {
             if (MaterialData == null)
                 MaterialData = SystemData.Settings.DefaultMaterialData;
@@ -196,7 +196,7 @@ namespace Materiator
         // TODO: Refactor this function (it is confusing)
         public void GenerateMateriaSlots()
         {
-            var materiaSlotsCount = 0;
+            var materiaSlotCount = 0;
 
             // Rebuild Materia Slots
             if (MateriaSlots != null)
@@ -217,14 +217,14 @@ namespace Materiator
                 if (newMateriaSlots.Count != MateriaSlots.Count)
                     MateriaSlots = newMateriaSlots;
 
-                materiaSlotsCount = MateriaSlots.Count;
+                materiaSlotCount = MateriaSlots.Count;
 
                 if (!IsDirty && MateriaSetterData != null)
                     MateriaSlots = MateriaSetterData.MateriaSlots;
             }
 
             // If there are no slots or mesh was updated with extra UVs that led to more filtered rects than materia slots
-            if (materiaSlotsCount == 0 || FilteredRects.Count != materiaSlotsCount)
+            if (materiaSlotCount == 0 || FilteredRects.Count != materiaSlotCount)
             {
                 if (MateriaSlots == null)
                     MateriaSlots = new List<MateriaSlot>();
@@ -250,10 +250,10 @@ namespace Materiator
             if (preset == null) return;
 
             for (int i = 0; i < MateriaSlots.Count; i++)
-                for (int j = 0; j < preset.MateriaPresetItemList.Count; j++)
-                    if (MateriaSlots[i].Tag.Name == preset.MateriaPresetItemList[j].Tag.Name)
-                        if (MateriaSlots[i].Materia != preset.MateriaPresetItemList[j].Materia)
-                            MateriaSlots[i].Materia = preset.MateriaPresetItemList[j].Materia;
+                for (int j = 0; j < preset.MateriaPresetItems.Count; j++)
+                    if (MateriaSlots[i].Tag.Name == preset.MateriaPresetItems[j].Tag.Name)
+                        if (MateriaSlots[i].Materia != preset.MateriaPresetItems[j].Materia)
+                            MateriaSlots[i].Materia = preset.MateriaPresetItems[j].Materia;
         }
 
         // Texture assigning needs to be figured out here

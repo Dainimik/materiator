@@ -114,11 +114,11 @@ namespace Materiator
             {
                 for (int i = 0; i < materiaSlots.Count; i++)
                 {
-                    for (int j = 0; j < preset.MateriaPresetItemList.Count; j++)
+                    for (int j = 0; j < preset.MateriaPresetItems.Count; j++)
                     {
-                        if (materiaSlots[i].Tag.Name == preset.MateriaPresetItemList[j].Tag.Name)
+                        if (materiaSlots[i].Tag.Name == preset.MateriaPresetItems[j].Tag.Name)
                         {
-                            if (materiaSlots[i].Materia != preset.MateriaPresetItemList[j].Materia)
+                            if (materiaSlots[i].Materia != preset.MateriaPresetItems[j].Materia)
                             {
                                 numberOfDifferentMateria++;
                             }
