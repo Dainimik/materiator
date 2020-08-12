@@ -2,6 +2,6 @@
     <ui:VisualElement>
         <uie:ObjectField label="Shader" name="ShaderObjectField" allow-scene-objects="false" />
         <ui:IMGUIContainer name="IMGUIContainer" />
-        <ui:Button text="Update Properties" name="UpdateShaderProperties" tooltip="Selects shader properties with [Materia] attribute and adds them to Properties list" />
+        <ui:Button text="Update Properties" name="UpdateShaderPropertiesButton" tooltip="Selects shader properties with [Materia] attribute and adds them to Properties list" />
     </ui:VisualElement>
 </ui:UXML>

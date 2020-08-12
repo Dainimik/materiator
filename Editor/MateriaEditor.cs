@@ -6,6 +6,7 @@ using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.SceneManagement;
 using System.Linq;
 using UnityEditorInternal;
+using System.Collections.Generic;
 
 namespace Materiator
 {
@@ -18,10 +19,9 @@ namespace Materiator
         private VisualElement _IMGUIContainer;
 
         private SerializedProperty _shaderData;
+        private SerializedProperty _description;
 
         private ReorderableList _materiaPropertyList;
-
-        private SerializedProperty _description;
 
         private ObjectField _shaderDataObjectField;
         private TextField _descriptionTextField;
@@ -38,8 +38,9 @@ namespace Materiator
         {
             _materia = (Materia)target;
 
-            if (_previewTextures != null)
-                SetUpPreview();
+            SetUpPreview();
+            UpdatePreview(_previewMaterial);
+                
 
             //EditorUtils.GenerateMateriaPreviewIcons(_materia, _previewMaterial);
         }
@@ -58,7 +59,7 @@ namespace Materiator
         {
             InitializeEditor<Materia>();
 
-            _materiaPropertyList = new ReorderableList(serializedObject, serializedObject.FindProperty("Properties"), true, true, false, false);
+            _materiaPropertyList = new ReorderableList(serializedObject, serializedObject.FindProperty("Properties"), false, true, false, false);
             SetUpList();
 
             IMGUIContainer defaultInspector = new IMGUIContainer(() => IMGUI());
