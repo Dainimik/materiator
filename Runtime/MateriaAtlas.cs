@@ -10,6 +10,6 @@ namespace Materiator
         public Material Material;
         public Textures Textures = new Textures();
 
-        public SerializableDictionary<int, MateriaAtlasItem> AtlasItems;
+        public SerializableDictionary<int, MateriaAtlasItem> AtlasItems = new SerializableDictionary<int, MateriaAtlasItem>();
     }
 }

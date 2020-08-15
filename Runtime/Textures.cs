@@ -52,17 +52,31 @@ namespace Materiator
                 Texs[tex.Key] = tex.Value;
         }
 
-        public void CreateTextures(List<ShaderProperty> shaderProps, int width, int height)
+        public void RemoveTextures(List<ShaderProperty> props)
+        {
+            foreach (var tex in Texs.ToArray())
+                if (!props.Select(prop => prop.Name).ToArray().Contains(tex.Key))
+                    Texs.Remove(tex.Key);
+        }
+
+        public void CreateTextures(List<ShaderProperty> props, int width, int height)
         {
             FilterMode = SystemData.Settings.FilterMode;
 
-            for (int i = 0; i < shaderProps.Count; i++)
+            for (int i = 0; i < props.Count; i++)
             {
-                if (shaderProps[i].GetType() == typeof(ColorShaderProperty) || shaderProps[i].GetType() == typeof(FloatShaderProperty))
+                if (props[i].GetType() == typeof(ColorShaderProperty) || props[i].GetType() == typeof(FloatShaderProperty))
                 {
-                    if (!Texs.ContainsKey(shaderProps[i].Name))
+                    if (!Texs.ContainsKey(props[i].Name))
                     {
-                        Texs.Add(shaderProps[i].Name, CreateTexture2D(width, height, TextureFormat.RGBA32, FilterMode));
+                        Texs.Add(props[i].Name, CreateTexture2D(width, height, TextureFormat.RGBA32, FilterMode));
+                    }
+                    else
+                    {
+                        if (Texs[props[i].Name] == null)
+                        {
+                            Texs[props[i].Name] = CreateTexture2D(width, height, TextureFormat.RGBA32, FilterMode);
+                        }
                     }
                 }
             }

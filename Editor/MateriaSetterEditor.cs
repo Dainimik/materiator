@@ -140,9 +140,10 @@ namespace Materiator
                     mat.name = name;
 
                 Material.objectReferenceValue = mat;
-                serializedObject.ApplyModifiedProperties();
-
+                
                 MateriaSetter.Textures = newTextures; // Should this be a SerializedProperty here instead of assigning value directly?
+                serializedObject.ApplyModifiedProperties(); // This should be after assigning newTextures to Textures or else editing Setter prefab in project view fails!
+
                 MateriaSetter.SetTextures();
 
                 var newMateriaSlots = new List<MateriaSlot>();

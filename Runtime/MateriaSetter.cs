@@ -139,24 +139,10 @@ namespace Materiator
             if (Textures == null)
                 Textures = new Textures();
 
-            RemoveTextures(shaderProps);
-            CreateTextures(shaderProps);
+            Textures.RemoveTextures(shaderProps);
+            Textures.CreateTextures(shaderProps, GridSize.x, GridSize.y);
 
             SetTextures();
-
-            void RemoveTextures(List<ShaderProperty> props)
-            {
-                foreach (var tex in Textures.Texs.ToArray())
-                    if (!props.Select(prop => prop.Name).ToArray().Contains(tex.Key))
-                        Textures.Texs.Remove(tex.Key);
-            }
-
-            void CreateTextures(List<ShaderProperty> props)
-            {
-                foreach (var prop in props)
-                    if (!Textures.Texs.Keys.Contains(prop.Name))
-                        Textures.CreateTextures(new List<ShaderProperty> { prop }, GridSize.x, GridSize.y);
-            }
         }
 
         public void SetTextures()
@@ -261,8 +247,7 @@ namespace Materiator
                 Mesh = MateriaSetterData.AtlasedMesh;
                 MaterialData = atlas.MaterialData;
                 Material = atlas.Material;
-                //Textures = atlas.Textures;
-                Textures.Assign(atlas.Textures);
+                Textures = atlas.Textures;
 
                 GridSize = MateriaSetterData.AtlasedGridSize;
                 UVRect = MateriaSetterData.AtlasedUVRect;
@@ -285,7 +270,6 @@ namespace Materiator
             MaterialData = MateriaSetterData.MaterialData;
             Material = MateriaSetterData.Material;
             Textures = MateriaSetterData.Textures;
-            //Textures.Assign(MateriaSetterData.Textures);
 
             GridSize = MateriaSetterData.NativeGridSize;
             UVRect = SystemData.Settings.UVRect;
