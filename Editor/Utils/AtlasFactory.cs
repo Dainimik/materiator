@@ -8,25 +8,17 @@ namespace Materiator
 {
     public static class AtlasFactory
     {
-        public static void CreateAtlas(KeyValuePair<MaterialData, List<MateriaSetter>> group, MaterialData materialData, string path, MateriaAtlas existingAtlas = null)
+        public static void CreateAtlas(KeyValuePair<MaterialData, List<MateriaSetter>> group, string path, MateriaAtlas existingAtlas = null)
         {
-            var compatibleMateriaSettersCount = 0;
-            var compatibleMateriaSetters = new List<MateriaSetter>();
+            var materiaSetters = group.Value;
+            var materiaSetterCount = materiaSetters.Count;
+
             var prefabs = new List<GameObject>();
             var prefabPaths = new List<string>();
 
-            foreach (var ms in group.Value)
-            {
-                if (CheckMateriaSetterCompatibility(ms))
-                {
-                    compatibleMateriaSetters.Add(ms);
-                    compatibleMateriaSettersCount++;
-                }
-            }
-
-            var rects = CalculateRects(compatibleMateriaSettersCount, SystemData.Settings.GridSize);
+            var rects = CalculateRects(materiaSetterCount, SystemData.Settings.GridSize);
             var rectIndex = 0;
-            var atlasGridSize = CalculateAtlasSize(compatibleMateriaSettersCount, SystemData.Settings.GridSize);
+            var atlasGridSize = CalculateAtlasSize(materiaSetterCount, SystemData.Settings.GridSize);
 
             var includeAllPrefabs = false;
 
@@ -44,7 +36,7 @@ namespace Materiator
                 atlas = existingAtlas;
             }
 
-            foreach (var ms in compatibleMateriaSetters)
+            foreach (var ms in group.Value)
             {
                 if (ms.MateriaSetterData.MateriaAtlas != null && !includeAllPrefabs)
                     continue;
@@ -56,7 +48,6 @@ namespace Materiator
                     prefabs.Add(prefabGO);
                     prefabPaths.Add(AssetDatabase.GetAssetPath(root));
                 }
-                compatibleMateriaSettersCount++;
             }
 
             var nullSlotIterator = 0;
@@ -166,18 +157,26 @@ namespace Materiator
                 AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(item));
         }
 
-        public static bool CheckMateriaSetterCompatibility(MateriaSetter ms)
+        public static Dictionary<Materia, List<MateriaSetter>> CombineSameValues(List<MateriaSetter> materiaSetters)
         {
-            if (ms.IsDirty == false
-                && ms.MateriaSetterData != null
-                && ms.MateriaSetterData.Material != null)
+            var values = new Dictionary<Materia, List<MateriaSetter>>();
+
+            foreach (var setter in materiaSetters)
             {
-                return true;
+                foreach (var slot in setter.MateriaSlots)
+                {
+                    if (!values.ContainsKey(slot.Materia))
+                    {
+                        values.Add(slot.Materia, new List<MateriaSetter>() { setter });
+                    }
+                    else
+                    {
+                        values[slot.Materia].Add(setter);
+                    }
+                }
             }
-            else
-            {
-                return false;
-            }
+
+            return values;
         }
 
         private static MateriaAtlas CreateMateriaAtlasAsset(string directory, string name, Material material, Vector2Int size)

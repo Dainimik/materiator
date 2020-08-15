@@ -308,7 +308,7 @@ namespace Materiator
             {
                 var groupMembers = new List<MateriaSetter>();
 
-                if (AtlasFactory.CheckMateriaSetterCompatibility(ms))
+                if (CheckMateriaSetterCompatibility(ms))
                 {
                     if (PrefabUtility.IsPartOfPrefabAsset(ms)
                     && !PrefabUtility.IsPartOfPrefabInstance(ms) || PrefabUtility.IsPartOfVariantPrefab(ms))
@@ -338,12 +338,34 @@ namespace Materiator
             }
         }
 
+        private bool CheckMateriaSetterCompatibility(MateriaSetter ms)
+        {
+            if (ms.IsDirty == false
+                && ms.MateriaSetterData != null
+                && ms.MateriaSetterData.Material != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         private void Overwrite()
         {
             if (EditorUtility.DisplayDialog("Overwrite current atlas?", "Are you sure you want to overwrite " + _atlasObjectField.value.name + " with current settings?", "Yes", "No"))
             {
+                foreach (var ms in _compatibleMateriaSetters)
+                {
+                    if (!CheckMateriaSetterCompatibility(ms))
+                    {
+                        _compatibleMateriaSetters.Remove(ms);
+                    }
+                }
+
                 var kvp = new KeyValuePair<MaterialData, List<MateriaSetter>>(_atlas.MaterialData, _compatibleMateriaSetters);
-                AtlasFactory.CreateAtlas(kvp, kvp.Key, AssetDatabase.GetAssetPath(_atlas), _atlas);
+                AtlasFactory.CreateAtlas(kvp, AssetDatabase.GetAssetPath(_atlas), _atlas);
             }
         }
 
