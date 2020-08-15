@@ -26,6 +26,8 @@ namespace Materiator
 
         private Button _reloadButton;
 
+        private SerializedProperty _materiaSetterData;
+
         private void OnEnable()
         {
             MateriaSetter = (MateriaSetter)target;
@@ -117,7 +119,7 @@ namespace Materiator
 
         private void CreateEditModeData(int editMode)
         {
-            if (MateriaSetter.MateriaSetterData != null)
+            if (_materiaSetterData.objectReferenceValue != null)
             {
                 var newTextures = new Textures();
 
@@ -140,23 +142,19 @@ namespace Materiator
                     mat.name = name;
 
                 Material.objectReferenceValue = mat;
-                
-                MateriaSetter.Textures = newTextures; // Should this be a SerializedProperty here instead of assigning value directly?
-                serializedObject.ApplyModifiedProperties(); // This should be after assigning newTextures to Textures or else editing Setter prefab in project view fails!
+                serializedObject.ApplyModifiedProperties(); // This should be after assigning newTextures to Textures or else editing Setter prefab in project view fails! But then any materia modification will apply changes to texture immediately
 
+                MateriaSetter.Textures = newTextures;
                 MateriaSetter.SetTextures();
 
                 var newMateriaSlots = new List<MateriaSlot>();
 
                 foreach (var item in MateriaSetter.MateriaSetterData.MateriaSlots)
-                {
                     newMateriaSlots.Add(new MateriaSlot(item.ID, item.Materia, item.Tag));
-                }
 
                 MateriaSetter.MateriaSlots = newMateriaSlots;
-                serializedObject.Update(); // Why are two updates here necessary?
+
                 MateriaSetter.UpdateRenderer();
-                serializedObject.Update(); // Why are two updates here necessary?
             }
         }
 
@@ -165,6 +163,8 @@ namespace Materiator
             EditMode = serializedObject.FindProperty("EditMode");
             IsDirty = serializedObject.FindProperty("IsDirty");
             Material = serializedObject.FindProperty("Material");
+
+            _materiaSetterData = serializedObject.FindProperty("MateriaSetterData");
 
             _reloadButton = root.Q<Button>("ReloadButton");
         }
