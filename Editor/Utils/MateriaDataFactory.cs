@@ -138,6 +138,11 @@ namespace Materiator
                 data.Textures = outputTextures;
                 data.NativeMesh = materiaSetter.Mesh;
                 data.NativeGridSize = materiaSetter.GridSize;
+
+                if (data.Textures.ID == 0)
+                {
+                    data.Textures.ID = UnityEngine.Random.Range(-999999, 9999999);
+                }
             }
 
             if (data.MateriaSlots != null)

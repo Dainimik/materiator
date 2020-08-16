@@ -81,7 +81,7 @@ namespace Materiator
         {
             SwitchEditModeTo(EditMode.Native);
 
-            LoadPrefabs((MateriaAtlas)_atlasObjectField.value);
+            LoadPrefabs();
 
             GenerateListViews();
         }
@@ -377,7 +377,15 @@ namespace Materiator
                 var i = 0;
                 foreach (var kvp in _groupsList)
                 {
-                    //AtlasFactory.CreateAtlas(kvp, _materialDataMaterialGroups[kvp.Key], path, null);
+                    foreach (var ms in kvp.Value)
+                    {
+                        if (!CheckMateriaSetterCompatibility(ms))
+                        {
+                            _groupsList[kvp.Key].Remove(ms);
+                        }
+                    }
+
+                    AtlasFactory.CreateAtlas(kvp, path, null);
                     i++;
                 }
             }

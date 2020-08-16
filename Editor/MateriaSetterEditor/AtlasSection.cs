@@ -56,6 +56,7 @@ namespace Materiator
 
         private void SwitchEditMode()
         {
+            EditorUtility.SetDirty(_editor.MateriaSetter);
             if (_materiaSetter.EditMode == EditMode.Native)
                 LoadAtlas(_materiaSetter.MateriaSetterData.MateriaAtlas);
             else if (_materiaSetter.EditMode == EditMode.Atlas)

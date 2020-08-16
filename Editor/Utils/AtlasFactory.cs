@@ -6,66 +6,47 @@ using UnityEngine;
 
 namespace Materiator
 {
-    public static class AtlasFactory
+    public class AtlasFactory
     {
+        private static MateriaAtlas _atlas;
+
+        private static MateriaSetterData _msData;
+
+        private static Rect[] _rects;
+        private static Vector2Int _atlasGridSize;
+        private static int _rectIndex;
+        private static Mesh _atlasedMesh;
+
+        private static int _nullSlotIterator;
+        private static List<int> _nullSlotIndices;
+
         public static void CreateAtlas(KeyValuePair<MaterialData, List<MateriaSetter>> group, string path, MateriaAtlas existingAtlas = null)
         {
+            var materialData = group.Key;
             var materiaSetters = group.Value;
             var materiaSetterCount = materiaSetters.Count;
 
-            var prefabs = new List<GameObject>();
-            var prefabPaths = new List<string>();
+            _rects = CalculateRects(materiaSetterCount, SystemData.Settings.GridSize);
+            _atlasGridSize = CalculateAtlasSize(materiaSetterCount, SystemData.Settings.GridSize);
 
-            var rects = CalculateRects(materiaSetterCount, SystemData.Settings.GridSize);
-            var rectIndex = 0;
-            var atlasGridSize = CalculateAtlasSize(materiaSetterCount, SystemData.Settings.GridSize);
+            _atlas = existingAtlas;
+            if (existingAtlas == null)
+                _atlas = CreateMateriaAtlasAsset(AssetUtils.GetDirectoryName(path), AssetUtils.GetFileName(path), materialData, _atlasGridSize);
 
-            var includeAllPrefabs = false;
-
-            var dir = AssetUtils.GetDirectoryName(path);
-            var atlasName = AssetUtils.GetFileName(path);
-            MateriaAtlas atlas = null;
-
-            if (existingAtlas == null || existingAtlas.GridSize.x < atlasGridSize.x || existingAtlas.GridSize.y < atlasGridSize.y)
-            {
-                //atlas = CreateMateriaAtlasAsset(dir, atlasName, materialData, atlasGridSize);
-                includeAllPrefabs = true;
-            }
-            else
-            {
-                atlas = existingAtlas;
-            }
-
-            foreach (var ms in group.Value)
-            {
-                if (ms.MateriaSetterData.MateriaAtlas != null && !includeAllPrefabs)
-                    continue;
-
-                var root = ms.transform.root;
-                var prefabGO = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GetAssetPath(root));
-                if (!prefabs.Contains(prefabGO))
-                {
-                    prefabs.Add(prefabGO);
-                    prefabPaths.Add(AssetDatabase.GetAssetPath(root));
-                }
-            }
-
-            var nullSlotIterator = 0;
-            var nullSlotIndices = new List<int>();
-            foreach (var kvp in atlas.AtlasItems)
-            {
-                if (kvp.Value.MateriaSetterData == null)
-                    nullSlotIndices.Add(kvp.Key);
-            }
+            _nullSlotIterator = 0;
+            _nullSlotIndices = GetAtlasNullSlotIndices();
 
             var processedPrefabs = new HashSet<GameObject>();
-            var skipSavingPrefab = false;
+            _rectIndex = 0;
+
+            var includeAllPrefabs = DeterminePrefabProcessing(existingAtlas);
+            var prefabs = GetPrefabs(materiaSetters, includeAllPrefabs);
 
             try
             {
                 AssetDatabase.StartAssetEditing();
 
-                for (var i = 0; i < prefabs.Count; i++)
+                for (var i = 0; i < prefabs.Length; i++)
                 {
                     var prefab = PrefabUtility.LoadPrefabContents(AssetDatabase.GetAssetPath(prefabs[i]));
                     var ms = prefab.GetComponentsInChildren<MateriaSetter>();
@@ -83,61 +64,27 @@ namespace Materiator
                             if (ms[j].MateriaSetterData.MateriaAtlas != null && !includeAllPrefabs)
                                 continue;
 
-                            var data = ms[j].MateriaSetterData;
+                            _msData = ms[j].MateriaSetterData;
 
-                            var atlasedMesh = Utils.CopyMesh(ms[j].MateriaSetterData.NativeMesh);
-                            atlasedMesh.uv = MeshAnalyzer.RemapUVs(atlasedMesh.uv, rects[rectIndex]);
+                            FillAtlasWithItems(prefabs, i);
 
-                            var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.MateriaSetterData == data).FirstOrDefault();
-                            if (nullSlotIndices.Count > 0)
-                            {
-                                atlas.AtlasItems[nullSlotIndices[nullSlotIterator]].MateriaSetter = prefabMS;
-                                atlas.AtlasItems[nullSlotIndices[nullSlotIterator]].MateriaSetterData = data;
+                            SetAtlasTextureValues();
 
-                                nullSlotIterator++;
-                            }
-                            else
-                            {
-                                if (!atlas.AtlasItems.ContainsKey(i))
-                                    atlas.AtlasItems.Add(i, new MateriaAtlasItem(prefabMS, data));
-                            }
+                            CreateAtlasedMesh();
 
-                            atlas.MaterialData = group.Key;
-                            atlas.GridSize = atlasGridSize;
+                            UpdateMateriaSetterData();
 
-                            var rectInt = Utils.GetRectIntFromRect(atlasGridSize, rects[rectIndex]);
+                            ms[j].LoadAtlas(_atlas);
 
-                            foreach (var tex in data.Textures.Texs)
-                            {
-                                var colors = tex.Value.GetPixels32();
-                                atlas.Textures.Texs.Where(t => t.Key == tex.Key).FirstOrDefault().Value.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, colors);
-                            }
-
-                            if (data.AtlasedMesh != null)
-                                AssetDatabase.RemoveObjectFromAsset(data.AtlasedMesh);
-
-                            AssetDatabase.AddObjectToAsset(atlasedMesh, data);
-
-                            data.MateriaAtlas = atlas;
-                            data.AtlasedMesh = atlasedMesh;
-                            data.AtlasedUVRect = rects[rectIndex];
-                            data.AtlasedGridSize = atlasGridSize;
-
-                            ms[j].LoadAtlas(atlas);
-
-                            rectIndex++;
+                            _rectIndex++;
                         }
 
                         processedPrefabs.Add(prefab);
-                    }
-                    else
-                        skipSavingPrefab = true;
 
-                    if (!skipSavingPrefab)
-                    {
-                        PrefabUtility.SaveAsPrefabAsset(prefab, prefabPaths[i]); // Saves changes madate in unloaded scene to prefab
-                        PrefabUtility.UnloadPrefabContents(prefab);
+                        PrefabUtility.SaveAsPrefabAsset(prefab, AssetDatabase.GetAssetPath(prefabs[i])); // Saves changes madate in unloaded scene to prefab
                     }
+
+                    PrefabUtility.UnloadPrefabContents(prefab);
                 }
             }
             catch (Exception ex)
@@ -149,7 +96,7 @@ namespace Materiator
                 AssetDatabase.StopAssetEditing();
             }
 
-            atlas.Textures.Apply();
+            _atlas.Textures.Apply();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
@@ -157,34 +104,102 @@ namespace Materiator
                 AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(item));
         }
 
-        public static Dictionary<Materia, List<MateriaSetter>> CombineSameValues(List<MateriaSetter> materiaSetters)
+        private static bool DeterminePrefabProcessing(MateriaAtlas atlas)
         {
-            var values = new Dictionary<Materia, List<MateriaSetter>>();
-
-            foreach (var setter in materiaSetters)
-            {
-                foreach (var slot in setter.MateriaSlots)
-                {
-                    if (!values.ContainsKey(slot.Materia))
-                    {
-                        values.Add(slot.Materia, new List<MateriaSetter>() { setter });
-                    }
-                    else
-                    {
-                        values[slot.Materia].Add(setter);
-                    }
-                }
-            }
-
-            return values;
+            if (atlas == null || atlas.GridSize.x < _atlasGridSize.x || atlas.GridSize.y < _atlasGridSize.y)
+                return true;
+            else
+                return false;
         }
 
-        private static MateriaAtlas CreateMateriaAtlasAsset(string directory, string name, Material material, Vector2Int size)
+        private static GameObject[] GetPrefabs(List<MateriaSetter> setters, bool includeAllPrefabs)
+        {
+            var prefabs = new List<GameObject>();
+
+            foreach (var ms in setters)
+            {
+                if (ms.MateriaSetterData.MateriaAtlas != null && !includeAllPrefabs)
+                    continue;
+
+                var root = ms.transform.root;
+                var prefabGO = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GetAssetPath(root));
+
+                if (!prefabs.Contains(prefabGO))
+                    prefabs.Add(prefabGO);
+            }
+
+            return prefabs.ToArray();
+        }
+
+        private static List<int> GetAtlasNullSlotIndices()
+        {
+            var indices = new List<int>();
+
+            if (_atlas != null)
+                foreach (var kvp in _atlas.AtlasItems)
+                    if (kvp.Value.MateriaSetterData == null)
+                        indices.Add(kvp.Key);
+
+            return indices;
+        }
+
+        private static void FillAtlasWithItems(GameObject[] prefabs, int i)
+        {
+            var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.MateriaSetterData == _msData).FirstOrDefault();
+
+            if (_nullSlotIndices.Count > 0)
+            {
+                _atlas.AtlasItems[_nullSlotIndices[_nullSlotIterator]].MateriaSetter = prefabMS;
+                _atlas.AtlasItems[_nullSlotIndices[_nullSlotIterator]].MateriaSetterData = _msData;
+
+                _nullSlotIterator++;
+            }
+            else
+            {
+                if (!_atlas.AtlasItems.ContainsKey(i))
+                    _atlas.AtlasItems.Add(i, new MateriaAtlasItem(prefabMS, _msData));
+            }
+        }
+
+        private static void SetAtlasTextureValues()
+        {
+            var rectInt = Utils.GetRectIntFromRect(_atlasGridSize, _rects[_rectIndex]);
+
+            foreach (var tex in _msData.Textures.Texs)
+            {
+                var colors = tex.Value.GetPixels32();
+                _atlas.Textures.Texs.Where(t => t.Key == tex.Key).FirstOrDefault().Value.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, colors);
+            }
+            _atlas.Textures.ID = 111; // For debugging purposes
+        }
+
+        private static void CreateAtlasedMesh()
+        {
+            _atlasedMesh = Utils.CopyMesh(_msData.NativeMesh);
+            _atlasedMesh.uv = MeshAnalyzer.RemapUVs(_atlasedMesh.uv, _rects[_rectIndex]);
+        }
+
+        private static void UpdateMateriaSetterData()
+        {
+            if (_msData.AtlasedMesh != null)
+                AssetDatabase.RemoveObjectFromAsset(_msData.AtlasedMesh);
+
+            AssetDatabase.AddObjectToAsset(_atlasedMesh, _msData);
+
+            _msData.MateriaAtlas = _atlas;
+            _msData.AtlasedMesh = _atlasedMesh;
+            _msData.AtlasedUVRect = _rects[_rectIndex];
+            _msData.AtlasedGridSize = _atlasGridSize;
+        }
+
+        private static MateriaAtlas CreateMateriaAtlasAsset(string directory, string name, MaterialData materialData, Vector2Int gridSize)
         {
             var atlas = AssetUtils.CreateScriptableObjectAsset<MateriaAtlas>(directory, name);
-            //atlas.Textures.CreateTextures(size.x, size.y);
+            atlas.MaterialData = materialData;
+            atlas.GridSize = gridSize;
+            atlas.Textures.CreateTextures(materialData.ShaderData.Properties, gridSize.x, gridSize.y);
             atlas.Textures.SetNames(name);
-            atlas.Material = UnityEngine.Object.Instantiate(material);
+            atlas.Material = UnityEngine.Object.Instantiate(materialData.Material);
             atlas.Material.name = name;
 
             AssetDatabase.AddObjectToAsset(atlas.Material, atlas);
@@ -193,7 +208,6 @@ namespace Materiator
             AssetDatabase.SaveAssets();
 
             atlas.Textures.ImportTextureAssets();
-            atlas.AtlasItems = new SerializableDictionary<int, MateriaAtlasItem>();
 
             return atlas;
         }

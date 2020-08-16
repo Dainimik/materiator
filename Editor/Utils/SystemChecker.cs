@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
+using UnityEditor.Experimental.SceneManagement;
 using UnityEngine.UIElements;
 
 namespace Materiator
@@ -99,6 +101,16 @@ namespace Materiator
                     new Dictionary<ContextAction, string>
                     {
                         [ContextActions.Retry] = "Retry"
+                    });
+            }
+            else if (PrefabUtility.IsPartOfPrefabAsset(materiaSetter) && !PrefabStageUtility.GetCurrentPrefabStage()) // This is here because switching edit mode in project view prefab causes bugs
+            {
+                return ErrorMessage(
+                    editor,
+                    "Please Open Prefab to edit Materia Setter.",
+                    new Dictionary<ContextAction, string>
+                    {
+                        [ContextActions.OpenPrefab] = "Open Prefab"
                     });
             }
             else

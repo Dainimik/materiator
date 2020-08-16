@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
 
 namespace Materiator
 {
@@ -22,6 +23,11 @@ namespace Materiator
         public static void AddSkinnedMeshRenderer(MateriaSetterEditor editor)
         {
             editor.MateriaSetter.gameObject.AddComponent<SkinnedMeshRenderer>();
+        }
+
+        public static void OpenPrefab(MateriaSetterEditor editor)
+        {
+            AssetDatabase.OpenAsset(editor.MateriaSetter.gameObject);
         }
     }
 }
