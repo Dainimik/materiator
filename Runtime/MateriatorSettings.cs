@@ -11,6 +11,14 @@ namespace Materiator
         Continuous
     }
 
+    public enum MateriaTextureFormat
+    {
+        RGB24,
+        RGBA32,
+        RGB9e5Float,
+        RGBAHalf
+    }
+
     public class MateriatorSettings : ScriptableObject
     {
         public Vector2Int GridSize = new Vector2Int(4, 4);
@@ -26,6 +34,9 @@ namespace Materiator
 
         public Color HighlightColor;
         public HighlightMode HighlightMode;
+
+        public bool OptimizeTextures = true;
+        public TextureFormat TextureFormat = TextureFormat.RGBAHalf;
         public FilterMode FilterMode;
 
         [HideInInspector]

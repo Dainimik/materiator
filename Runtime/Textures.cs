@@ -69,13 +69,13 @@ namespace Materiator
                 {
                     if (!Texs.ContainsKey(props[i].Name))
                     {
-                        Texs.Add(props[i].Name, CreateTexture2D(width, height, TextureFormat.RGBA32, FilterMode));
+                        Texs.Add(props[i].Name, CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode));
                     }
                     else
                     {
                         if (Texs[props[i].Name] == null)
                         {
-                            Texs[props[i].Name] = CreateTexture2D(width, height, TextureFormat.RGBA32, FilterMode);
+                            Texs[props[i].Name] = CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode);
                         }
                     }
                 }
@@ -107,10 +107,11 @@ namespace Materiator
                 var rectInt = Utils.GetRectIntFromRect(Size, rect.Value);
                 var numberOfColors = rectInt.width * rectInt.height;
 
-                var colors = new Dictionary<Texture2D, Color32[]>();
+                var colors = new Dictionary<Texture2D, Color[]>();
+
                 foreach (var tex in Texs)
                 {
-                    colors.Add(tex.Value, new Color32[numberOfColors]);
+                    colors.Add(tex.Value, new Color[numberOfColors]);
 
                     for (int i = 0; i < numberOfColors; i++)
                     {
@@ -121,7 +122,7 @@ namespace Materiator
                                 var colorProp = (ColorShaderProperty)prop;
                                 if (colorProp.Name == tex.Key)
                                 {
-                                    colors[tex.Value][i] = colorProp.Value;
+                                    colors[tex.Value][i] = (Color)colorProp.Value * colorProp.Multiplier;
                                 }
                             }
                             else if (prop.GetType() == typeof(FloatShaderProperty))
@@ -134,16 +135,16 @@ namespace Materiator
                                     var b = (byte)(floatProp.B * 255);
                                     var a = (byte)(floatProp.A * 255);
 
-                                    colors[tex.Value][i].r = r;
-                                    colors[tex.Value][i].g = g;
-                                    colors[tex.Value][i].b = b;
-                                    colors[tex.Value][i].a = a;
+                                    colors[tex.Value][i].r = floatProp.R;
+                                    colors[tex.Value][i].g = floatProp.G;
+                                    colors[tex.Value][i].b = floatProp.B;
+                                    colors[tex.Value][i].a = floatProp.A;
                                 }
                             }
                         }
                     }
 
-                    tex.Value.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, colors[tex.Value]);
+                    tex.Value.SetPixels(rectInt.x, rectInt.y, rectInt.width, rectInt.height, colors[tex.Value]);
                 }
             }
 
@@ -192,7 +193,7 @@ namespace Materiator
                     }
                 }
 
-                tex.Value.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, colors[tex.Value]);
+                //tex.Value.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, colors[tex.Value]);
             }
 
             Apply();
