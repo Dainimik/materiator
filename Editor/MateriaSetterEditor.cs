@@ -17,6 +17,9 @@ namespace Materiator
         public SerializedProperty IsDirty;
         public SerializedProperty Material;
 
+        public SerializedProperty UseCustomGridSize;
+        public SerializedProperty GridSize;
+
         public VisualElement Root;
 
         public AtlasSection AtlasSection;
@@ -163,6 +166,9 @@ namespace Materiator
             EditMode = serializedObject.FindProperty("EditMode");
             IsDirty = serializedObject.FindProperty("IsDirty");
             Material = serializedObject.FindProperty("Material");
+
+            UseCustomGridSize = serializedObject.FindProperty("UseCustomGridSize");
+            GridSize = serializedObject.FindProperty("GridSize");
 
             _materiaSetterData = serializedObject.FindProperty("MateriaSetterData");
 

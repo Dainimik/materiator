@@ -18,7 +18,6 @@ namespace Materiator
 
         public MateriaAtlas MateriaAtlas;
         public Mesh AtlasedMesh;
-        public Vector2Int AtlasedGridSize;
         public Rect AtlasedUVRect;
     }
 }

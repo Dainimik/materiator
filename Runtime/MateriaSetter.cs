@@ -31,7 +31,9 @@ namespace Materiator
         public Material Material;
         public Textures Textures;
 
+        public bool UseCustomGridSize;
         public Vector2Int GridSize;
+
         public Rect UVRect;
 
 
@@ -122,12 +124,21 @@ namespace Materiator
         {
             if (EditMode == EditMode.Native)
             {
-                GridSize = SystemData.Settings.GridSize;
+                if (!UseCustomGridSize)
+                    GridSize = SystemData.Settings.GridSize;
+
+                if (MateriaSetterData && !IsDirty)
+                    GridSize = MateriaSetterData.NativeGridSize;
+                
                 UVRect = SystemData.Settings.UVRect;
             }
             else if (EditMode == EditMode.Atlas)
             {
-                GridSize = MateriaSetterData.AtlasedGridSize;
+                if (IsDirty)
+                    GridSize = MateriaSetterData.NativeGridSize;
+                else
+                    GridSize = MateriaSetterData.MateriaAtlas.GridSize;
+                
                 UVRect = MateriaSetterData.AtlasedUVRect;
             }
         }
@@ -139,9 +150,13 @@ namespace Materiator
             if (Textures == null)
                 Textures = new Textures();
 
-            Textures.RemoveTextures(shaderProps);
-            Textures.CreateTextures(shaderProps, GridSize.x, GridSize.y);
+            var gridSize = GridSize;
+            if (EditMode == EditMode.Atlas)
+                gridSize = MateriaSetterData.MateriaAtlas.GridSize;
 
+            Textures.RemoveTextures(shaderProps, gridSize.x, gridSize.y);
+            Textures.CreateTextures(shaderProps, gridSize.x, gridSize.y);
+            
             SetTextures();
         }
 
@@ -163,12 +178,10 @@ namespace Materiator
 
         public void AnalyzeMesh()
         {
-            var gridSize = SystemData.Settings.GridSize;
+            if (MateriaSetterData != null && !IsDirty) // this here can probably be removed because it is being checked in SetUpGridSize fn
+                GridSize = MateriaSetterData.NativeGridSize;
 
-            if (MateriaSetterData != null)
-                gridSize = MateriaSetterData.NativeGridSize;
-
-            Rects = MeshAnalyzer.CalculateRects(gridSize, UVRect);
+            Rects = MeshAnalyzer.CalculateRects(GridSize, UVRect);
             FilteredRects = MeshAnalyzer.FilterRects(Rects, Mesh.uv);
         }
 
@@ -249,7 +262,7 @@ namespace Materiator
                 Material = atlas.Material;
                 Textures = atlas.Textures;
 
-                GridSize = MateriaSetterData.AtlasedGridSize;
+                GridSize = MateriaSetterData.MateriaAtlas.GridSize;
                 UVRect = MateriaSetterData.AtlasedUVRect;
 
                 Textures.SetTexturesToMaterial(Material);

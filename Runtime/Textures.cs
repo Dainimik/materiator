@@ -7,6 +7,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
 
 namespace Materiator
 {
@@ -46,16 +47,10 @@ namespace Materiator
             }
         }
 
-        public void Assign(Textures textures)
-        {
-            foreach (var tex in textures.Texs)
-                Texs[tex.Key] = tex.Value;
-        }
-
-        public void RemoveTextures(List<ShaderProperty> props)
+        public void RemoveTextures(List<ShaderProperty> props, int width, int height)
         {
             foreach (var tex in Texs.ToArray())
-                if (!props.Select(prop => prop.Name).ToArray().Contains(tex.Key))
+                if (!props.Select(prop => prop.Name).ToArray().Contains(tex.Key) || (Size.x != width || Size.y != height))
                     Texs.Remove(tex.Key);
         }
 
@@ -73,7 +68,7 @@ namespace Materiator
                     }
                     else
                     {
-                        if (Texs[props[i].Name] == null)
+                        if (Texs[props[i].Name] == null || (Size.x != width || Size.y != height))
                         {
                             Texs[props[i].Name] = CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode);
                         }
@@ -112,6 +107,7 @@ namespace Materiator
                 foreach (var tex in Texs)
                 {
                     colors.Add(tex.Value, new Color[numberOfColors]);
+                    //var data = tex.Value.GetRawTextureData<Color>();
 
                     for (int i = 0; i < numberOfColors; i++)
                     {
@@ -149,6 +145,18 @@ namespace Materiator
             }
 
             Apply();
+        }
+
+        private void FillTextureData(Texture2D texture, NativeArray<Color> data)
+        {
+            var index = 0;
+            for (int y = 0; y < texture.height; y++)
+            {
+                for (int x = 0; x < texture.width; x++)
+                {
+                    //data[index++] = ((x & y) == 0 ? orange : teal);
+                }
+            }
         }
 
         // TODO: This function is a modified copy!!! Merge with original!
@@ -236,8 +244,8 @@ namespace Materiator
 
             foreach (var tex in source.Texs)
             {
-                var sourceColors = Utils.ColorToColor32Array(tex.Value.GetPixels(sourceRectInt.x, sourceRectInt.y, sourceRectInt.width, sourceRectInt.height));
-                Texs.Where(t => t.Key == tex.Key).FirstOrDefault().Value.SetPixels32(destinationRectInt.x, destinationRectInt.y, destinationRectInt.width, destinationRectInt.height, sourceColors);
+                var sourceColors = tex.Value.GetPixels(sourceRectInt.x, sourceRectInt.y, sourceRectInt.width, sourceRectInt.height);
+                Texs.Where(t => t.Key == tex.Key).FirstOrDefault().Value.SetPixels(destinationRectInt.x, destinationRectInt.y, destinationRectInt.width, destinationRectInt.height, sourceColors);
             }
 
             Apply();

@@ -21,6 +21,10 @@ namespace Materiator
         private Button _reloadMateriaSetterDataButton;
         private Button _newMateriaSetterDataButton;
 
+        private Toggle _useCustomGridSizeToggle;
+        private Vector2IntField _gridSizeField;
+        private Button _combineMateriaButton;
+
         public VisualElement _dataIndicator;
 
         private MateriaSection _materiaSection;
@@ -145,6 +149,12 @@ namespace Materiator
             _materiaSetter.UpdateRenderer(false);
         }
 
+        private void CombineMateria()
+        {
+            _editor.SetMateriaSetterDirty(true);
+            _materiaSetter.Refresh();
+        }
+
         private void RegisterCallbacks()
         {
             _materiaSetterDataObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
@@ -155,6 +165,13 @@ namespace Materiator
             _materialDataObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
             {
                 OnMaterialDataChanged((MaterialData)e.newValue);
+            });
+
+            _useCustomGridSizeToggle.RegisterCallback<ChangeEvent<bool>>(e =>
+            {
+                _editor.UseCustomGridSize.boolValue = e.newValue;
+                _editor.serializedObject.ApplyModifiedProperties();
+                // enable vector2 field visibility
             });
 
             _editor.OnDirtyChanged += UpdateIndicator; // This event is not deregistered anywhere
@@ -175,6 +192,10 @@ namespace Materiator
             _newMateriaSetterDataButton = root.Q<Button>("NewMateriaSetterDataButton");
             _reloadMateriaSetterDataButton = root.Q<Button>("ReloadMateriaSetterDataButton");
 
+            _useCustomGridSizeToggle = root.Q<Toggle>("UseCustomGridSizeToggle");
+            _gridSizeField = root.Q<Vector2IntField>("GridSizeField");
+            _combineMateriaButton = root.Q<Button>("CombineMateriaButton");
+
             _dataIndicator = root.Q<VisualElement>("DataIndicator");
 
             _currentShaderLabel = root.Q<Label>("CurrentShaderLabel");
@@ -184,12 +205,16 @@ namespace Materiator
         {
             _materiaSetterDataObjectField.BindProperty(MateriaSetterData);
             _materialDataObjectField.BindProperty(MaterialData);
+
+            _useCustomGridSizeToggle.BindProperty(_editor.UseCustomGridSize);
+            _gridSizeField.BindProperty(_editor.GridSize);
         }
 
         private void RegisterButtons()
         {
             _newMateriaSetterDataButton.clicked += CreateNewData;
             _reloadMateriaSetterDataButton.clicked += () => { ReloadData((MateriaSetterData)_materiaSetterDataObjectField.value); };
+            _combineMateriaButton.clicked += CombineMateria;
         }
     }
 }

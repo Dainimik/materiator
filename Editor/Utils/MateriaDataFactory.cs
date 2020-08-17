@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -26,6 +27,8 @@ namespace Materiator
                 path = dir + name + ".asset";
             }
 
+            var IsTextureSizeDifferent = false;
+
             Material material = null;
             Textures outputTextures = null;
 
@@ -34,6 +37,36 @@ namespace Materiator
 
             if (isDataAssetExisting)
             {
+                // Figure this out because this is wrong and will be buggy
+                if ((materiaSetter.Textures.Size.x != data.Textures.Size.x) || (materiaSetter.Textures.Size.y != data.Textures.Size.y) || (materiaSetter.Textures.Texs.Count != data.Textures.Texs.Count))
+                {
+                    IsTextureSizeDifferent = true;
+
+                    if (data.MateriaAtlas)
+                    {
+                        // show warning: if proceeding, all atlas will be recalculated and may take some time
+
+                        // recalculate atlas textures
+                    }
+
+                    foreach (var tex in data.Textures.Texs.ToArray())
+                    {
+                        if (packAssets)
+                        {
+                            AssetDatabase.RemoveObjectFromAsset(tex.Value);
+                        }
+                        else
+                        {
+                            AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(tex.Value));
+                        }
+
+                        data.Textures.Texs.Clear();
+                        data.Textures.CreateTextures(data.MaterialData.ShaderData.Properties, materiaSetter.Textures.Size.x, materiaSetter.Textures.Size.y);
+                    }
+
+                    AssetDatabase.SaveAssets();
+                }
+                
                 if (editor.EditMode.enumValueIndex == 0)
                 {
                     outputTextures = data.Textures;
@@ -60,7 +93,6 @@ namespace Materiator
                             AssetDatabase.CreateAsset(mat, folderDir + name + "_Material.mat");
                             material = (Material)AssetDatabase.LoadAssetAtPath(folderDir + name + "_Material.mat", typeof(Material));
                         }
-
                     }
                 }
                 else if (editor.EditMode.enumValueIndex == 1)
@@ -86,9 +118,7 @@ namespace Materiator
                 outputTextures.SetNames(name);
 
                 if (data.MateriaAtlas != null)
-                {
                     data.MateriaAtlas.Textures.CopyPixelColors(materiaSetter.Textures, materiaSetter.Textures.Size, SystemData.Settings.UVRect, data.MateriaAtlas.Textures.Size, materiaSetter.MateriaSetterData.AtlasedUVRect);
-                }
             }
             else if (editor.EditMode.enumValueIndex == 1)
             {
@@ -107,6 +137,10 @@ namespace Materiator
                 if (!isDataAssetExisting)
                 {
                     AssetDatabase.AddObjectToAsset(material, data);
+                    outputTextures.AddTexturesToAsset(data);
+                }
+                if (materiaSetter.EditMode == EditMode.Native && IsTextureSizeDifferent) // Figure this out because this is wrong and will be buggy
+                {
                     outputTextures.AddTexturesToAsset(data);
                 }
             }

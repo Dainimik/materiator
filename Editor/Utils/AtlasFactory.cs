@@ -17,24 +17,44 @@ namespace Materiator
         private static int _rectIndex;
         private static Mesh _atlasedMesh;
 
-        private static int _nullSlotIterator;
-        private static List<int> _nullSlotIndices;
-
         public static void CreateAtlas(KeyValuePair<MaterialData, List<MateriaSetter>> group, string path, MateriaAtlas existingAtlas = null)
         {
             var materialData = group.Key;
             var materiaSetters = group.Value;
-            var materiaSetterCount = materiaSetters.Count;
 
-            _rects = CalculateRects(materiaSetterCount, SystemData.Settings.GridSize);
-            _atlasGridSize = CalculateAtlasSize(materiaSetterCount, SystemData.Settings.GridSize);
+            // collect textures
+            var texs = new Dictionary<string, List<Texture2D>>();
+            foreach (var item in group.Value)
+            {
+                foreach (var kvp in item.MateriaSetterData.Textures.Texs)
+                {
+                    if (!texs.ContainsKey(kvp.Key))
+                    {
+                        texs.Add(kvp.Key, new List<Texture2D>() { kvp.Value });
+                    }
+                    else
+                    {
+                        if (!texs[kvp.Key].Contains(kvp.Value))
+                        {
+                            texs[kvp.Key].Add(kvp.Value);
+                        }
+                    }
+                }
+            }
 
+            // create textures
+            var output = new List<KeyValuePair<KeyValuePair<string, Texture2D>, Rect[]>>();
+            foreach (var item in texs)
+            {
+                var newTex = new Texture2D(8192, 8192);
+                _rects = newTex.PackTextures(item.Value.ToArray(), 0, 8192, false);
+                output.Add(new KeyValuePair<KeyValuePair<string, Texture2D>, Rect[]>(new KeyValuePair<string, Texture2D>(item.Key, newTex), _rects ));
+            }
+
+            // create atlas asset
             _atlas = existingAtlas;
             if (existingAtlas == null)
-                _atlas = CreateMateriaAtlasAsset(AssetUtils.GetDirectoryName(path), AssetUtils.GetFileName(path), materialData, _atlasGridSize);
-
-            _nullSlotIterator = 0;
-            _nullSlotIndices = GetAtlasNullSlotIndices();
+                _atlas = CreateMateriaAtlasAsset(AssetUtils.GetDirectoryName(path), AssetUtils.GetFileName(path), materialData, output);
 
             var processedPrefabs = new HashSet<GameObject>();
             _rectIndex = 0;
@@ -68,7 +88,8 @@ namespace Materiator
 
                             FillAtlasWithItems(prefabs, i);
 
-                            SetAtlasTextureValues();
+                            //SetAtlasTextureValues();
+                            _atlas.Textures.ID = 111; // For debugging purposes
 
                             CreateAtlasedMesh();
 
@@ -131,46 +152,12 @@ namespace Materiator
             return prefabs.ToArray();
         }
 
-        private static List<int> GetAtlasNullSlotIndices()
-        {
-            var indices = new List<int>();
-
-            if (_atlas != null)
-                foreach (var kvp in _atlas.AtlasItems)
-                    if (kvp.Value.MateriaSetterData == null)
-                        indices.Add(kvp.Key);
-
-            return indices;
-        }
-
         private static void FillAtlasWithItems(GameObject[] prefabs, int i)
         {
             var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.MateriaSetterData == _msData).FirstOrDefault();
 
-            if (_nullSlotIndices.Count > 0)
-            {
-                _atlas.AtlasItems[_nullSlotIndices[_nullSlotIterator]].MateriaSetter = prefabMS;
-                _atlas.AtlasItems[_nullSlotIndices[_nullSlotIterator]].MateriaSetterData = _msData;
-
-                _nullSlotIterator++;
-            }
-            else
-            {
-                if (!_atlas.AtlasItems.ContainsKey(i))
-                    _atlas.AtlasItems.Add(i, new MateriaAtlasItem(prefabMS, _msData));
-            }
-        }
-
-        private static void SetAtlasTextureValues()
-        {
-            var rectInt = Utils.GetRectIntFromRect(_atlasGridSize, _rects[_rectIndex]);
-
-            foreach (var tex in _msData.Textures.Texs)
-            {
-                var colors = tex.Value.GetPixels32();
-                _atlas.Textures.Texs.Where(t => t.Key == tex.Key).FirstOrDefault().Value.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, colors);
-            }
-            _atlas.Textures.ID = 111; // For debugging purposes
+            if (!_atlas.AtlasItems.ContainsKey(i))
+                _atlas.AtlasItems.Add(i, new MateriaAtlasItem(prefabMS, _msData));
         }
 
         private static void CreateAtlasedMesh()
@@ -189,20 +176,22 @@ namespace Materiator
             _msData.MateriaAtlas = _atlas;
             _msData.AtlasedMesh = _atlasedMesh;
             _msData.AtlasedUVRect = _rects[_rectIndex];
-            _msData.AtlasedGridSize = _atlasGridSize;
         }
 
-        private static MateriaAtlas CreateMateriaAtlasAsset(string directory, string name, MaterialData materialData, Vector2Int gridSize)
+        private static MateriaAtlas CreateMateriaAtlasAsset(string directory, string name, MaterialData materialData, List<KeyValuePair<KeyValuePair<string, Texture2D>, Rect[]>> output)
         {
             var atlas = AssetUtils.CreateScriptableObjectAsset<MateriaAtlas>(directory, name);
-            atlas.MaterialData = materialData;
-            atlas.GridSize = gridSize;
-            atlas.Textures.CreateTextures(materialData.ShaderData.Properties, gridSize.x, gridSize.y);
-            atlas.Textures.SetNames(name);
+            atlas.GridSize = new Vector2Int(output[0].Key.Value.width, output[0].Key.Value.height);
+            _atlasGridSize = atlas.GridSize;
+            atlas.MaterialData = materialData;            
             atlas.Material = UnityEngine.Object.Instantiate(materialData.Material);
             atlas.Material.name = name;
-
             AssetDatabase.AddObjectToAsset(atlas.Material, atlas);
+
+            foreach (var item in output)
+                atlas.Textures.Texs.Add(item.Key.Key, item.Key.Value);
+
+            atlas.Textures.SetNames(name);
             atlas.Textures.AddTexturesToAsset(atlas);
 
             AssetDatabase.SaveAssets();
@@ -210,84 +199,6 @@ namespace Materiator
             atlas.Textures.ImportTextureAssets();
 
             return atlas;
-        }
-
-        #region These two functions are almost identical
-        public static Rect[] CalculateRects(int number, Vector2Int gridSize) //16, 4x4
-        {
-            Rect[] rects = new Rect[number]; // 16
-            var size = CalculateAtlasSize(number, gridSize);
-
-            var sizeMultiplierX = gridSize.x / (float)size.x; // 0.25
-            var sizeMultiplierY = gridSize.y / (float)size.y;
-
-            for (int i = 0, y = 0; y < size.y / gridSize.y; y++) // 4
-            {
-                for (int x = 0; x < size.x / gridSize.x; x++, i++) // 4
-                {
-                    if (i >= number) break; // 16
-                    rects[i] = new Rect
-                    (
-                        x * sizeMultiplierX, //if 10 then 2.5
-                        y * sizeMultiplierY,
-                        sizeMultiplierX,// 0.25
-                        sizeMultiplierY
-                    );
-                }
-            }
-
-            return rects;
-        }
-
-        
-        /*This function is borrowed for easier comparison and should be deleted
-         * public static Rect[] CalculateRects(Vector2Int size, Rect offset) // 4, 0
-        {
-            var rects = new Rect[size.x * size.y]; // 16
-            var rectSize = new Vector2();
-
-            rectSize.x = 1 / (float)size.x * offset.width; // 0.25
-            rectSize.y = 1 / (float)size.y * offset.height;
-
-            for (int i = 0, y = 0; y < size.y; y++) // 4
-            {
-                for (int x = 0; x < size.x; x++, i++) // 4
-                {
-                    if (i >= size.x * size.y) break; // 16
-
-                    rects[i] = new Rect
-                    (
-                        offset.x + (x / (float)size.x * offset.width), // if 10 then 2.5
-                        offset.y + (y / (float)size.y * offset.height),
-                        rectSize.x,
-                        rectSize.y
-                    );
-
-                    rects[i].xMin = rects[i].x;
-                    rects[i].yMin = rects[i].y;
-                    rects[i].xMax = rects[i].x + rectSize.x;
-                    rects[i].yMax = rects[i].y + rectSize.y;
-                }
-            }
-
-            return rects;
-        }*/
-        #endregion
-
-        public static Vector2Int CalculateAtlasSize(int numberOfMeshes, Vector2Int atlasEntrySize)
-        {
-            var ranges = new Vector2[] { new Vector2(0, 2), new Vector2(1, 5), new Vector2(4, 17), new Vector2(16, 65), new Vector2(64, 257), new Vector2(256, 1025), new Vector2(1024, 4097), new Vector2(4096, 16385), new Vector2(16384, 65537), new Vector2(65536, 262145), new Vector2(262144, 1048577), new Vector2(1048576, 4194305) };
-            var size = atlasEntrySize; // Minimum atlas size
-            for (int i = 0; i < ranges.Length; i++)
-            {
-                if (numberOfMeshes > ranges[i].x && numberOfMeshes < ranges[i].y)
-                {
-                    // This is temporary
-                    size.x *= (int)Mathf.Pow(2, i);
-                    size.y *= (int)Mathf.Pow(2, i);
-                }
-            }
-            return size;
         }
     }
 }

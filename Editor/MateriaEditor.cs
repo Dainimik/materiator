@@ -6,7 +6,6 @@ using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.SceneManagement;
 using System.Linq;
 using UnityEditorInternal;
-using System.Collections.Generic;
 
 namespace Materiator
 {

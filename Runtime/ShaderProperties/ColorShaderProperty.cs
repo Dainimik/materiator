@@ -6,15 +6,15 @@ namespace Materiator
     [Serializable]
     public sealed class ColorShaderProperty : ShaderProperty
     {
-        public Color32 Value;
+        public Color Value;
         public float Multiplier = 1;
 
-        public ColorShaderProperty(string propertyName, Color32? value = null) : base(propertyName)
+        public ColorShaderProperty(string propertyName, Color? value = null) : base(propertyName)
         {
             if (value == null)
                 value = Color.black;
 
-            Value = (Color32)value;
+            Value = (Color)value;
         }
     }
 }
