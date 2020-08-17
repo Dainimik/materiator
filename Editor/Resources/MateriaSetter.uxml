@@ -34,9 +34,11 @@
                     </ui:VisualElement>
                     <ui:Button text="Reload Data" name="ReloadMateriaSetterDataButton" />
                 </ui:VisualElement>
-                <ui:Toggle label="Custom Grid SIze" name="UseCustomGridSizeToggle" value="false" />
-                <uie:Vector2IntField label="Grid Size" name="GridSizeField" />
-                <ui:Button text="Combine" name="CombineMateriaButton" />
+                <ui:VisualElement name="GridSettingsContainer">
+                    <ui:Toggle label="Custom Grid SIze" name="UseCustomGridSizeToggle" value="false" />
+                    <uie:Vector2IntField label="Grid Size" name="GridSizeField" />
+                    <ui:Button text="Combine" name="CombineMateriaButton" />
+                </ui:VisualElement>
                 <Materiator.UVInspector name="UVInspectorContainer" />
                 <ui:VisualElement name="IMGUIContainer" />
                 <uie:ObjectField label="Material Data" name="MaterialDataObjectField" allow-scene-objects="false" />

@@ -21,6 +21,7 @@ namespace Materiator
         private Button _reloadMateriaSetterDataButton;
         private Button _newMateriaSetterDataButton;
 
+        private VisualElement _gridSettingsContainer;
         private Toggle _useCustomGridSizeToggle;
         private Vector2IntField _gridSizeField;
         private Button _combineMateriaButton;
@@ -49,6 +50,16 @@ namespace Materiator
             }
 
             _materiaSection = new MateriaSection(_editor);
+
+            // TODO: Refactor this
+            if (_materiaSetter.EditMode == EditMode.Native)
+            {
+                _gridSettingsContainer.SetEnabled(true);
+            }
+            else if (_materiaSetter.EditMode == EditMode.Atlas)
+            {
+                _gridSettingsContainer.SetEnabled(false);
+            }
         }
 
         private void SetReloadDataButtonState(MateriaSetterData data)
@@ -192,6 +203,7 @@ namespace Materiator
             _newMateriaSetterDataButton = root.Q<Button>("NewMateriaSetterDataButton");
             _reloadMateriaSetterDataButton = root.Q<Button>("ReloadMateriaSetterDataButton");
 
+            _gridSettingsContainer = root.Q<VisualElement>("GridSettingsContainer");
             _useCustomGridSizeToggle = root.Q<Toggle>("UseCustomGridSizeToggle");
             _gridSizeField = root.Q<Vector2IntField>("GridSizeField");
             _combineMateriaButton = root.Q<Button>("CombineMateriaButton");

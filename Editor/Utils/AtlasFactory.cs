@@ -17,10 +17,22 @@ namespace Materiator
         private static int _rectIndex;
         private static Mesh _atlasedMesh;
 
-        public static void CreateAtlas(KeyValuePair<MaterialData, List<MateriaSetter>> group, string path, MateriaAtlas existingAtlas = null)
+        public static void CreateAtlas(KeyValuePair<MaterialData, List<MateriaSetter>> group, string path, MateriaAtlas existingAtlas = null, bool updateAtlas = false)
         {
             var materialData = group.Key;
             var materiaSetters = group.Value;
+
+            // create atlas asset
+            _atlas = existingAtlas;
+            if (existingAtlas != null)
+            {
+                foreach (var tex in _atlas.Textures.Texs)
+                {
+                    AssetDatabase.RemoveObjectFromAsset(tex.Value);
+                }
+
+                _atlas.Textures.Texs.Clear();
+            }
 
             // collect textures
             var texs = new Dictionary<string, List<Texture2D>>();
@@ -47,19 +59,29 @@ namespace Materiator
             foreach (var item in texs)
             {
                 var newTex = new Texture2D(8192, 8192);
+                newTex.filterMode = SystemData.Settings.FilterMode;
                 _rects = newTex.PackTextures(item.Value.ToArray(), 0, 8192, false);
                 output.Add(new KeyValuePair<KeyValuePair<string, Texture2D>, Rect[]>(new KeyValuePair<string, Texture2D>(item.Key, newTex), _rects ));
             }
 
-            // create atlas asset
-            _atlas = existingAtlas;
             if (existingAtlas == null)
+            {
                 _atlas = CreateMateriaAtlasAsset(AssetUtils.GetDirectoryName(path), AssetUtils.GetFileName(path), materialData, output);
+            }
+            else
+            {
+                foreach (var item in output)
+                    _atlas.Textures.Texs.Add(item.Key.Key, item.Key.Value);
+
+                _atlas.Textures.SetNames(AssetUtils.GetFileName(path));
+                _atlas.Textures.AddTexturesToAsset(_atlas);
+                AssetDatabase.SaveAssets();
+            }
 
             var processedPrefabs = new HashSet<GameObject>();
             _rectIndex = 0;
 
-            var includeAllPrefabs = DeterminePrefabProcessing(existingAtlas);
+            var includeAllPrefabs = DeterminePrefabProcessing(existingAtlas, updateAtlas);
             var prefabs = GetPrefabs(materiaSetters, includeAllPrefabs);
 
             try
@@ -125,9 +147,9 @@ namespace Materiator
                 AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(item));
         }
 
-        private static bool DeterminePrefabProcessing(MateriaAtlas atlas)
+        private static bool DeterminePrefabProcessing(MateriaAtlas atlas, bool updateAtlas)
         {
-            if (atlas == null || atlas.GridSize.x < _atlasGridSize.x || atlas.GridSize.y < _atlasGridSize.y)
+            if (atlas == null || updateAtlas)
                 return true;
             else
                 return false;

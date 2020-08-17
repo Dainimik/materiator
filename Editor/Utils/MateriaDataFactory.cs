@@ -35,36 +35,36 @@ namespace Materiator
             bool isDataAssetExisting;
             var data = AssetUtils.CreateOrReplaceScriptableObjectAsset(materiaSetter.MateriaSetterData, path, out isDataAssetExisting);
 
+            var remakeAtlas = false;
+
             if (isDataAssetExisting)
             {
-                // Figure this out because this is wrong and will be buggy
-                if ((materiaSetter.Textures.Size.x != data.Textures.Size.x) || (materiaSetter.Textures.Size.y != data.Textures.Size.y) || (materiaSetter.Textures.Texs.Count != data.Textures.Texs.Count))
+                if (editor.EditMode.enumValueIndex == 0)
                 {
-                    IsTextureSizeDifferent = true;
-
-                    if (data.MateriaAtlas)
+                    // Figure this out because this is wrong and will be buggy
+                    if ((materiaSetter.Textures.Size.x != data.Textures.Size.x) || (materiaSetter.Textures.Size.y != data.Textures.Size.y) || (materiaSetter.Textures.Texs.Count != data.Textures.Texs.Count))
                     {
-                        // show warning: if proceeding, all atlas will be recalculated and may take some time
+                        IsTextureSizeDifferent = true;
 
-                        // recalculate atlas textures
-                    }
-
-                    foreach (var tex in data.Textures.Texs.ToArray())
-                    {
-                        if (packAssets)
+                        if (data.MateriaAtlas)
                         {
-                            AssetDatabase.RemoveObjectFromAsset(tex.Value);
-                        }
-                        else
-                        {
-                            AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(tex.Value));
+                            // recalculate atlas textures
+                            remakeAtlas = true;
                         }
 
-                        data.Textures.Texs.Clear();
-                        data.Textures.CreateTextures(data.MaterialData.ShaderData.Properties, materiaSetter.Textures.Size.x, materiaSetter.Textures.Size.y);
-                    }
+                        foreach (var tex in data.Textures.Texs.ToArray())
+                        {
+                            if (packAssets)
+                                AssetDatabase.RemoveObjectFromAsset(tex.Value);
+                            else
+                                AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(tex.Value));
 
-                    AssetDatabase.SaveAssets();
+                            data.Textures.Texs.Clear();
+                            data.Textures.CreateTextures(data.MaterialData.ShaderData.Properties, materiaSetter.Textures.Size.x, materiaSetter.Textures.Size.y);
+                        }
+
+                        AssetDatabase.SaveAssets();
+                    }
                 }
                 
                 if (editor.EditMode.enumValueIndex == 0)
@@ -139,7 +139,7 @@ namespace Materiator
                     AssetDatabase.AddObjectToAsset(material, data);
                     outputTextures.AddTexturesToAsset(data);
                 }
-                if (materiaSetter.EditMode == EditMode.Native && IsTextureSizeDifferent) // Figure this out because this is wrong and will be buggy
+                else if (materiaSetter.EditMode == EditMode.Native && IsTextureSizeDifferent) // Figure this out because this is wrong and will be buggy
                 {
                     outputTextures.AddTexturesToAsset(data);
                 }
@@ -212,6 +212,15 @@ namespace Materiator
             else if (editor.EditMode.enumValueIndex == 1)
             {
                 editor.AtlasSection.LoadAtlas(data.MateriaAtlas);
+            }
+
+            if (remakeAtlas)
+            {
+                var setters = new List<MateriaSetter>();
+                foreach (var item in materiaSetter.MateriaSetterData.MateriaAtlas.AtlasItems.Values)
+                    setters.Add(item.MateriaSetter);
+
+                AtlasFactory.CreateAtlas(new KeyValuePair<MaterialData, List<MateriaSetter>>(materiaSetter.MateriaSetterData.MaterialData, setters), AssetDatabase.GetAssetPath(materiaSetter.MateriaSetterData.MateriaAtlas), materiaSetter.MateriaSetterData.MateriaAtlas, true);
             }
         }
     }
