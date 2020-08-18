@@ -60,6 +60,8 @@ namespace Materiator
             {
                 _gridSettingsContainer.SetEnabled(false);
             }
+            _combineMateriaButton.SetEnabled(false);
+            _gridSizeField.value = _editor.GridSize.vector2IntValue;
         }
 
         private void SetReloadDataButtonState(MateriaSetterData data)
@@ -162,6 +164,9 @@ namespace Materiator
 
         private void CombineMateria()
         {
+            _editor.GridSize.vector2IntValue = _gridSizeField.value;
+            _editor.serializedObject.ApplyModifiedProperties();
+
             _editor.SetMateriaSetterDirty(true);
             _materiaSetter.Refresh();
         }
@@ -183,6 +188,14 @@ namespace Materiator
                 _editor.UseCustomGridSize.boolValue = e.newValue;
                 _editor.serializedObject.ApplyModifiedProperties();
                 // enable vector2 field visibility
+            });
+
+            _gridSizeField.RegisterCallback<ChangeEvent<Vector2Int>>(e =>
+            {
+                if (e.newValue != _materiaSetter.GridSize)
+                    _combineMateriaButton.SetEnabled(true);
+                else
+                    _combineMateriaButton.SetEnabled(false);
             });
 
             _editor.OnDirtyChanged += UpdateIndicator; // This event is not deregistered anywhere
@@ -219,7 +232,6 @@ namespace Materiator
             _materialDataObjectField.BindProperty(MaterialData);
 
             _useCustomGridSizeToggle.BindProperty(_editor.UseCustomGridSize);
-            _gridSizeField.BindProperty(_editor.GridSize);
         }
 
         private void RegisterButtons()

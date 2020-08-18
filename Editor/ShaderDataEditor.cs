@@ -8,10 +8,10 @@ using System.Collections.Generic;
 namespace Materiator
 {
     [CustomEditor(typeof(ShaderData))]
-    [CanEditMultipleObjects]
     public class ShaderDataEditor : MateriatorEditor
     {
         private ShaderData _shaderData;
+        private List<string> _propertiesToRemove = new List<string>();
 
         private IMGUIContainer _IMGUIContainer;
 
@@ -19,6 +19,8 @@ namespace Materiator
 
         private ObjectField _shaderObjectField;
         private Button _updateShaderPropertiesButton;
+
+        private List<KeyValuePair<int, ShaderProperty>> _newProperties;
 
         private void OnEnable()
         {
@@ -42,18 +44,22 @@ namespace Materiator
 
         private void UpdateShaderProperties()
         {
-            var shader = (Shader)_shader.objectReferenceValue;
             var shaderDataProperties = _shaderData.Properties;
             var keywords = _shaderData.Keywords;
+
+            var shader = (Shader)_shader.objectReferenceValue;
 
             if (shader)
             {
                 var shaderPropertyNames = new List<string>();
                 var propertyCount = ShaderUtil.GetPropertyCount(shader);
+                _newProperties = new List<KeyValuePair<int, ShaderProperty>>();
+                var index = 0;
+
                 for (int i = 0; i < propertyCount; i++)
                 {
                     var attrs = shader.GetPropertyAttributes(i);
-                    
+
                     if (attrs.Where(attr => attr == "MateriaFloat").Count() > 0 || attrs.Where(attr => attr == "MateriaColor").Count() > 0)
                     {
                         var propName = ShaderUtil.GetPropertyName(shader, i);
@@ -74,9 +80,11 @@ namespace Materiator
 
                             if (prop != null && !shaderDataProperties.Contains(prop))
                             {
-                                shaderDataProperties.Add(prop);
+                                shaderDataProperties.Insert(index, prop);
+                                _newProperties.Add(new KeyValuePair<int, ShaderProperty>(index, prop));
                             }
                         }
+                        index++;
                     }
 
                     if (attrs.Where(attr => attr == "MateriaKeyword").Count() > 0)
@@ -93,70 +101,73 @@ namespace Materiator
                     }
                 }
 
-                var materias = AssetUtils.FindAssets<Materia>();
-                var removedName = "";
+                _propertiesToRemove.Clear();
 
                 for (var i = 0; i < _shaderData.Properties.Count; i++)
                 {
                     if (!shaderPropertyNames.Contains(_shaderData.Properties[i].Name))
                     {
-                        removedName = _shaderData.Properties[i].Name;
+                        _propertiesToRemove.Add(_shaderData.Properties[i].Name);
                         _shaderData.Properties.RemoveAt(i);
-
-                        RemovePropertyFromMaterias(materias, removedName);
                     }
                 }
 
-                UpdateMaterias(materias);
+                UpdateMaterias();
             }
         }
 
-        private void UpdateMaterias(List<Materia> materias)
+        private void UpdateMaterias()
         {
-            var shaderDataProperties = _shaderData.Properties;
+            var materias = AssetUtils.FindAssets<Materia>();
 
             foreach (var materia in materias)
             {
                 if (materia.ShaderData == _shaderData)
                 {
-                    var properties = materia.Properties;
+                    RemoveOldPropertiesFromMateria(materia);
 
-                    for (int i = 0; i < shaderDataProperties.Count; i++)
-                    {
-                        var materiaProp = properties[i];
-                        var shaderDataProp = shaderDataProperties[i];
+                    AddNewPropertiesToMateria(materia);
 
-                        if (shaderDataProp.GetType() == typeof(FloatShaderProperty))
-                        {
-                            var mp = (FloatShaderProperty)properties[i];
-                            var sp = (FloatShaderProperty)shaderDataProperties[i];
-
-                            mp.RChannel = sp.RChannel;
-                            mp.GChannel = sp.GChannel;
-                            mp.BChannel = sp.BChannel;
-                            mp.AChannel = sp.AChannel;
-                        }
-
-                        materiaProp.Name = shaderDataProp.Name;
-                    }
+                    UpdateMateriaFloatPropertyDescriptiveNames(materia);
                 }
             }
         }
 
-        private void RemovePropertyFromMaterias(List<Materia> materias, string removedName)
+        private void RemoveOldPropertiesFromMateria(Materia materia)
         {
-            foreach (var materia in materias)
+            for (var j = 0; j < materia.Properties.Count; j++)
+                for (int k = 0; k < _propertiesToRemove.Count; k++)
+                    if (materia.Properties[j].Name == _propertiesToRemove[k])
+                        materia.Properties.RemoveAt(j);
+        }
+
+        private void AddNewPropertiesToMateria(Materia materia)
+        {
+            foreach (var kvp in _newProperties)
+                materia.Properties.Insert(kvp.Key, kvp.Value);
+        }
+
+        private void UpdateMateriaFloatPropertyDescriptiveNames(Materia materia)
+        {
+            var properties = materia.Properties;
+
+            for (int i = 0; i < _shaderData.Properties.Count; i++)
             {
-                if (materia.ShaderData == _shaderData)
+                var materiaProp = properties[i];
+                var shaderDataProp = _shaderData.Properties[i];
+
+                if (shaderDataProp.GetType() == typeof(FloatShaderProperty))
                 {
-                    for (var j = 0; j < materia.Properties.Count; j++)
-                    {
-                        if (materia.Properties[j].Name == removedName)
-                        {
-                            materia.Properties.RemoveAt(j);
-                        }
-                    }
+                    var mp = (FloatShaderProperty)properties[i];
+                    var sp = (FloatShaderProperty)_shaderData.Properties[i];
+
+                    mp.RChannel = sp.RChannel;
+                    mp.GChannel = sp.GChannel;
+                    mp.BChannel = sp.BChannel;
+                    mp.AChannel = sp.AChannel;
                 }
+
+                materiaProp.Name = shaderDataProp.Name;
             }
         }
 

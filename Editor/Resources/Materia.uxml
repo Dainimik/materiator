@@ -11,7 +11,9 @@
     <ui:TextField picking-mode="Ignore" label="Description" multiline="true" name="DescriptionTextField" style="align-items: flex-start; flex-grow: 1;">
         <Style src="Materiator.uss" />
     </ui:TextField>
-    <ui:Button text="Create" name="CreateMateriaButton">
+    <ui:VisualElement name="ButtonContainer">
         <Style src="Materiator.uss" />
-    </ui:Button>
+        <ui:Button text="Create" name="CreateMateriaButton" />
+        <ui:Button text="Restore Defaults" name="RestoreDefaultsButton" />
+    </ui:VisualElement>
 </ui:UXML>

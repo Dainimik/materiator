@@ -24,7 +24,9 @@ namespace Materiator
 
         private ObjectField _shaderDataObjectField;
         private TextField _descriptionTextField;
+
         private Button _createMateriaButton;
+        private Button _restoreDefaultsButton;
 
         private PreviewRenderUtility _previewRenderUtility;
         private Mesh _previewMesh;
@@ -96,6 +98,11 @@ namespace Materiator
 
             // TODO: This should not be here
             _shaderDataObjectField.SetEnabled(false);
+        }
+
+        private void RestoreDefaults()
+        {
+
         }
 
         private void SetUpList()
@@ -305,6 +312,8 @@ namespace Materiator
             _IMGUIContainer = root.Q<VisualElement>("IMGUIContainer");
 
             _createMateriaButton = root.Q<Button>("CreateMateriaButton");
+            _restoreDefaultsButton = root.Q<Button>("RestoreDefaultsButton");
+
         }
 
         protected override void BindProperties()
@@ -317,6 +326,7 @@ namespace Materiator
         protected override void RegisterButtons()
         {
             _createMateriaButton.clicked += CreateMateria;
+            _restoreDefaultsButton.clicked += RestoreDefaults;
         }
     }
 }

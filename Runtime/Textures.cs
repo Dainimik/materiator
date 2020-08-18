@@ -257,6 +257,17 @@ namespace Materiator
                 AssetDatabase.AddObjectToAsset(tex.Value, objectToAddTo);
         }
 
+        public void RemoveTexturesFromAsset(bool saveDatabaseChanges = false)
+        {
+            foreach (var tex in Texs.ToArray())
+                AssetDatabase.RemoveObjectFromAsset(tex.Value);
+
+            Texs.Clear();
+
+            if (saveDatabaseChanges)
+                AssetDatabase.SaveAssets();
+        }
+
         private Texture2D AddTextureToAsset(Texture2D texture, Object objectToAddTo)
         {
             AssetDatabase.AddObjectToAsset(texture, objectToAddTo);

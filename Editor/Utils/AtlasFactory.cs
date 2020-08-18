@@ -21,61 +21,25 @@ namespace Materiator
         {
             var materialData = group.Key;
             var materiaSetters = group.Value;
+            List<KeyValuePair<KeyValuePair<string, Texture2D>, Rect[]>> output = PackIntoAtlasTextures(group);
 
             // create atlas asset
             _atlas = existingAtlas;
             if (existingAtlas != null)
             {
-                foreach (var tex in _atlas.Textures.Texs)
-                {
-                    AssetDatabase.RemoveObjectFromAsset(tex.Value);
-                }
+                _atlas.Textures.RemoveTexturesFromAsset();
 
-                _atlas.Textures.Texs.Clear();
-            }
-
-            // collect textures
-            var texs = new Dictionary<string, List<Texture2D>>();
-            foreach (var item in group.Value)
-            {
-                foreach (var kvp in item.MateriaSetterData.Textures.Texs)
-                {
-                    if (!texs.ContainsKey(kvp.Key))
-                    {
-                        texs.Add(kvp.Key, new List<Texture2D>() { kvp.Value });
-                    }
-                    else
-                    {
-                        if (!texs[kvp.Key].Contains(kvp.Value))
-                        {
-                            texs[kvp.Key].Add(kvp.Value);
-                        }
-                    }
-                }
-            }
-
-            // create textures
-            var output = new List<KeyValuePair<KeyValuePair<string, Texture2D>, Rect[]>>();
-            foreach (var item in texs)
-            {
-                var newTex = new Texture2D(8192, 8192);
-                newTex.filterMode = SystemData.Settings.FilterMode;
-                _rects = newTex.PackTextures(item.Value.ToArray(), 0, 8192, false);
-                output.Add(new KeyValuePair<KeyValuePair<string, Texture2D>, Rect[]>(new KeyValuePair<string, Texture2D>(item.Key, newTex), _rects ));
-            }
-
-            if (existingAtlas == null)
-            {
-                _atlas = CreateMateriaAtlasAsset(AssetUtils.GetDirectoryName(path), AssetUtils.GetFileName(path), materialData, output);
-            }
-            else
-            {
                 foreach (var item in output)
                     _atlas.Textures.Texs.Add(item.Key.Key, item.Key.Value);
 
                 _atlas.Textures.SetNames(AssetUtils.GetFileName(path));
                 _atlas.Textures.AddTexturesToAsset(_atlas);
+
                 AssetDatabase.SaveAssets();
+            }
+            else
+            {
+                _atlas = CreateMateriaAtlasAsset(AssetUtils.GetDirectoryName(path), AssetUtils.GetFileName(path), materialData, output);
             }
 
             var processedPrefabs = new HashSet<GameObject>();
@@ -110,7 +74,6 @@ namespace Materiator
 
                             FillAtlasWithItems(prefabs, i);
 
-                            //SetAtlasTextureValues();
                             _atlas.Textures.ID = 111; // For debugging purposes
 
                             CreateAtlasedMesh();
@@ -145,6 +108,41 @@ namespace Materiator
 
             foreach (var item in prefabs)
                 AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(item));
+        }
+
+        private static List<KeyValuePair<KeyValuePair<string, Texture2D>, Rect[]>> PackIntoAtlasTextures(KeyValuePair<MaterialData, List<MateriaSetter>> group)
+        {
+            // collect textures
+            var texs = new Dictionary<string, List<Texture2D>>();
+            foreach (var item in group.Value)
+            {
+                foreach (var kvp in item.MateriaSetterData.Textures.Texs)
+                {
+                    if (!texs.ContainsKey(kvp.Key))
+                    {
+                        texs.Add(kvp.Key, new List<Texture2D>() { kvp.Value });
+                    }
+                    else
+                    {
+                        if (!texs[kvp.Key].Contains(kvp.Value))
+                        {
+                            texs[kvp.Key].Add(kvp.Value);
+                        }
+                    }
+                }
+            }
+
+            // create textures
+            var output = new List<KeyValuePair<KeyValuePair<string, Texture2D>, Rect[]>>();
+            foreach (var item in texs)
+            {
+                var newTex = new Texture2D(8192, 8192);
+                newTex.filterMode = SystemData.Settings.FilterMode;
+                _rects = newTex.PackTextures(item.Value.ToArray(), 0, 8192, false);
+                output.Add(new KeyValuePair<KeyValuePair<string, Texture2D>, Rect[]>(new KeyValuePair<string, Texture2D>(item.Key, newTex), _rects));
+            }
+
+            return output;
         }
 
         private static bool DeterminePrefabProcessing(MateriaAtlas atlas, bool updateAtlas)

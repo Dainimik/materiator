@@ -139,7 +139,7 @@ namespace Materiator
 
                 newTextures.CreateTextures(MateriaSetter.MaterialData.ShaderData.Properties, sourceTextures.Size.x, sourceTextures.Size.y);
                 var mat = Instantiate(Material.objectReferenceValue);
-                newTextures.CopyPixelColors(sourceTextures, sourceTextures.Size, SystemData.Settings.UVRect, newTextures.Size, SystemData.Settings.UVRect);
+                MateriaSetter.UpdateColorsOfAllTextures();
 
                 if (name != null)
                     mat.name = name;
