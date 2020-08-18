@@ -9,7 +9,7 @@ namespace Materiator
         public Color Value;
         public float Multiplier = 1;
 
-        public ColorShaderProperty(string propertyName, Color? value = null) : base(propertyName)
+        public ColorShaderProperty(string name, string propertyName, Color? value = null) : base(name, propertyName)
         {
             if (value == null)
                 value = Color.black;

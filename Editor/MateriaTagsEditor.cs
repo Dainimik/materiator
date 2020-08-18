@@ -71,5 +71,25 @@ namespace Materiator
                 _materiaTags.MateriaTags.Add(SystemData.Settings.DefaultTag);
             };
         }
+
+        protected override void SetUpView()
+        {
+            //
+        }
+
+        protected override void GetProperties()
+        {
+            //
+        }
+
+        protected override void BindProperties()
+        {
+            //
+        }
+
+        protected override void RegisterCallbacks()
+        {
+            //
+        }
     }
 }

@@ -22,13 +22,24 @@ namespace Materiator
 
             GetProperties();
             BindProperties();
-            RegisterButtons();
+            RegisterCallbacks();
+
+            SetUpView();
         }
 
-        protected virtual void GetProperties() { }
+        protected virtual void OnDisable()
+        {
+            //UnregisterCallbacks();
+        }
 
-        protected virtual void BindProperties() { }
+        protected abstract void SetUpView();
 
-        protected virtual void RegisterButtons() { }
+        protected abstract void GetProperties();
+
+        protected abstract void BindProperties();
+
+        protected abstract void RegisterCallbacks();
+
+        //protected abstract void UnregisterCallbacks();
     }
 }

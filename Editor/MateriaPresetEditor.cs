@@ -116,5 +116,15 @@ namespace Materiator
         {
             _descriptionTextField.BindProperty(_description);
         }
+
+        protected override void SetUpView()
+        {
+            //
+        }
+
+        protected override void RegisterCallbacks()
+        {
+            //
+        }
     }
 }

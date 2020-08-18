@@ -6,6 +6,7 @@ using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.SceneManagement;
 using System.Linq;
 using UnityEditorInternal;
+using System;
 
 namespace Materiator
 {
@@ -44,10 +45,13 @@ namespace Materiator
                 
 
             //EditorUtils.GenerateMateriaPreviewIcons(_materia, _previewMaterial);
+
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
+
             _previewRenderUtility?.Cleanup();
         }
 
@@ -98,11 +102,16 @@ namespace Materiator
 
             // TODO: This should not be here
             _shaderDataObjectField.SetEnabled(false);
+
+            SetUpView();
         }
 
         private void RestoreDefaults()
         {
-
+            if (EditorUtility.DisplayDialog("Are you sure?", "All current settings will be lost.", "Yes", "No"))
+            {
+                CreateMateria();
+            }
         }
 
         private void SetUpList()
@@ -211,6 +220,14 @@ namespace Materiator
             }
         }
 
+        private void OnShaderDataChanged(ChangeEvent<UnityEngine.Object> e)
+        {
+            _shaderData.objectReferenceValue = e.newValue;
+            serializedObject.ApplyModifiedProperties();
+
+            SetUpView();
+        }
+
         #region Preview
         private void SetUpPreview()
         {
@@ -237,7 +254,8 @@ namespace Materiator
                     _previewTextures.SetTexturesToMaterial(_previewMaterial);
                 }
 
-                _previewTextures.UpdateColor(_materia.Properties);
+                if (_materia.Properties.Count > 0)
+                    _previewTextures.UpdateColor(_materia.Properties);
             }
         }
 
@@ -294,7 +312,16 @@ namespace Materiator
                 _previewRenderUtility.lights[1].transform.rotation = Quaternion.Euler(new Vector3(20f, -175f, 0f));
             }
         }
-#endregion
+        #endregion
+
+        protected override void SetUpView()
+        {
+            _createMateriaButton.visible = (Convert.ToBoolean(_shaderData.objectReferenceValue) && Convert.ToBoolean(_materia.Properties.Count == 0));
+
+            _IMGUIContainer.visible = Convert.ToBoolean(_materia.Properties.Count > 0);
+
+            _restoreDefaultsButton.visible = Convert.ToBoolean(_materia.Properties.Count);
+        }
 
         protected override void GetProperties()
         {
@@ -323,10 +350,12 @@ namespace Materiator
             _descriptionTextField.BindProperty(_description);
         }
 
-        protected override void RegisterButtons()
+        protected override void RegisterCallbacks()
         {
             _createMateriaButton.clicked += CreateMateria;
             _restoreDefaultsButton.clicked += RestoreDefaults;
+
+            _shaderDataObjectField.RegisterCallback<ChangeEvent<UnityEngine.Object>>(OnShaderDataChanged);
         }
     }
 }

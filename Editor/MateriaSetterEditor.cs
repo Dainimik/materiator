@@ -175,7 +175,17 @@ namespace Materiator
             _reloadButton = root.Q<Button>("ReloadButton");
         }
 
-        protected override void RegisterButtons()
+        protected override void SetUpView()
+        {
+            //
+        }
+
+        protected override void BindProperties()
+        {
+            //
+        }
+
+        protected override void RegisterCallbacks()
         {
             _reloadButton.clicked += Refresh;
         }

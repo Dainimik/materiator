@@ -98,10 +98,10 @@ namespace Materiator
                 Shader.Find("Universal Render Pipeline/Lit"),
                 new List<ShaderProperty>
                 {
-                    new ColorShaderProperty("_BaseMap", Color.white),
-                    new FloatShaderProperty("_MetallicGlossMap", defaultFloatValues, valueNames), // Combine into one
-                    new FloatShaderProperty("_SpecGlossMap", defaultFloatValues, valueNames), // Combine into one
-                    new ColorShaderProperty("_EmissionMap")
+                    new ColorShaderProperty("Base Color", "_BaseMap", Color.white),
+                    new FloatShaderProperty("Metallic/Smoothness", "_MetallicGlossMap", defaultFloatValues, valueNames), // Combine into one
+                    new FloatShaderProperty("Glossiness", "_SpecGlossMap", defaultFloatValues, valueNames), // Combine into one
+                    new ColorShaderProperty("Emission Color", "_EmissionMap")
                 },
                 new List<string>
                 {
@@ -113,9 +113,9 @@ namespace Materiator
                 Shader.Find("Universal Render Pipeline/Simple Lit"),
                 new List<ShaderProperty>
                 {
-                    new ColorShaderProperty("_BaseMap", Color.white),
-                    new FloatShaderProperty("_SpecGlossMap", defaultFloatValues, valueNames),
-                    new ColorShaderProperty("_EmissionMap")
+                    new ColorShaderProperty("Base Color", "_BaseMap", Color.white),
+                    new FloatShaderProperty("Specular/Glossiness", "_SpecGlossMap", defaultFloatValues, valueNames),
+                    new ColorShaderProperty("Emission Color", "_EmissionMap")
                 },
                 new List<string>
                 {
@@ -127,9 +127,9 @@ namespace Materiator
                 Shader.Find("Standard"),
                 new List<ShaderProperty>
                 {
-                    new ColorShaderProperty("_MainTex", Color.white),
-                    new FloatShaderProperty("_MetallicGlossMap", defaultFloatValues, valueNames),
-                    new ColorShaderProperty("_EmissionMap")
+                    new ColorShaderProperty("Base Color", "_MainTex", Color.white),
+                    new FloatShaderProperty("Metallic/Smoothness/Glossiness", "_MetallicGlossMap", defaultFloatValues, valueNames),
+                    new ColorShaderProperty("Emission Color", "_EmissionMap")
                 },
                 new List<string>
                 {
@@ -141,9 +141,9 @@ namespace Materiator
                 Shader.Find("Standard (Specular setup)"),
                 new List<ShaderProperty>
                 {
-                    new ColorShaderProperty("_MainTex", Color.white),
-                    new FloatShaderProperty("_SpecGlossMap", defaultFloatValues, valueNames),
-                    new ColorShaderProperty("_EmissionMap")
+                    new ColorShaderProperty("Base Color", "_MainTex", Color.white),
+                    new FloatShaderProperty("Specular/Glossiness", "_SpecGlossMap", defaultFloatValues, valueNames),
+                    new ColorShaderProperty("Emission Color", "_EmissionMap")
                 },
                 new List<string>
                 {

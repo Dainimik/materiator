@@ -22,7 +22,7 @@ namespace Materiator
         //[Range(0, 1)]
         public float A;
 
-        public FloatShaderProperty(string propertyName, Vector4? value = null, string[] channelNames = null) : base(propertyName)
+        public FloatShaderProperty(string name, string propertyName, Vector4? value = null, string[] channelNames = null) : base(name, propertyName)
         {
             Vector4 val = Vector4.zero;
 

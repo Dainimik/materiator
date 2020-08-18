@@ -118,7 +118,7 @@ namespace Materiator
                                 var colorProp = (ColorShaderProperty)prop;
                                 if (colorProp.Name == tex.Key)
                                 {
-                                    colors[tex.Value][i] = (Color)colorProp.Value * colorProp.Multiplier;
+                                    colors[tex.Value][i] = colorProp.Value * colorProp.Multiplier;
                                 }
                             }
                             else if (prop.GetType() == typeof(FloatShaderProperty))
@@ -165,10 +165,10 @@ namespace Materiator
             var rectInt = Utils.GetRectIntFromRect(Size, SystemData.Settings.UVRect);
             var numberOfColors = rectInt.width * rectInt.height;
 
-            var colors = new Dictionary<Texture2D, Color32[]>();
+            var colors = new Dictionary<Texture2D, Color[]>();
             foreach (var tex in Texs)
             {
-                colors.Add(tex.Value, new Color32[numberOfColors]);
+                colors.Add(tex.Value, new Color[numberOfColors]);
 
                 for (int i = 0; i < numberOfColors; i++)
                 {
@@ -179,7 +179,7 @@ namespace Materiator
                             var colorProp = (ColorShaderProperty)prop;
                             if (colorProp.Name == tex.Key)
                             {
-                                colors[tex.Value][i] = colorProp.Value;
+                                colors[tex.Value][i] = colorProp.Value * colorProp.Multiplier;
                             }
                         }
                         else if (prop.GetType() == typeof(FloatShaderProperty))
@@ -201,7 +201,7 @@ namespace Materiator
                     }
                 }
 
-                //tex.Value.SetPixels32(rectInt.x, rectInt.y, rectInt.width, rectInt.height, colors[tex.Value]);
+                tex.Value.SetPixels(rectInt.x, rectInt.y, rectInt.width, rectInt.height, colors[tex.Value]);
             }
 
             Apply();

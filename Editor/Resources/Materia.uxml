@@ -5,15 +5,16 @@
     <uie:ObjectField label="Shader Data" name="ShaderDataObjectField" allow-scene-objects="false">
         <Style src="Materiator.uss" />
     </uie:ObjectField>
-    <ui:VisualElement name="IMGUIContainer" style="margin-left: 3px; margin-top: 3px; margin-bottom: 3px;">
-        <Style src="Materiator.uss" />
-    </ui:VisualElement>
     <ui:TextField picking-mode="Ignore" label="Description" multiline="true" name="DescriptionTextField" style="align-items: flex-start; flex-grow: 1;">
         <Style src="Materiator.uss" />
     </ui:TextField>
-    <ui:VisualElement name="ButtonContainer">
+    <ui:Button text="Create" name="CreateMateriaButton">
         <Style src="Materiator.uss" />
-        <ui:Button text="Create" name="CreateMateriaButton" />
-        <ui:Button text="Restore Defaults" name="RestoreDefaultsButton" />
+    </ui:Button>
+    <ui:VisualElement name="IMGUIContainer" style="margin-left: 3px; margin-top: 3px; margin-bottom: 3px;">
+        <Style src="Materiator.uss" />
     </ui:VisualElement>
+    <ui:Button text="Restore Defaults" name="RestoreDefaultsButton">
+        <Style src="Materiator.uss" />
+    </ui:Button>
 </ui:UXML>

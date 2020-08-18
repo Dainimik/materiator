@@ -29,7 +29,7 @@ namespace Materiator
                 if (property.GetType() == typeof(ColorShaderProperty))
                 {
                     var colorProp = (ColorShaderProperty)property;
-                    materiaProperty = new ColorShaderProperty(colorProp.Name, colorProp.Value);
+                    materiaProperty = new ColorShaderProperty(colorProp.Name, colorProp.PropertyName, colorProp.Value);
                 }
                 else if (property.GetType() == typeof(FloatShaderProperty))
                 {
@@ -37,6 +37,7 @@ namespace Materiator
                     materiaProperty = new FloatShaderProperty
                     (
                         floatProp.Name,
+                        floatProp.PropertyName,
                         new Vector4(floatProp.R, floatProp.G, floatProp.B, floatProp.A),
                         new string[] { floatProp.RChannel, floatProp.GChannel, floatProp.BChannel, floatProp.AChannel }
                     );

@@ -52,6 +52,7 @@ namespace Materiator
             if (shader)
             {
                 var shaderPropertyNames = new List<string>();
+                var shaderPropertyPropertyNames = new List<string>();
                 var propertyCount = ShaderUtil.GetPropertyCount(shader);
                 _newProperties = new List<KeyValuePair<int, ShaderProperty>>();
                 var index = 0;
@@ -62,20 +63,23 @@ namespace Materiator
 
                     if (attrs.Where(attr => attr == "MateriaFloat").Count() > 0 || attrs.Where(attr => attr == "MateriaColor").Count() > 0)
                     {
-                        var propName = ShaderUtil.GetPropertyName(shader, i);
+                        var propName = ShaderUtil.GetPropertyDescription(shader, i);
                         shaderPropertyNames.Add(propName);
 
-                        if (shaderDataProperties.Where(n => n.Name == propName).Count() == 0)
+                        var propPropertyName = ShaderUtil.GetPropertyName(shader, i);
+                        shaderPropertyPropertyNames.Add(propPropertyName);
+
+                        if (shaderDataProperties.Where(n => n.PropertyName == propPropertyName).Count() == 0)
                         {
                             ShaderProperty prop = null;
 
                             if (attrs.Contains("MateriaColor"))
                             {
-                                prop = new ColorShaderProperty(propName);
+                                prop = new ColorShaderProperty(propName, propPropertyName);
                             }
                             else if (attrs.Contains("MateriaFloat"))
                             {
-                                prop = new FloatShaderProperty(propName);
+                                prop = new FloatShaderProperty(propName, propPropertyName);
                             }
 
                             if (prop != null && !shaderDataProperties.Contains(prop))
@@ -105,9 +109,9 @@ namespace Materiator
 
                 for (var i = 0; i < _shaderData.Properties.Count; i++)
                 {
-                    if (!shaderPropertyNames.Contains(_shaderData.Properties[i].Name))
+                    if (!shaderPropertyPropertyNames.Contains(_shaderData.Properties[i].PropertyName))
                     {
-                        _propertiesToRemove.Add(_shaderData.Properties[i].Name);
+                        _propertiesToRemove.Add(_shaderData.Properties[i].PropertyName);
                         _shaderData.Properties.RemoveAt(i);
                     }
                 }
@@ -137,7 +141,7 @@ namespace Materiator
         {
             for (var j = 0; j < materia.Properties.Count; j++)
                 for (int k = 0; k < _propertiesToRemove.Count; k++)
-                    if (materia.Properties[j].Name == _propertiesToRemove[k])
+                    if (materia.Properties[j].PropertyName == _propertiesToRemove[k])
                         materia.Properties.RemoveAt(j);
         }
 
@@ -171,6 +175,16 @@ namespace Materiator
             }
         }
 
+        protected override void SetUpView()
+        {
+            //
+        }
+
+        protected override void RegisterCallbacks()
+        {
+            _updateShaderPropertiesButton.clicked += UpdateShaderProperties;
+        }
+
         protected override void GetProperties()
         {
             _shader = serializedObject.FindProperty("Shader");
@@ -186,11 +200,6 @@ namespace Materiator
         protected override void BindProperties()
         {
             _shaderObjectField.BindProperty(_shader);
-        }
-
-        protected override void RegisterButtons()
-        {
-            _updateShaderPropertiesButton.clicked += UpdateShaderProperties;
         }
     }
 }
