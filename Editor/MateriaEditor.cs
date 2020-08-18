@@ -108,7 +108,7 @@ namespace Materiator
 
         private void RestoreDefaults()
         {
-            if (EditorUtility.DisplayDialog("Are you sure?", "All current settings will be lost.", "Yes", "No"))
+            if (EditorUtility.DisplayDialog("Restore Defaults", "All current settings will be lost. Are you sure?", "Yes", "No"))
             {
                 CreateMateria();
             }

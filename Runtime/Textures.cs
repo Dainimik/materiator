@@ -192,10 +192,10 @@ namespace Materiator
                                 var b = (byte)(floatProp.B * 255);
                                 var a = (byte)(floatProp.A * 255);
 
-                                colors[tex.Value][i].r = r;
-                                colors[tex.Value][i].g = g;
-                                colors[tex.Value][i].b = b;
-                                colors[tex.Value][i].a = a;
+                                colors[tex.Value][i].r = floatProp.R * 255;
+                                colors[tex.Value][i].g = floatProp.G * 255;
+                                colors[tex.Value][i].b = floatProp.B * 255;
+                                colors[tex.Value][i].a = floatProp.A * 255;
                             }
                         }
                     }
