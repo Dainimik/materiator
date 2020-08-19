@@ -165,10 +165,10 @@ namespace Materiator
                     var mp = (FloatShaderProperty)properties[i];
                     var sp = (FloatShaderProperty)_shaderData.Properties[i];
 
-                    mp.RChannel = sp.RChannel;
-                    mp.GChannel = sp.GChannel;
-                    mp.BChannel = sp.BChannel;
-                    mp.AChannel = sp.AChannel;
+                    mp.RName = sp.RName;
+                    mp.GName = sp.GName;
+                    mp.BName = sp.BName;
+                    mp.AName = sp.AName;
                 }
 
                 materiaProp.Name = shaderDataProp.Name;

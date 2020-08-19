@@ -123,15 +123,10 @@ namespace Materiator
                             var floatProp = (FloatShaderProperty)prop;
                             if (floatProp.PropertyName == tex.Key)
                             {
-                                var r = (byte)(floatProp.R * 255);
-                                var g = (byte)(floatProp.G * 255);
-                                var b = (byte)(floatProp.B * 255);
-                                var a = (byte)(floatProp.A * 255);
-
-                                colors[tex.Value][i].r = floatProp.R;
-                                colors[tex.Value][i].g = floatProp.G;
-                                colors[tex.Value][i].b = floatProp.B;
-                                colors[tex.Value][i].a = floatProp.A;
+                                colors[tex.Value][i].r = floatProp.RValue;
+                                colors[tex.Value][i].g = floatProp.GValue;
+                                colors[tex.Value][i].b = floatProp.BValue;
+                                colors[tex.Value][i].a = floatProp.AValue;
                             }
                         }
                     }

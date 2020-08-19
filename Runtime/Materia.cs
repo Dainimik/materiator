@@ -38,8 +38,8 @@ namespace Materiator
                     (
                         floatProp.Name,
                         floatProp.PropertyName,
-                        new Vector4(floatProp.R, floatProp.G, floatProp.B, floatProp.A),
-                        new string[] { floatProp.RChannel, floatProp.GChannel, floatProp.BChannel, floatProp.AChannel }
+                        new Vector4(floatProp.RValue, floatProp.GValue, floatProp.BValue, floatProp.AValue),
+                        new string[] { floatProp.RName, floatProp.GName, floatProp.BName, floatProp.AName }
                     );
                 }
 

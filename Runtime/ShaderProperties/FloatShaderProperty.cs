@@ -6,21 +6,21 @@ namespace Materiator
     [Serializable]
     public sealed class FloatShaderProperty : ShaderProperty
     {
-        public string RChannel;
+        public string RName;
         //[Range(0, 1)]
-        public float R;
+        public float RValue;
 
-        public string GChannel;
+        public string GName;
         //[Range(0, 1)]
-        public float G;
+        public float GValue;
 
-        public string BChannel;
+        public string BName;
         //[Range(0, 1)]
-        public float B;
+        public float BValue;
 
-        public string AChannel;
+        public string AName;
         //[Range(0, 1)]
-        public float A;
+        public float AValue;
 
         public FloatShaderProperty(string name, string propertyName, Vector4? value = null, string[] channelNames = null) : base(name, propertyName)
         {
@@ -29,10 +29,10 @@ namespace Materiator
             if (value != null)
                 val = (Vector4)value;
             
-            R = val.x;
-            G = val.y;
-            B = val.z;
-            A = val.w;
+            RValue = val.x;
+            GValue = val.y;
+            BValue = val.z;
+            AValue = val.w;
 
             if (channelNames == null)
             {
@@ -41,10 +41,10 @@ namespace Materiator
                     channelNames[i] = "";
             }
 
-            RChannel = channelNames[0];
-            GChannel = channelNames[1];
-            BChannel = channelNames[2];
-            AChannel = channelNames[3];
+            RName = channelNames[0];
+            GName = channelNames[1];
+            BName = channelNames[2];
+            AName = channelNames[3];
         }
     }
 }
