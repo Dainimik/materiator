@@ -13,7 +13,6 @@ namespace Materiator
         private static MateriaSetterData _msData;
 
         private static Rect[] _rects;
-        private static Vector2Int _atlasGridSize;
         private static int _rectIndex;
         private static Mesh _atlasedMesh;
 
@@ -202,7 +201,6 @@ namespace Materiator
         {
             var atlas = AssetUtils.CreateScriptableObjectAsset<MateriaAtlas>(directory, name);
             atlas.GridSize = new Vector2Int(output[0].Key.Value.width, output[0].Key.Value.height);
-            _atlasGridSize = atlas.GridSize;
             atlas.MaterialData = materialData;            
             atlas.Material = UnityEngine.Object.Instantiate(materialData.Material);
             atlas.Material.name = name;
