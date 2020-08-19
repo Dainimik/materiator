@@ -227,6 +227,11 @@ namespace Materiator
             {
                 _previewMesh = AssetUtils.LoadAssetFromUniqueAssetPath<Mesh>("Library/unity default resources::Sphere");
                 _previewMaterial = Instantiate(_materia.MaterialData.Material);
+
+                foreach (var kw in _materia.MaterialData.ShaderData.Keywords)
+                    if (!_previewMaterial.IsKeywordEnabled(kw))
+                        _previewMaterial.EnableKeyword(kw);
+                    
                 _previewTextures = new Textures();
 
                 _drag = new Vector2(35f, 35f);
