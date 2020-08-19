@@ -7,7 +7,7 @@ namespace Materiator
     public abstract class ShaderProperty
     {
         public string Name;
-        [HideInInspector]
+        //[HideInInspector]
         public string PropertyName;
 
         public ShaderProperty(string name, string propertyName)

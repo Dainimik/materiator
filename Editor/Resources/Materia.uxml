@@ -2,7 +2,7 @@
     <ui:Label text="Materia" class="title-header">
         <Style src="Materiator.uss" />
     </ui:Label>
-    <uie:ObjectField label="Shader Data" name="ShaderDataObjectField" allow-scene-objects="false">
+    <uie:ObjectField label="Material Data" name="MaterialDataObjectField" allow-scene-objects="false">
         <Style src="Materiator.uss" />
     </uie:ObjectField>
     <ui:TextField picking-mode="Ignore" label="Description" multiline="true" name="DescriptionTextField" style="align-items: flex-start; flex-grow: 1;">

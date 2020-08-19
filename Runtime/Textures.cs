@@ -50,7 +50,7 @@ namespace Materiator
         public void RemoveTextures(List<ShaderProperty> props, int width, int height)
         {
             foreach (var tex in Texs.ToArray())
-                if (!props.Select(prop => prop.Name).ToArray().Contains(tex.Key) || (Size.x != width || Size.y != height))
+                if (!props.Select(prop => prop.PropertyName).ToArray().Contains(tex.Key) || (Size.x != width || Size.y != height))
                     Texs.Remove(tex.Key);
         }
 
@@ -62,15 +62,15 @@ namespace Materiator
             {
                 if (props[i].GetType() == typeof(ColorShaderProperty) || props[i].GetType() == typeof(FloatShaderProperty))
                 {
-                    if (!Texs.ContainsKey(props[i].Name))
+                    if (!Texs.ContainsKey(props[i].PropertyName))
                     {
-                        Texs.Add(props[i].Name, CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode));
+                        Texs.Add(props[i].PropertyName, CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode));
                     }
                     else
                     {
-                        if (Texs[props[i].Name] == null || (Size.x != width || Size.y != height))
+                        if (Texs[props[i].PropertyName] == null || (Size.x != width || Size.y != height))
                         {
-                            Texs[props[i].Name] = CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode);
+                            Texs[props[i].PropertyName] = CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode);
                         }
                     }
                 }
@@ -116,7 +116,7 @@ namespace Materiator
                             if (prop.GetType() == typeof(ColorShaderProperty))
                             {
                                 var colorProp = (ColorShaderProperty)prop;
-                                if (colorProp.Name == tex.Key)
+                                if (colorProp.PropertyName == tex.Key)
                                 {
                                     colors[tex.Value][i] = colorProp.Value * colorProp.Multiplier;
                                 }
@@ -124,7 +124,7 @@ namespace Materiator
                             else if (prop.GetType() == typeof(FloatShaderProperty))
                             {
                                 var floatProp = (FloatShaderProperty)prop;
-                                if (floatProp.Name == tex.Key)
+                                if (floatProp.PropertyName == tex.Key)
                                 {
                                     var r = (byte)(floatProp.R * 255);
                                     var g = (byte)(floatProp.G * 255);
@@ -177,7 +177,7 @@ namespace Materiator
                         if (prop.GetType() == typeof(ColorShaderProperty))
                         {
                             var colorProp = (ColorShaderProperty)prop;
-                            if (colorProp.Name == tex.Key)
+                            if (colorProp.PropertyName == tex.Key)
                             {
                                 colors[tex.Value][i] = colorProp.Value * colorProp.Multiplier;
                             }
@@ -185,7 +185,7 @@ namespace Materiator
                         else if (prop.GetType() == typeof(FloatShaderProperty))
                         {
                             var floatProp = (FloatShaderProperty)prop;
-                            if (floatProp.Name == tex.Key)
+                            if (floatProp.PropertyName == tex.Key)
                             {
                                 var r = (byte)(floatProp.R * 255);
                                 var g = (byte)(floatProp.G * 255);

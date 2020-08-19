@@ -18,12 +18,12 @@ namespace Materiator
 
         private VisualElement _IMGUIContainer;
 
-        private SerializedProperty _shaderData;
+        private SerializedProperty _materialData;
         private SerializedProperty _description;
 
         private ReorderableList _materiaPropertyList;
 
-        private ObjectField _shaderDataObjectField;
+        private ObjectField _materialDataObjectField;
         private TextField _descriptionTextField;
 
         private Button _createMateriaButton;
@@ -40,12 +40,7 @@ namespace Materiator
         {
             _materia = (Materia)target;
 
-            SetUpPreview();
-            UpdatePreview(_previewMaterial);
-                
-
-            //EditorUtils.GenerateMateriaPreviewIcons(_materia, _previewMaterial);
-
+            UpdatePreview();
         }
 
         protected override void OnDisable()
@@ -70,12 +65,6 @@ namespace Materiator
             IMGUIContainer defaultInspector = new IMGUIContainer(() => IMGUI());
             _IMGUIContainer.Add(defaultInspector);
 
-            // This should not be here
-            if (_materia.Properties.Count > 0)
-            {
-                _shaderDataObjectField.SetEnabled(false);
-            }
-
             return root;
         }
 
@@ -90,10 +79,10 @@ namespace Materiator
 
         private void CreateMateria()
         {
-            var shaderData = _materia.ShaderData;
+            var shaderData = _materia.MaterialData.ShaderData;
             if (!shaderData) return;
 
-            var shaderDataProperties = _materia.ShaderData.Properties;
+            var shaderDataProperties = _materia.MaterialData.ShaderData.Properties;
 
             _materia.Properties.Clear();
             _materia.AddProperties(shaderDataProperties);
@@ -101,7 +90,7 @@ namespace Materiator
             OnValueChanged();
 
             // TODO: This should not be here
-            _shaderDataObjectField.SetEnabled(false);
+            _materialDataObjectField.SetEnabled(false);
 
             SetUpView();
         }
@@ -175,9 +164,12 @@ namespace Materiator
 
         private void OnValueChanged()
         {
-            UpdatePreview(_previewMaterial);
+            UpdatePreview();
             UpdateSceneMateriaSettersColors();
             UpdatePrefabMateriaSettersColors();
+
+            if (_materia.Properties.Count > 0)
+                _materia.PreviewIcon = GenerateThumbnail();
         }
 
         private void UpdateSceneMateriaSettersColors()
@@ -222,7 +214,7 @@ namespace Materiator
 
         private void OnShaderDataChanged(ChangeEvent<UnityEngine.Object> e)
         {
-            _shaderData.objectReferenceValue = e.newValue;
+            _materialData.objectReferenceValue = e.newValue;
             serializedObject.ApplyModifiedProperties();
 
             SetUpView();
@@ -231,26 +223,26 @@ namespace Materiator
         #region Preview
         private void SetUpPreview()
         {
-            if (_materia.ShaderData)
+            if (_materia.MaterialData)
             {
                 _previewMesh = AssetUtils.LoadAssetFromUniqueAssetPath<Mesh>("Library/unity default resources::Sphere");
-                _previewMaterial = new Material(_materia.ShaderData.Shader);
+                _previewMaterial = Instantiate(_materia.MaterialData.Material);
                 _previewTextures = new Textures();
 
                 _drag = new Vector2(35f, 35f);
             }
         }
 
-        private void UpdatePreview(Material material)
+        private void UpdatePreview()
         {
-            if (_materia.ShaderData)
+            if (_materia.MaterialData && _materia.MaterialData.Material)
             {
-                if (_previewTextures == null)
+                if (_previewTextures == null || _previewMesh == null || _previewMaterial == null)
                     SetUpPreview();
 
                 if (_previewTextures.Texs.Count != _materia.Properties.Count)
                 {
-                    _previewTextures.CreateTextures(_materia.Properties, 4, 4);
+                    _previewTextures.CreateTextures(_materia.Properties, 1, 1);
                     _previewTextures.SetTexturesToMaterial(_previewMaterial);
                 }
 
@@ -265,18 +257,44 @@ namespace Materiator
 
             if (Event.current.type == EventType.Repaint)
             {
-                _previewRenderUtility.BeginPreview(r, background);
-
-                _previewRenderUtility.DrawMesh(_previewMesh, Vector3.zero, new Vector3(1, 1, 1), Quaternion.identity, _previewMaterial, 0, null, null, false);
-
-                _previewRenderUtility.camera.transform.position = Vector2.zero;
-                _previewRenderUtility.camera.transform.rotation = Quaternion.Euler(new Vector3(-_drag.y, -_drag.x, 0));
-                _previewRenderUtility.camera.transform.position = _previewRenderUtility.camera.transform.forward * -4f;
-                _previewRenderUtility.camera.Render();
-
-                _previewTexture = _previewRenderUtility.EndPreview();
+                _previewTexture = GeneratePreview(r, background, true);
                 GUI.DrawTexture(r, _previewTexture, ScaleMode.ScaleToFit, false);
             }
+        }
+
+        private Texture GeneratePreview(Rect r, GUIStyle background, bool drag)
+        {
+            _previewRenderUtility.BeginPreview(r, background);
+            _previewRenderUtility.DrawMesh(_previewMesh, Vector3.zero, new Vector3(1, 1, 1), Quaternion.identity, _previewMaterial, 0, null, null, false);
+            _previewRenderUtility.camera.transform.position = Vector2.zero;
+
+            if (drag)
+                _previewRenderUtility.camera.transform.rotation = Quaternion.Euler(new Vector3(-_drag.y, -_drag.x, 0));
+            else
+                _previewRenderUtility.camera.transform.rotation = Quaternion.Euler(new Vector3(-_drag.y, -_drag.x, 0));
+            
+            _previewRenderUtility.camera.transform.position = _previewRenderUtility.camera.transform.forward * -4f;
+            _previewRenderUtility.camera.Render();
+
+            return _previewRenderUtility.EndPreview();
+        }
+
+        private Texture2D GenerateThumbnail()
+        {
+            if (_materia.PreviewIcon != null)
+                DestroyImmediate(_materia.PreviewIcon);
+
+            var rt = (RenderTexture)GeneratePreview(new Rect(0f, 0f, 64f, 64f), GUIStyle.none, false);
+
+            RenderTexture.active = rt;
+            var tex = new Texture2D(rt.width, rt.height, TextureFormat.RGBA32, false);
+
+            tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+            tex.Apply();
+
+            RenderTexture.active = null;
+
+            return tex;
         }
 
         public override void OnPreviewSettings()
@@ -316,23 +334,24 @@ namespace Materiator
 
         protected override void SetUpView()
         {
-            _createMateriaButton.visible = (Convert.ToBoolean(_shaderData.objectReferenceValue) && Convert.ToBoolean(_materia.Properties.Count == 0));
+            var propCountBool = Convert.ToBoolean(_materia.Properties.Count > 0);
 
-            _IMGUIContainer.visible = Convert.ToBoolean(_materia.Properties.Count > 0);
-
+            _createMateriaButton.visible = (Convert.ToBoolean(_materialData.objectReferenceValue) && Convert.ToBoolean(_materia.Properties.Count == 0));
+            _IMGUIContainer.visible = propCountBool;
             _restoreDefaultsButton.visible = Convert.ToBoolean(_materia.Properties.Count);
+            _materialDataObjectField.SetEnabled(!propCountBool);
         }
 
         protected override void GetProperties()
         {
-            _shaderData = serializedObject.FindProperty("ShaderData");
+            _materialData = serializedObject.FindProperty("MaterialData");
 
             _description = serializedObject.FindProperty("_description");
 
             _IMGUIContainer = root.Q<IMGUIContainer>("IMGUIContainer");
 
-            _shaderDataObjectField = root.Q<ObjectField>("ShaderDataObjectField");
-            _shaderDataObjectField.objectType = typeof(ShaderData);
+            _materialDataObjectField = root.Q<ObjectField>("MaterialDataObjectField");
+            _materialDataObjectField.objectType = typeof(MaterialData);
 
             _descriptionTextField = root.Q<TextField>("DescriptionTextField");
 
@@ -345,7 +364,7 @@ namespace Materiator
 
         protected override void BindProperties()
         {
-            _shaderDataObjectField.BindProperty(_shaderData);
+            _materialDataObjectField.BindProperty(_materialData);
 
             _descriptionTextField.BindProperty(_description);
         }
@@ -355,7 +374,7 @@ namespace Materiator
             _createMateriaButton.clicked += CreateMateria;
             _restoreDefaultsButton.clicked += RestoreDefaults;
 
-            _shaderDataObjectField.RegisterCallback<ChangeEvent<UnityEngine.Object>>(OnShaderDataChanged);
+            _materialDataObjectField.RegisterCallback<ChangeEvent<UnityEngine.Object>>(OnShaderDataChanged);
         }
     }
 }

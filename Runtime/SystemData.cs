@@ -81,7 +81,7 @@ namespace Materiator
             var materia = ScriptableObject.CreateInstance<Materia>();
             materia.name = name;
 
-            materia.ShaderData = _settings.DefaultShaderData;
+            materia.MaterialData = _settings.DefaultMaterialData;
             materia.AddProperties(_settings.DefaultShaderData.Properties);
 
             AssetDatabase.AddObjectToAsset(materia, _settings);

@@ -9,7 +9,7 @@ namespace Materiator
     [CreateAssetMenu(menuName = "Materiator/Materia", fileName = "Materia")]
     public class Materia : MateriatorScriptableObject
     {
-        public ShaderData ShaderData;
+        public MaterialData MaterialData;
 
         [SerializeReference]
         [ShaderProperty(typeof(ShaderProperty))]

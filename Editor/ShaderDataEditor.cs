@@ -126,7 +126,7 @@ namespace Materiator
 
             foreach (var materia in materias)
             {
-                if (materia.ShaderData == _shaderData)
+                if (materia.MaterialData?.ShaderData == _shaderData)
                 {
                     RemoveOldPropertiesFromMateria(materia);
 
