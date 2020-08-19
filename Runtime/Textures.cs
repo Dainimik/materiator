@@ -147,18 +147,6 @@ namespace Materiator
             Apply();
         }
 
-        private void FillTextureData(Texture2D texture, NativeArray<Color> data)
-        {
-            var index = 0;
-            for (int y = 0; y < texture.height; y++)
-            {
-                for (int x = 0; x < texture.width; x++)
-                {
-                    //data[index++] = ((x & y) == 0 ? orange : teal);
-                }
-            }
-        }
-
         // TODO: This function is a modified copy!!! Merge with original!
         public void UpdateColor(List<ShaderProperty> shaderProperties)
         {
