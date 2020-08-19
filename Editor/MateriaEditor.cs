@@ -78,6 +78,16 @@ namespace Materiator
             serializedObject.ApplyModifiedProperties();
         }
 
+        private void OnValueChanged()
+        {
+            UpdatePreview();
+            UpdateSceneMateriaSettersColors();
+            UpdatePrefabMateriaSettersColors();
+
+            if (_materia.Properties.Count > 0)
+                _materia.PreviewIcon = GenerateThumbnail();
+        }
+
         private void CreateMateria()
         {
             var shaderData = _materia.MaterialData.ShaderData;
@@ -161,16 +171,6 @@ namespace Materiator
             EditorUtility.CopySerialized(_materia.PreviewIcon, staticPreviewTex);
 
             return staticPreviewTex;
-        }
-
-        private void OnValueChanged()
-        {
-            UpdatePreview();
-            UpdateSceneMateriaSettersColors();
-            UpdatePrefabMateriaSettersColors();
-
-            if (_materia.Properties.Count > 0)
-                _materia.PreviewIcon = GenerateThumbnail();
         }
 
         private void UpdateSceneMateriaSettersColors()
