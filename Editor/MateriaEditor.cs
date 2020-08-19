@@ -285,7 +285,7 @@ namespace Materiator
             if (drag)
                 _previewRenderUtility.camera.transform.rotation = Quaternion.Euler(new Vector3(-_drag.y, -_drag.x, 0));
             else
-                _previewRenderUtility.camera.transform.rotation = Quaternion.Euler(new Vector3(-_drag.y, -_drag.x, 0));
+                _previewRenderUtility.camera.transform.rotation = Quaternion.identity;
             
             _previewRenderUtility.camera.transform.position = _previewRenderUtility.camera.transform.forward * -4f;
             _previewRenderUtility.camera.Render();

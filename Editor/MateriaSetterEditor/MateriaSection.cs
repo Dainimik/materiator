@@ -43,8 +43,7 @@ namespace Materiator
             _materiaReorderableList.drawHeaderCallback = (Rect rect) =>
             {
                 EditorGUI.LabelField(new Rect(rect.x + 25f, rect.y, 50f, 20f), new GUIContent("Tag", "Tag"), EditorStyles.boldLabel);
-                EditorGUI.LabelField(new Rect(rect.x + 125f, rect.y, 20f, 20f), new GUIContent("C", "Base Color"), EditorStyles.boldLabel);
-                EditorGUI.LabelField(new Rect(rect.x + 150f, rect.y, 20f, 20f), new GUIContent("E", "Emission Color"), EditorStyles.boldLabel);
+                EditorGUI.LabelField(new Rect(rect.x + 135f, rect.y, 20f, 20f), new GUIContent("C", "Base Color"), EditorStyles.boldLabel);
                 EditorGUI.LabelField(new Rect(rect.x + 170f, rect.y, 100f, 20f), new GUIContent("Materia " + "(" + _materiaSetter.MateriaSlots.Count + ")"), EditorStyles.boldLabel);
             };
 
@@ -61,7 +60,7 @@ namespace Materiator
                 var tex = new Texture2D(4, 4);
 
                 EditorGUI.LabelField(r, new GUIContent((elementID.intValue + 1).ToString()));
-                EditorGUI.LabelField(new Rect(rect.x + 120f, rect.y, rect.width, rect.height), new GUIContent(_materiaSetter.MateriaSlots[index].Materia.PreviewIcon));
+                EditorGUI.LabelField(new Rect(rect.x + 130f, rect.y, rect.width, rect.height), new GUIContent(_materiaSetter.MateriaSlots[index].Materia.PreviewIcon));
 
                 _editor.serializedObject.Update();
 
