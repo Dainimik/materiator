@@ -7,6 +7,7 @@ using UnityEditor.SceneManagement;
 using System.Linq;
 using UnityEditorInternal;
 using System;
+using System.Collections.Generic;
 
 namespace Materiator
 {
@@ -261,7 +262,7 @@ namespace Materiator
                 }
 
                 if (_materia.Properties.Count > 0)
-                    _previewTextures.UpdateColor(_materia.Properties);
+                    _previewTextures.UpdateColors(SystemData.Settings.UVRect, _materia.Properties);
             }
         }
 

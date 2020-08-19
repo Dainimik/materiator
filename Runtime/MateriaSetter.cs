@@ -234,7 +234,8 @@ namespace Materiator
 
         public void UpdateColorsOfAllTextures()
         {
-            Textures.UpdateColors(FilteredRects, MateriaSlots);
+            foreach (var rect in FilteredRects)
+                Textures.UpdateColors(rect.Value, MateriaSlots.Where(ms => ms.ID == rect.Key).First().Materia.Properties);
         }
 
         public void LoadPreset(MateriaPreset preset)

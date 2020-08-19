@@ -7,7 +7,6 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Collections;
 
 namespace Materiator
 {
@@ -95,68 +94,17 @@ namespace Materiator
                 material.SetTexture(tex.Key, tex.Value);
         }
 
-        public void UpdateColors(IDictionary<int, Rect> rects, List<MateriaSlot> materiaSlots)
+        public void UpdateColors(Rect rect, List<ShaderProperty> shaderProperties)
         {
-            foreach (var rect in rects)
-            {
-                var rectInt = Utils.GetRectIntFromRect(Size, rect.Value);
-                var numberOfColors = rectInt.width * rectInt.height;
-
-                var colors = new Dictionary<Texture2D, Color[]>();
-
-                foreach (var tex in Texs)
-                {
-                    colors.Add(tex.Value, new Color[numberOfColors]);
-                    //var data = tex.Value.GetRawTextureData<Color>();
-
-                    for (int i = 0; i < numberOfColors; i++)
-                    {
-                        foreach (var prop in materiaSlots.Where(ms => ms.ID == rect.Key).First().Materia.Properties)
-                        {
-                            if (prop.GetType() == typeof(ColorShaderProperty))
-                            {
-                                var colorProp = (ColorShaderProperty)prop;
-                                if (colorProp.PropertyName == tex.Key)
-                                {
-                                    colors[tex.Value][i] = colorProp.Value * colorProp.Multiplier;
-                                }
-                            }
-                            else if (prop.GetType() == typeof(FloatShaderProperty))
-                            {
-                                var floatProp = (FloatShaderProperty)prop;
-                                if (floatProp.PropertyName == tex.Key)
-                                {
-                                    var r = (byte)(floatProp.R * 255);
-                                    var g = (byte)(floatProp.G * 255);
-                                    var b = (byte)(floatProp.B * 255);
-                                    var a = (byte)(floatProp.A * 255);
-
-                                    colors[tex.Value][i].r = floatProp.R;
-                                    colors[tex.Value][i].g = floatProp.G;
-                                    colors[tex.Value][i].b = floatProp.B;
-                                    colors[tex.Value][i].a = floatProp.A;
-                                }
-                            }
-                        }
-                    }
-
-                    tex.Value.SetPixels(rectInt.x, rectInt.y, rectInt.width, rectInt.height, colors[tex.Value]);
-                }
-            }
-
-            Apply();
-        }
-
-        // TODO: This function is a modified copy!!! Merge with original!
-        public void UpdateColor(List<ShaderProperty> shaderProperties)
-        {
-            var rectInt = Utils.GetRectIntFromRect(Size, SystemData.Settings.UVRect);
+            var rectInt = Utils.GetRectIntFromRect(Size, rect);
             var numberOfColors = rectInt.width * rectInt.height;
 
             var colors = new Dictionary<Texture2D, Color[]>();
+
             foreach (var tex in Texs)
             {
                 colors.Add(tex.Value, new Color[numberOfColors]);
+                //var data = tex.Value.GetRawTextureData<Color>();
 
                 for (int i = 0; i < numberOfColors; i++)
                 {
