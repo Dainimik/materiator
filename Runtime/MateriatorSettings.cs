@@ -19,23 +19,35 @@ namespace Materiator
         RGBAHalf
     }
 
+    public enum TextureUpdateMode
+    {
+        Immediate,
+        Delayed,
+        Manual
+    }
+
     public class MateriatorSettings : ScriptableObject
     {
-        public Vector2Int GridSize = new Vector2Int(4, 4);
-        public bool PackAssets;
-
-        [HideInInspector]
-        public MateriaTagCollection MateriaTags;
+        [Header("Materia Setter Settings")]
+        public Vector2Int DefaultGridSize = new Vector2Int(1, 1);
 
         public MaterialData DefaultMaterialData;
         public ShaderData DefaultShaderData;
         public Materia DefaultMateria;
         public MateriaTag DefaultTag = new MateriaTag("-");
 
+        public bool PackAssets;
+
+        [HideInInspector]
+        public MateriaTagCollection MateriaTags;
+
+        [Header("Materia Editor Settings")]
+        public TextureUpdateMode TextureUpdateMode = TextureUpdateMode.Immediate;
+
         public Color HighlightColor;
         public HighlightMode HighlightMode;
 
-        public bool OptimizeTextures = true;
+        [Header("Texture Settings")]
         public TextureFormat TextureFormat = TextureFormat.RGBAHalf;
         public FilterMode FilterMode;
 

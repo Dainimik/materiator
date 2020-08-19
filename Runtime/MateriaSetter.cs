@@ -125,7 +125,7 @@ namespace Materiator
             if (EditMode == EditMode.Native)
             {
                 if (!UseCustomGridSize)
-                    GridSize = SystemData.Settings.GridSize;
+                    GridSize = SystemData.Settings.DefaultGridSize;
 
                 if (MateriaSetterData && !IsDirty)
                     GridSize = MateriaSetterData.NativeGridSize;

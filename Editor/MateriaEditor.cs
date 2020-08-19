@@ -7,7 +7,6 @@ using UnityEditor.SceneManagement;
 using System.Linq;
 using UnityEditorInternal;
 using System;
-using System.Collections.Generic;
 
 namespace Materiator
 {
@@ -86,6 +85,8 @@ namespace Materiator
 
             if (_materia.Properties.Count > 0)
                 _materia.PreviewIcon = GenerateThumbnail();
+
+            SetUpView();
         }
 
         private void CreateMateria()
@@ -99,9 +100,6 @@ namespace Materiator
             _materia.AddProperties(shaderDataProperties);
 
             OnValueChanged();
-
-            // TODO: This should not be here
-            _materialDataObjectField.SetEnabled(false);
 
             SetUpView();
         }
@@ -133,6 +131,7 @@ namespace Materiator
                 if (EditorGUI.EndChangeCheck())
                 {
                     serializedObject.ApplyModifiedProperties();
+
                     OnValueChanged();
                 }
             };
@@ -150,46 +149,22 @@ namespace Materiator
 
                 return propertyHeight + spacing;
             };
-
-            /*_materiaPropertyList.onAddCallback = (ReorderableList list) =>
-            {
-                var index = list.serializedProperty.arraySize;
-                list.serializedProperty.arraySize++;
-                list.index = index;
-                var element = list.serializedProperty.GetArrayElementAtIndex(index);
-                serializedObject.ApplyModifiedProperties();
-                serializedObject.Update();
-            };*/
-        }
-
-        public override Texture2D RenderStaticPreview(string assetPath, UnityEngine.Object[] subAssets, int width, int height)
-        {
-            if (_materia == null || _materia.PreviewIcon == null)
-                return null;
-
-            Texture2D staticPreviewTex = new Texture2D(width, height);
-            EditorUtility.CopySerialized(_materia.PreviewIcon, staticPreviewTex);
-
-            return staticPreviewTex;
         }
 
         private void UpdateSceneMateriaSettersColors()
         {
-            var materiaSetters = GameObject.FindObjectsOfType<MateriaSetter>();
+            var materiaSetters = FindObjectsOfType<MateriaSetter>().Where(ms => ms.MateriaSlots.Select(s => s.Materia).Contains(_materia)).ToArray();
 
-            for (int i = 0; i < materiaSetters.Length; i++)
-            {
-                var aaa = materiaSetters[i].MateriaSlots.Where(m => m.Materia == (Materia)target);
-                if (aaa.Count() != 0)
-                {
-                    materiaSetters[i].UpdateColorsOfAllTextures();
-                }
-            }
+            foreach (var ms in materiaSetters)
+                ms.UpdateColorsOfAllTextures();
         }
 
         private void UpdatePrefabMateriaSettersColors()
         {
-            var materiaSetters = AssetUtils.FindAllComponentsInPrefabs<MateriaSetter>();
+            var materiaSetters = AssetUtils.FindAllComponentsInPrefabs<MateriaSetter>().Where(ms => ms.MateriaSlots.Select(s => s.Materia).Contains(_materia)).ToArray();
+
+            foreach (var ms in materiaSetters)
+                ms.UpdateColorsOfAllTextures();
 
             var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
             if (prefabStage != null)
@@ -202,15 +177,6 @@ namespace Materiator
                 }
                 EditorSceneManager.MarkSceneDirty(prefabStage.scene);
             }
-
-            for (int i = 0; i < materiaSetters.Count; i++)
-            {
-                var aaa = materiaSetters[i].MateriaSlots.Where(m => m.Materia == (Materia)target);
-                if (aaa.Count() != 0)
-                {
-                    materiaSetters[i].UpdateColorsOfAllTextures();
-                }
-            }
         }
 
         private void OnShaderDataChanged(ChangeEvent<UnityEngine.Object> e)
@@ -222,6 +188,17 @@ namespace Materiator
         }
 
         #region Preview
+        public override Texture2D RenderStaticPreview(string assetPath, UnityEngine.Object[] subAssets, int width, int height)
+        {
+            if (_materia == null || _materia.PreviewIcon == null)
+                return null;
+
+            Texture2D staticPreviewTex = new Texture2D(width, height);
+            EditorUtility.CopySerialized(_materia.PreviewIcon, staticPreviewTex);
+
+            return staticPreviewTex;
+        }
+
         private void SetUpPreview()
         {
             if (_materia.MaterialData)
