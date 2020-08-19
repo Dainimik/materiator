@@ -326,11 +326,11 @@ namespace Materiator
 
         protected override void SetUpView()
         {
-            var propCountBool = Convert.ToBoolean(_materia.Properties.Count > 0);
+            var propCountBool = Convert.ToBoolean(_materia.Properties.Count);
 
-            _createMateriaButton.visible = (Convert.ToBoolean(_materialData.objectReferenceValue) && Convert.ToBoolean(_materia.Properties.Count == 0));
+            _createMateriaButton.visible = Convert.ToBoolean(_materialData.objectReferenceValue) && !propCountBool;
             _IMGUIContainer.visible = propCountBool;
-            _restoreDefaultsButton.visible = Convert.ToBoolean(_materia.Properties.Count);
+            _restoreDefaultsButton.visible = propCountBool;
             _materialDataObjectField.SetEnabled(!propCountBool);
         }
 
