@@ -229,8 +229,17 @@ namespace Materiator
                 _previewMaterial = Instantiate(_materia.MaterialData.Material);
 
                 foreach (var kw in _materia.MaterialData.ShaderData.Keywords)
+                {
                     if (!_previewMaterial.IsKeywordEnabled(kw))
                         _previewMaterial.EnableKeyword(kw);
+
+                    // Code speciffic to default unity shaders
+                    if (_previewMaterial.globalIlluminationFlags == MaterialGlobalIlluminationFlags.EmissiveIsBlack)
+                        _previewMaterial.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
+
+                    if (_previewMaterial.GetColor("_EmissionColor") == Color.black)
+                        _previewMaterial.SetColor("_EmissionColor", Color.white);
+                }
                     
                 _previewTextures = new Textures();
 
