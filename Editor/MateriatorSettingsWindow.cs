@@ -9,7 +9,6 @@ namespace Materiator
         private Editor _editor = null;
         private MateriatorSettings _settings;
 
-        [MenuItem("Tools/Materiator/Settings")]
         public static void OpenWindow()
         {
             GetWindow<MateriatorSettingsWindow>("Materiator Settings");

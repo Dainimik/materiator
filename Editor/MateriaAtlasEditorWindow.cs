@@ -46,8 +46,6 @@ namespace Materiator
 
         private List<MateriaSetter> _selectedListViewMateriaSetters = new List<MateriaSetter>();
 
-        [MenuItem("Tools/Materiator/Atlas Editor")]
-
         public static void OpenWindow()
         {
             _window = GetWindow<MateriaAtlasEditorWindow>("Atlas Editor");
