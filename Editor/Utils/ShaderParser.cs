@@ -1,6 +1,4 @@
-﻿using Sirenix.OdinInspector;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -30,7 +28,7 @@ namespace Materiator
 
         private  List<ShaderProperty> _shaderProperties = new List<ShaderProperty>();
 
-        [Button("ProcessShader")]
+        [ContextMenu("ProcessShader")]
         public void ProcessShader()
         {
             var text = File.ReadAllText(AssetDatabase.GetAssetPath(Shader));
