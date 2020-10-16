@@ -68,12 +68,9 @@ namespace Materiator
             // will recycle elements created by the "makeItem"
             // and invoke the "bindItem" callback to associate
             // the element with the matching data item (specified as an index in the list)
-            if (list.Count > 0)
-            {
-                Action<VisualElement, int> bindItem = (e, i) => (e as Label).text = list[i];
-                listView.makeItem = makeItem;
-                listView.bindItem = bindItem;
-            }
+            Action<VisualElement, int> bindItem = (e, i) => (e as Label).text = list[i];
+            listView.makeItem = makeItem;
+            listView.bindItem = bindItem;
             
             listView.itemsSource = list;
             listView.selectionType = SelectionType.Multiple;
@@ -86,6 +83,8 @@ namespace Materiator
                     list.Remove(item.ToString());
                     targetList.Add(item.ToString());
                 }
+
+                GetShaderProperties();
 
                 listView.Refresh();
                 targetListView.Refresh();
@@ -100,7 +99,10 @@ namespace Materiator
 
             for (int i = 0; i < propertyCount; i++)
             {
-                _shaderData.AvailableShaderProperties.Add(ShaderUtil.GetPropertyName(_shaderData.Shader, i) + " - " + ShaderUtil.GetPropertyDescription(_shaderData.Shader, i));
+                var prop = ShaderUtil.GetPropertyName(_shaderData.Shader, i) + " - " + ShaderUtil.GetPropertyDescription(_shaderData.Shader, i);
+
+                if (!_shaderData.SelectedShaderProperties.Contains(prop))
+                    _shaderData.AvailableShaderProperties.Add(prop);
             }
         }
 
@@ -112,20 +114,13 @@ namespace Materiator
                 dest.Add(item.ToString());
             }
 
-            DrawShaderPropertiesListView(_availableShaderPropertiesListView, _selectedShaderPropertiesListView, _shaderData.AvailableShaderProperties, _shaderData.SelectedShaderProperties);
-            DrawShaderPropertiesListView(_selectedShaderPropertiesListView, _availableShaderPropertiesListView, _shaderData.SelectedShaderProperties, _shaderData.AvailableShaderProperties);
-        }
-
-        private void RemovePropertyFromSelected()
-        {
-
+            _availableShaderPropertiesListView.Refresh();
+            _selectedShaderPropertiesListView.Refresh();
         }
 
         private void UpdateShaderProperties()
         {
             GetShaderProperties();
-            DrawShaderPropertiesListView(_availableShaderPropertiesListView, _selectedShaderPropertiesListView, _shaderData.AvailableShaderProperties, _shaderData.SelectedShaderProperties);
-            DrawShaderPropertiesListView(_selectedShaderPropertiesListView, _availableShaderPropertiesListView, _shaderData.SelectedShaderProperties, _shaderData.AvailableShaderProperties);
 
             var shaderDataProperties = _shaderData.Properties;
             var keywords = _shaderData.Keywords;
@@ -266,8 +261,8 @@ namespace Materiator
         protected override void RegisterCallbacks()
         {
             _updateShaderPropertiesButton.clicked += UpdateShaderProperties;
-            //_addPropertyToSelected.clicked += AddPropertyToSelected;
-            _removePropertyFromSelected.clicked += RemovePropertyFromSelected;
+            _addPropertyToSelected.clicked += () => AddPropertyToSelected(_availableShaderPropertiesListView.selectedItems, _shaderData.AvailableShaderProperties, _shaderData.SelectedShaderProperties);
+            _removePropertyFromSelected.clicked += () => AddPropertyToSelected(_selectedShaderPropertiesListView.selectedItems, _shaderData.SelectedShaderProperties, _shaderData.AvailableShaderProperties);
         }
 
         protected override void GetProperties()
