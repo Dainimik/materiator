@@ -81,16 +81,6 @@ namespace Materiator
                         [ContextActions.Retry] = "Retry"
                     });
             }
-            else if (materiaSetter.Renderer.sharedMaterials.Count() > 1)
-            {
-                return ErrorMessage(
-                    editor,
-                    "Renderer needs to have only one material assigned. Please remove excess materials and hit the Retry button.",
-                    new Dictionary<ContextAction, string>
-                    {
-                        [ContextActions.Retry] = "Retry"
-                    });
-            }
             else if (
                 (materiaSetter.MeshFilter != null && materiaSetter.MeshFilter.sharedMesh.subMeshCount > 1) ||
                 (materiaSetter.SkinnedMeshRenderer != null && materiaSetter.SkinnedMeshRenderer.sharedMesh.subMeshCount > 1))
