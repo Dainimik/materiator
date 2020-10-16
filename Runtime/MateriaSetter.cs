@@ -28,6 +28,7 @@ namespace Materiator
         public MateriaPreset MateriaPreset;
         public MaterialData MaterialData;
 
+        public Material PreviousMaterial;
         public Material Material;
         public Textures Textures;
 
@@ -96,12 +97,9 @@ namespace Materiator
                 {
                     Material = Instantiate(SystemData.Settings.DefaultMaterialData.Material);
                     Material.name = gameObject.name;
-                    UpdateRenderer(false);
                 }
-                else
-                {
-                    Material = Renderer.sharedMaterial;
-                }
+
+                UpdateRenderer(false, true);
             }
         }
 
@@ -117,7 +115,9 @@ namespace Materiator
             }
 
             if (updateMaterial)
-                Renderer.sharedMaterial = Material;
+            {
+                MaterialUtils.UpdateRendererMaterials(Renderer, Material, ref PreviousMaterial);
+            }
         }
 
         private void SetUpGridSize()
