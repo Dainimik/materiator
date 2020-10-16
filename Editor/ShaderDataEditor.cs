@@ -4,6 +4,8 @@ using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using System.Linq;
 using System.Collections.Generic;
+using System;
+using System.Collections;
 
 namespace Materiator
 {
@@ -22,6 +24,17 @@ namespace Materiator
 
         private List<KeyValuePair<int, ShaderProperty>> _newProperties;
 
+
+
+        private ListView _availableShaderPropertiesListView;
+        private ListView _selectedShaderPropertiesListView;
+
+        private SerializedProperty _availableShaderProperties;
+        private SerializedProperty _selectedShaderProperties;
+
+        private Button _addPropertyToSelected;
+        private Button _removePropertyFromSelected;
+
         private void OnEnable()
         {
             _shaderData = (ShaderData)target;
@@ -34,6 +47,9 @@ namespace Materiator
             IMGUIContainer defaultInspector = new IMGUIContainer(() => IMGUI());
             _IMGUIContainer.Add(defaultInspector);
 
+            DrawShaderPropertiesListView(_availableShaderPropertiesListView, _selectedShaderPropertiesListView, _shaderData.AvailableShaderProperties, _shaderData.SelectedShaderProperties);
+            DrawShaderPropertiesListView(_selectedShaderPropertiesListView, _availableShaderPropertiesListView, _shaderData.SelectedShaderProperties, _shaderData.AvailableShaderProperties);
+
             return root;
         }
 
@@ -42,8 +58,75 @@ namespace Materiator
             base.DrawDefaultInspector();
         }
 
+        private void DrawShaderPropertiesListView(ListView listView, ListView targetListView, List<string> list, List<string> targetList)
+        {
+            // The "makeItem" function will be called as needed
+            // when the ListView needs more items to render
+            Func<VisualElement> makeItem = () => new Label();
+
+            // As the user scrolls through the list, the ListView object
+            // will recycle elements created by the "makeItem"
+            // and invoke the "bindItem" callback to associate
+            // the element with the matching data item (specified as an index in the list)
+            if (list.Count > 0)
+            {
+                Action<VisualElement, int> bindItem = (e, i) => (e as Label).text = list[i];
+                listView.makeItem = makeItem;
+                listView.bindItem = bindItem;
+            }
+            
+            listView.itemsSource = list;
+            listView.selectionType = SelectionType.Multiple;
+
+            // Callback invoked when the user double clicks an item
+            listView.onItemsChosen += (items) =>
+            {
+                foreach (var item in items)
+                {
+                    list.Remove(item.ToString());
+                    targetList.Add(item.ToString());
+                }
+
+                listView.Refresh();
+                targetListView.Refresh();
+            };
+        }
+
+        private void GetShaderProperties()
+        {
+            var propertyCount = ShaderUtil.GetPropertyCount(_shaderData.Shader);
+
+            _shaderData.AvailableShaderProperties.Clear();
+
+            for (int i = 0; i < propertyCount; i++)
+            {
+                _shaderData.AvailableShaderProperties.Add(ShaderUtil.GetPropertyName(_shaderData.Shader, i) + " - " + ShaderUtil.GetPropertyDescription(_shaderData.Shader, i));
+            }
+        }
+
+        private void AddPropertyToSelected(IEnumerable items, List<string> source, List<string> dest)
+        {
+            foreach (var item in items)
+            {
+                source.Remove(item.ToString());
+                dest.Add(item.ToString());
+            }
+
+            DrawShaderPropertiesListView(_availableShaderPropertiesListView, _selectedShaderPropertiesListView, _shaderData.AvailableShaderProperties, _shaderData.SelectedShaderProperties);
+            DrawShaderPropertiesListView(_selectedShaderPropertiesListView, _availableShaderPropertiesListView, _shaderData.SelectedShaderProperties, _shaderData.AvailableShaderProperties);
+        }
+
+        private void RemovePropertyFromSelected()
+        {
+
+        }
+
         private void UpdateShaderProperties()
         {
+            GetShaderProperties();
+            DrawShaderPropertiesListView(_availableShaderPropertiesListView, _selectedShaderPropertiesListView, _shaderData.AvailableShaderProperties, _shaderData.SelectedShaderProperties);
+            DrawShaderPropertiesListView(_selectedShaderPropertiesListView, _availableShaderPropertiesListView, _shaderData.SelectedShaderProperties, _shaderData.AvailableShaderProperties);
+
             var shaderDataProperties = _shaderData.Properties;
             var keywords = _shaderData.Keywords;
 
@@ -183,6 +266,8 @@ namespace Materiator
         protected override void RegisterCallbacks()
         {
             _updateShaderPropertiesButton.clicked += UpdateShaderProperties;
+            //_addPropertyToSelected.clicked += AddPropertyToSelected;
+            _removePropertyFromSelected.clicked += RemovePropertyFromSelected;
         }
 
         protected override void GetProperties()
@@ -194,7 +279,16 @@ namespace Materiator
             _shaderObjectField = root.Q<ObjectField>("ShaderObjectField");
             _shaderObjectField.objectType = typeof(Shader);
 
+            _availableShaderPropertiesListView = root.Q<ListView>("AvailableShaderPropertiesListView");
+            _selectedShaderPropertiesListView = root.Q<ListView>("SelectedShaderPropertiesListView");
+
+            _availableShaderProperties = serializedObject.FindProperty("AvailableShaderProperties");
+            _selectedShaderProperties = serializedObject.FindProperty("SelectedShaderProperties");
+
             _updateShaderPropertiesButton = root.Q<Button>("UpdateShaderPropertiesButton");
+
+            _addPropertyToSelected = root.Q<Button>("AddPropertyToSelected");
+            _removePropertyFromSelected = root.Q<Button>("RemovePropertyFromSelected");
         }
 
         protected override void BindProperties()

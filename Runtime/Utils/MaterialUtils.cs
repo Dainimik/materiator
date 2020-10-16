@@ -30,7 +30,7 @@ namespace Materiator
                 }
                 else
                 {
-                    if (renderer.sharedMaterials.Length != 0 || GetNumberOfNullMaterials(renderer.sharedMaterials) == 0)
+                    if (renderer.sharedMaterials.Length != 0 && GetNumberOfNullMaterials(renderer.sharedMaterials) != 1)
                     {
                         var materials = CloneAndExpandMaterialArray(renderer.sharedMaterials, 1);
                         materials[materials.Length - 1] = material;
