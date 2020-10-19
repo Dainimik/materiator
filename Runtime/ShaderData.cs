@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Materiator
@@ -7,15 +8,47 @@ namespace Materiator
     public class ShaderData : ScriptableObject
     {
         [HideInInspector] // Temporarily
+        public Shader SourceShader;
         public Shader Shader;
 
-        [SerializeReference]
-        public List<ShaderProperty> Properties = new List<ShaderProperty>();
+        public List<MateriatorShaderProperty> MateriatorShaderProperties = new List<MateriatorShaderProperty>();
         public List<string> Keywords = new List<string>();
 
-        public List<string> AvailableShaderProperties = new List<string>();
-        public List<string> SelectedShaderProperties = new List<string>();
+#if UNITY_EDITOR
+        public List<ShaderProperty> AvailableShaderProperties = new List<ShaderProperty>();
+        public List<ShaderProperty> SelectedShaderProperties = new List<ShaderProperty>();
+#endif
 
         public bool IsEditable = true;
     }
+
+#if UNITY_EDITOR
+
+    public enum ShaderPropertyType
+    {
+        Color,
+        Vector
+    }
+
+    [Serializable]
+    public class ShaderProperty
+    {
+        public string FullString;
+        public string PropertyName;
+        public string Name;
+        public ShaderPropertyType Type;
+        public List<string> Value;
+        public Vector2 Range;
+
+        public ShaderProperty(string fullString, string propertyName, string name, ShaderPropertyType type, List<string> value, Vector2 range = default)
+        {
+            FullString = fullString;
+            PropertyName = propertyName;
+            Name = name;
+            Type = type;
+            Value = value;
+            Range = range;
+        }
+    }
+#endif
 }

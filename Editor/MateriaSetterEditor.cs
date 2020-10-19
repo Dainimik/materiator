@@ -137,7 +137,7 @@ namespace Materiator
                     sourceTextures = MateriaSetter.MateriaSetterData.MateriaAtlas.Textures;
                 }
 
-                newTextures.CreateTextures(MateriaSetter.MaterialData.ShaderData.Properties, sourceTextures.Size.x, sourceTextures.Size.y);
+                newTextures.CreateTextures(MateriaSetter.MaterialData.ShaderData.MateriatorShaderProperties, sourceTextures.Size.x, sourceTextures.Size.y);
                 var mat = Instantiate(Material.objectReferenceValue);
                 MateriaSetter.UpdateColorsOfAllTextures();
 

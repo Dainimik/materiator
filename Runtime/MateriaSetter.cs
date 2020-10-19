@@ -145,7 +145,7 @@ namespace Materiator
 
         private void InitializeTextures()
         {
-            var shaderProps = MaterialData.ShaderData.Properties;
+            var shaderProps = MaterialData.ShaderData.MateriatorShaderProperties;
 
             if (Textures == null)
                 Textures = new Textures();

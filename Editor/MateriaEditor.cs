@@ -94,7 +94,7 @@ namespace Materiator
             var shaderData = _materia.MaterialData.ShaderData;
             if (!shaderData) return;
 
-            var shaderDataProperties = _materia.MaterialData.ShaderData.Properties;
+            var shaderDataProperties = _materia.MaterialData.ShaderData.MateriatorShaderProperties;
 
             _materia.Properties.Clear();
             _materia.AddProperties(shaderDataProperties);

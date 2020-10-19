@@ -46,31 +46,28 @@ namespace Materiator
             }
         }
 
-        public void RemoveTextures(List<ShaderProperty> props, int width, int height)
+        public void RemoveTextures(List<MateriatorShaderProperty> props, int width, int height)
         {
             foreach (var tex in Texs.ToArray())
                 if (!props.Select(prop => prop.PropertyName).ToArray().Contains(tex.Key) || (Size.x != width || Size.y != height))
                     Texs.Remove(tex.Key);
         }
 
-        public void CreateTextures(List<ShaderProperty> props, int width, int height)
+        public void CreateTextures(List<MateriatorShaderProperty> props, int width, int height)
         {
             FilterMode = SystemData.Settings.FilterMode;
 
             for (int i = 0; i < props.Count; i++)
             {
-                if (props[i].GetType() == typeof(ColorShaderProperty) || props[i].GetType() == typeof(FloatShaderProperty))
+                if (!Texs.ContainsKey(props[i].PropertyName))
                 {
-                    if (!Texs.ContainsKey(props[i].PropertyName))
+                    Texs.Add(props[i].PropertyName, CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode));
+                }
+                else
+                {
+                    if (Texs[props[i].PropertyName] == null || (Size.x != width || Size.y != height))
                     {
-                        Texs.Add(props[i].PropertyName, CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode));
-                    }
-                    else
-                    {
-                        if (Texs[props[i].PropertyName] == null || (Size.x != width || Size.y != height))
-                        {
-                            Texs[props[i].PropertyName] = CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode);
-                        }
+                        Texs[props[i].PropertyName] = CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode);
                     }
                 }
             }
@@ -94,7 +91,7 @@ namespace Materiator
                 material.SetTexture(tex.Key, tex.Value);
         }
 
-        public void UpdateColors(Rect rect, List<ShaderProperty> shaderProperties)
+        public void UpdateColors(Rect rect, List<MateriatorShaderProperty> shaderProperties)
         {
             var rectInt = Utils.GetRectIntFromRect(Size, rect);
             var numberOfColors = rectInt.width * rectInt.height;
@@ -104,29 +101,32 @@ namespace Materiator
             foreach (var tex in Texs)
             {
                 colors.Add(tex.Value, new Color[numberOfColors]);
-                //var data = tex.Value.GetRawTextureData<Color>();
 
                 for (int i = 0; i < numberOfColors; i++)
                 {
                     foreach (var prop in shaderProperties)
                     {
-                        if (prop.GetType() == typeof(ColorShaderProperty))
+                        if (prop.PropertyName == tex.Key)
                         {
-                            var colorProp = (ColorShaderProperty)prop;
-                            if (colorProp.PropertyName == tex.Key)
+                            foreach (var value in prop.Values)
                             {
-                                colors[tex.Value][i] = colorProp.Value * colorProp.Multiplier;
-                            }
-                        }
-                        else if (prop.GetType() == typeof(FloatShaderProperty))
-                        {
-                            var floatProp = (FloatShaderProperty)prop;
-                            if (floatProp.PropertyName == tex.Key)
-                            {
-                                colors[tex.Value][i].r = floatProp.RValue;
-                                colors[tex.Value][i].g = floatProp.GValue;
-                                colors[tex.Value][i].b = floatProp.BValue;
-                                colors[tex.Value][i].a = floatProp.AValue;
+                                switch (value.Channel)
+                                {
+                                    case MateriatorShaderPropertyValueChannel.R:
+                                        colors[tex.Value][i].r = value.Value;
+                                        break;
+                                    case MateriatorShaderPropertyValueChannel.G:
+                                        colors[tex.Value][i].g = value.Value;
+                                        break;
+                                    case MateriatorShaderPropertyValueChannel.B:
+                                        colors[tex.Value][i].b = value.Value;
+                                        break;
+                                    case MateriatorShaderPropertyValueChannel.A:
+                                        colors[tex.Value][i].a = value.Value;
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
                         }
                     }

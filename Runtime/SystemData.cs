@@ -62,15 +62,15 @@ namespace Materiator
             var renderPipelineType = RenderPipelineUtils.GetActivePipelineType();
             if (renderPipelineType == RenderPipelineUtils.PipelineType.Universal)
             {
-                _settings.DefaultShaderData = shaderDatas.Where(sd => sd.Shader == Shader.Find("Universal Render Pipeline/Lit")).FirstOrDefault();
+                _settings.DefaultShaderData = shaderDatas.Where(sd => sd.SourceShader == Shader.Find("Universal Render Pipeline/Lit")).FirstOrDefault();
             }
             else if (renderPipelineType == RenderPipelineUtils.PipelineType.BuiltIn)
             {
-                _settings.DefaultShaderData = shaderDatas.Where(sd => sd.Shader == Shader.Find("Standard")).FirstOrDefault();
+                _settings.DefaultShaderData = shaderDatas.Where(sd => sd.SourceShader == Shader.Find("Standard")).FirstOrDefault();
             }
 
-            _settings.DefaultMateria = CreateDefaultMateria("DefaultMateria");
             _settings.DefaultMaterialData = CreateDefaultMaterialData("DefaultMaterialData");
+            _settings.DefaultMateria = CreateDefaultMateria("DefaultMateria");
             _settings.MateriaTags = CreateDefaultTagCollection("MateriaTags");
 
             AssetDatabase.SaveAssets();
@@ -82,7 +82,7 @@ namespace Materiator
             materia.name = name;
 
             materia.MaterialData = _settings.DefaultMaterialData;
-            materia.AddProperties(_settings.DefaultShaderData.Properties);
+            materia.AddProperties(_settings.DefaultShaderData.MateriatorShaderProperties);
 
             AssetDatabase.AddObjectToAsset(materia, _settings);
 
@@ -96,12 +96,31 @@ namespace Materiator
 
             CreateDefaultShaderData(
                 Shader.Find("Universal Render Pipeline/Lit"),
-                new List<ShaderProperty>
+                new List<MateriatorShaderProperty>
                 {
-                    new ColorShaderProperty("Base Color", "_BaseMap", Color.white),
-                    new FloatShaderProperty("Metallic/Smoothness", "_MetallicGlossMap", defaultFloatValues, valueNames), // Combine into one
-                    new FloatShaderProperty("Glossiness", "_SpecGlossMap", defaultFloatValues, valueNames), // Combine into one
-                    new ColorShaderProperty("Emission Color", "_EmissionMap")
+                    new MateriatorShaderProperty("Base Color", "_BaseMap", ShaderPropertyType.Color, new List<MateriatorShaderPropertyValue>()
+                    {
+                        new MateriatorShaderPropertyValue("R", "_BaseMap", MateriatorShaderPropertyValueChannel.R, defaultFloatValues.x),
+                        new MateriatorShaderPropertyValue("G", "_BaseMap", MateriatorShaderPropertyValueChannel.G, defaultFloatValues.y),
+                        new MateriatorShaderPropertyValue("B", "_BaseMap", MateriatorShaderPropertyValueChannel.B, defaultFloatValues.z),
+                        new MateriatorShaderPropertyValue("A", "_BaseMap", MateriatorShaderPropertyValueChannel.A, defaultFloatValues.w),
+                    }),
+                    new MateriatorShaderProperty("Metallic/Smoothness", "_MetallicGlossMap", ShaderPropertyType.Vector, new List<MateriatorShaderPropertyValue>()
+                    {
+                        new MateriatorShaderPropertyValue("Metallic", "_MetallicGlossMap", MateriatorShaderPropertyValueChannel.R, defaultFloatValues.x),
+                        new MateriatorShaderPropertyValue("Smoothness", "_MetallicGlossMap", MateriatorShaderPropertyValueChannel.A, defaultFloatValues.w)
+                    }), // combine into one
+                    new MateriatorShaderProperty("Glossiness", "_SpecGlossMap", ShaderPropertyType.Vector, new List<MateriatorShaderPropertyValue>()
+                    {
+                        new MateriatorShaderPropertyValue("X", "_SpecGlossMap", MateriatorShaderPropertyValueChannel.R, defaultFloatValues.x) // this probably wont work needs to be tested
+                    }), // combine into one
+                    new MateriatorShaderProperty("Emission Color", "_EmissionMap", ShaderPropertyType.Color, new List<MateriatorShaderPropertyValue>()
+                    {
+                        new MateriatorShaderPropertyValue("R", "_EmissionMap", MateriatorShaderPropertyValueChannel.R, defaultFloatValues.x),
+                        new MateriatorShaderPropertyValue("G", "_EmissionMap", MateriatorShaderPropertyValueChannel.G, defaultFloatValues.y),
+                        new MateriatorShaderPropertyValue("B", "_EmissionMap", MateriatorShaderPropertyValueChannel.B, defaultFloatValues.z),
+                        new MateriatorShaderPropertyValue("A", "_EmissionMap", MateriatorShaderPropertyValueChannel.A, defaultFloatValues.w),
+                    })
                 },
                 new List<string>
                 {
@@ -109,9 +128,9 @@ namespace Materiator
                     "_EMISSION"
                 });
 
-            CreateDefaultShaderData(
+            /*CreateDefaultShaderData(
                 Shader.Find("Universal Render Pipeline/Simple Lit"),
-                new List<ShaderProperty>
+                new List<MateriatorShaderProperty>
                 {
                     new ColorShaderProperty("Base Color", "_BaseMap", Color.white),
                     new FloatShaderProperty("Specular/Glossiness", "_SpecGlossMap", defaultFloatValues, valueNames),
@@ -125,7 +144,7 @@ namespace Materiator
 
             CreateDefaultShaderData(
                 Shader.Find("Standard"),
-                new List<ShaderProperty>
+                new List<MateriatorShaderProperty>
                 {
                     new ColorShaderProperty("Base Color", "_MainTex", Color.white),
                     new FloatShaderProperty("Metallic/Smoothness/Glossiness", "_MetallicGlossMap", defaultFloatValues, valueNames),
@@ -139,7 +158,7 @@ namespace Materiator
 
             CreateDefaultShaderData(
                 Shader.Find("Standard (Specular setup)"),
-                new List<ShaderProperty>
+                new List<MateriatorShaderProperty>
                 {
                     new ColorShaderProperty("Base Color", "_MainTex", Color.white),
                     new FloatShaderProperty("Specular/Glossiness", "_SpecGlossMap", defaultFloatValues, valueNames),
@@ -149,24 +168,25 @@ namespace Materiator
                 {
                     "_METALLICGLOSSMAP",
                     "_EMISSION"
-                });
+                });*/
 
             AssetDatabase.SaveAssets();
 
             return AssetDatabase.GetAssetPath(_settings);
         }
 
-        private static void CreateDefaultShaderData(Shader shader, List<ShaderProperty> properties, List<string> keywords)
+        private static void CreateDefaultShaderData(Shader shader, List<MateriatorShaderProperty> properties, List<string> keywords)
         {
             var shaderData = ScriptableObject.CreateInstance<ShaderData>();
             shaderData.name = shader.name;
             shaderData.name.Replace(' ', '_');
             shaderData.name.Replace('/', '_');
 
-            shaderData.Shader = shader;
+            shaderData.SourceShader = shader;
+            shaderData.Shader = shader; // only temp for testing!!!
 
             foreach (var prop in properties)
-                shaderData.Properties.Add(prop);
+                shaderData.MateriatorShaderProperties.Add(prop);
 
             foreach (var kw in keywords)
                 shaderData.Keywords.Add(kw);
@@ -178,7 +198,7 @@ namespace Materiator
 
         private static MaterialData CreateDefaultMaterialData(string name)
         {
-            var material = Utils.CreateMaterial(_settings.DefaultShaderData.Shader);
+            var material = Utils.CreateMaterial(_settings.DefaultShaderData.SourceShader);
             material.name = "DefaultMaterial";
 
             var materialData = ScriptableObject.CreateInstance<MaterialData>();

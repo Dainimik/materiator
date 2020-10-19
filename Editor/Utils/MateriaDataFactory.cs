@@ -60,7 +60,7 @@ namespace Materiator
                                 AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(tex.Value));
 
                             data.Textures.Texs.Clear();
-                            data.Textures.CreateTextures(data.MaterialData.ShaderData.Properties, materiaSetter.Textures.Size.x, materiaSetter.Textures.Size.y);
+                            data.Textures.CreateTextures(data.MaterialData.ShaderData.MateriatorShaderProperties, materiaSetter.Textures.Size.x, materiaSetter.Textures.Size.y);
                         }
 
                         AssetDatabase.SaveAssets();
@@ -105,7 +105,7 @@ namespace Materiator
             else
             {
                 outputTextures = new Textures();
-                outputTextures.CreateTextures(materiaSetter.MaterialData.ShaderData.Properties, materiaSetter.Textures.Size.x, materiaSetter.Textures.Size.y);
+                outputTextures.CreateTextures(materiaSetter.MaterialData.ShaderData.MateriatorShaderProperties, materiaSetter.Textures.Size.x, materiaSetter.Textures.Size.y);
 
                 material = Material.Instantiate(materiaSetter.Material); // I'm instantiating here because Unity can't add an object to asset if it is already a part of an asset
             }

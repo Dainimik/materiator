@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -6,55 +7,63 @@ using UnityEngine;
 
 namespace Materiator
 {
-    public class ShaderParser : MonoBehaviour
+    public class ShaderParser
     {
-        public Shader Shader;
-
-        private struct ShaderProperty
-        {
-            public string PropertyName;
-            public string Name;
-            public List<string> Value;
-            public Vector2 Range;
-
-            public ShaderProperty(string propertyName, string name, List<string> value, Vector2 range = default)
-            {
-                PropertyName = propertyName;
-                Name = name;
-                Value = value;
-                Range = range;
-            }
-        }
-
         private  List<ShaderProperty> _shaderProperties = new List<ShaderProperty>();
 
-        [ContextMenu("ProcessShader")]
-        public void ProcessShader()
+        public static List<ShaderProperty> ProcessShader(Shader shader)
         {
-            var text = File.ReadAllText(AssetDatabase.GetAssetPath(Shader));
+            var text = File.ReadAllText(AssetDatabase.GetAssetPath(shader));
 
-            var shaderProperties = GetShaderProperties(text);
+            var shaderPropertyStrings = GetShaderProperties(text);
 
-            _shaderProperties = ParseShaderProperties(shaderProperties);
+            var shaderProperties = ParseShaderProperties(shaderPropertyStrings);
 
-            var textureCount = GetRequiredTextureCount(_shaderProperties);
+            var shaderVariableName = "";
 
-            Debug.Log("TexCount: " + textureCount);
+            var vectorTypeExpression = @"\d";
+
+            foreach (var shaderProperty in shaderProperties)
+            {
+                if (shaderProperty.Value.Count > 1)
+                {
+                    shaderVariableName = shaderProperty.PropertyName;
+
+                    var shaderVariableExpression = @"((float[2-4]|fixed[2-4]|half[2-4])\s+" + shaderVariableName + ";)";
+                    var shaderVar = ParseString(text, shaderVariableExpression)[0];
+                    var floatType = ParseStringFirstMatch(shaderVar, vectorTypeExpression);
+
+                    var count = shaderProperty.Value.Count - int.Parse(floatType);
+                    for (int i = 0; i < count; i++)
+                    {
+                        shaderProperty.Value.RemoveAt(shaderProperty.Value.Count - 1 - i);
+                    }                    
+                }
+            }
+
+            return shaderProperties;
         }
 
-        private List<string> GetShaderProperties(string text)
+        public static List<string> GetShaderProperties(string text)
         {
-            var expression = @"\S.*\w*[\s\S]\(\"".*\=.*";
+            var expression = @"(?s)(?=\[|_).*?\=\s\S[\d|\.|\,|\)]*";
 
-            return ParseString(text, expression);
+            var propertiesText = ExtractText(text, "Properties", "SubShader");
+
+            return ParseString(propertiesText, expression);
         }
 
-        private List<ShaderProperty> ParseShaderProperties(List<string> properties)
+        private static string ExtractText(string text, string from, string to)
         {
-            //char[] separators = { '(', '"', '=' };
+            var expression = "(?s)(?<=" + from + ").+?(?=" + to + ")";
 
-            string attributeExpression = @"(\[[a-zA-Z]*\.?[a-zA-Z]\])";
-            string propertyNameExpression = @"(.+?(?=\())";
+            return ParseString(text, expression)[0];
+        }
+
+        private static List<ShaderProperty> ParseShaderProperties(List<string> properties)
+        {
+            string attributeExpression = @"\[(.*?)\]";
+            string propertyNameExpression = @"(?=_).*?(?=\s|\("")";
             string nameExpression = "(\".*\")";
             string valueExpression = @"(\=\s*.*)";
             string rangeExpression = @"(Range.*\))";
@@ -69,10 +78,7 @@ namespace Materiator
                 }
 
                 var attributes = ParseString(prop, attributeExpression);
-                foreach (var item in attributes)
-                {
-                    Debug.Log(item);
-                }
+
                 if (attributes.Contains("[HideInInspector]"))
                 {
                     continue;
@@ -85,7 +91,9 @@ namespace Materiator
                 string digitExpression = @"([-+]?[0-9]*\.?[0-9]+)";
 
                 var value = ParseString(valueString, digitExpression);
-                
+
+                var type = GetPropertyType(prop);
+
                 var rangeString = ParseString(prop, rangeExpression);
                 
                 Vector2 range = default;
@@ -99,21 +107,46 @@ namespace Materiator
                 }
                 
                 
-                var property = new ShaderProperty(propertyName, name.Substring(1, name.Length - 2), value, range);
+                var property = new ShaderProperty(prop, propertyName, name.Substring(1, name.Length - 2), type, value, range);
 
                 results.Add(property);
-
-                Debug.Log(property.PropertyName);
-                Debug.Log(property.Name);
-                Debug.Log(property.Value);
-                Debug.Log(property.Range);
-
             }
 
             return results;
         }
 
-        private List<string> ParseString(string text, string expression)
+        private static ShaderPropertyType GetPropertyType(string property)
+        {
+            string colorExpression = @"(?<=\,\s)Color(?=\))";
+
+            var colorString = ParseString(property, colorExpression);
+
+            if (colorString.Count > 0)
+            {
+                return ShaderPropertyType.Color;
+            }
+            else
+            {
+                return ShaderPropertyType.Vector;
+            }
+
+        }
+
+        public static List<string> ParseFile(string path, string expression)
+        {
+            var text = File.ReadAllText(path);
+
+            MatchCollection mc = Regex.Matches(text, expression);
+
+            var results = new List<string>();
+
+            foreach (var match in mc)
+                results.Add(match.ToString());
+
+            return results;
+        }
+
+        private static List<string> ParseString(string text, string expression)
         {
             MatchCollection mc = Regex.Matches(text, expression);
 
@@ -125,16 +158,11 @@ namespace Materiator
             return results;
         }
 
-        private int GetRequiredTextureCount(List<ShaderProperty> shaderProperties)
+        private static string ParseStringFirstMatch(string text, string expression)
         {
-            var count = 0;
+            var match = Regex.Match(text, expression);
 
-            foreach (var prop in shaderProperties)
-            {
-                count += prop.Value.Count;
-            }
-
-            return Mathf.CeilToInt(count / 4);
+            return match.ToString();
         }
     }
 }
