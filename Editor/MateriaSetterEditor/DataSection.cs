@@ -41,7 +41,7 @@ namespace Materiator
             RegisterButtons();
 
             SetReloadDataButtonState((MateriaSetterData)_materiaSetterDataObjectField.value);
-            SetCurrentShaderLabel(_materiaSetter.MaterialData.ShaderData.SourceShader.name);
+            SetCurrentShaderLabel(_materiaSetter.MaterialData.ShaderData.Shader.name);
             UpdateIndicator(_editor.IsDirty.boolValue);
 
             if (MateriaSetterData.objectReferenceValue == null)
@@ -144,10 +144,10 @@ namespace Materiator
 
         private void OnMaterialDataChanged(MaterialData materialData)
         {
-            if (materialData.Material.shader != materialData.ShaderData.SourceShader)
-                materialData.Material.shader = materialData.ShaderData.SourceShader;
+            if (materialData.Material.shader != materialData.ShaderData.Shader)
+                materialData.Material.shader = materialData.ShaderData.Shader;
 
-            SetCurrentShaderLabel(materialData.ShaderData.SourceShader.name);
+            SetCurrentShaderLabel(materialData.ShaderData.Shader.name);
 
             _editor.SetMateriaSetterDirty(true);
 
@@ -156,7 +156,7 @@ namespace Materiator
             _editor.serializedObject.ApplyModifiedProperties();
 
             _materiaSetter.Material.name = _materiaSetter.gameObject.name;
-            _materiaSetter.Material.shader = materialData.ShaderData.SourceShader;
+            _materiaSetter.Material.shader = materialData.ShaderData.Shader;
 
             _materiaSetter.SetTextures();
             _materiaSetter.UpdateRenderer(false);

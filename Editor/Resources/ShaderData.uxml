@@ -1,21 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="Materiator.uss" />
     <ui:VisualElement>
-        <Style src="Materiator.uss" />
-        <uie:ObjectField label="Source Shader" name="SourceShaderObjectField" allow-scene-objects="false" />
         <ui:IMGUIContainer name="IMGUIContainer" />
-        <ui:Button text="Update Properties" name="UpdateShaderPropertiesButton" tooltip="Selects shader properties with [Materia] attribute and adds them to Properties list" />
-        <ui:VisualElement>
-            <ui:Label text="Available Properties" display-tooltip-when-elided="True" style="-unity-font-style: bold;" />
-            <ui:ListView focusable="True" name="AvailableShaderPropertiesListView" selection-type="Multiple" item-height="20" show-border="true" style="height: 300px;" />
-        </ui:VisualElement>
-        <ui:VisualElement style="flex-direction: row; justify-content: center;">
-            <ui:Button text="Add" display-tooltip-when-elided="True" name="AddPropertyToSelected" />
-            <ui:Button text="Remove" display-tooltip-when-elided="True" name="RemovePropertyFromSelected" />
-        </ui:VisualElement>
-        <ui:VisualElement>
-            <ui:Label text="Selected Properties" display-tooltip-when-elided="True" style="-unity-font-style: bold;" />
-            <ui:ListView focusable="True" name="SelectedShaderPropertiesListView" selection-type="Multiple" item-height="20" show-border="true" style="height: 300px;" />
-        </ui:VisualElement>
-        <ui:Button text="Convert Properties" name="ConvertShaderPropertiesButton" tooltip="Selects shader properties with [Materia] attribute and adds them to Properties list" />
     </ui:VisualElement>
 </ui:UXML>

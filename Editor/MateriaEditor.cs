@@ -121,12 +121,12 @@ namespace Materiator
 
             _materiaPropertyList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
             {
-                var element = _materiaPropertyList.serializedProperty.GetArrayElementAtIndex(index);
+                var element = _materia.Properties[index];
 
                 Rect r = new Rect(rect.x, rect.y, rect.width, rect.height);
 
                 EditorGUI.BeginChangeCheck();
-                EditorGUI.PropertyField(r, element);
+                CreateShaderPropertyGUI(r, element);
                 serializedObject.Update();
                 if (EditorGUI.EndChangeCheck())
                 {
@@ -147,8 +147,96 @@ namespace Materiator
                     spacing += 20;
                 }
 
-                return propertyHeight + spacing;
+                //return propertyHeight + spacing;
+                return 20f + spacing;
             };
+        }
+
+        private void CreateShaderPropertyGUI(Rect rect, MateriatorShaderProperty element)
+        {
+            var prop = element;
+
+            switch (prop.Type)
+            {
+                case ShaderPropertyType.Color:
+                    var colorValue = EditorGUI.ColorField(rect, new GUIContent(prop.Name), new Color(prop.Values[0].Value, prop.Values[1].Value, prop.Values[2].Value, prop.Values[3].Value), true, true, true);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        prop.Values[0].Value = colorValue.r;
+                        prop.Values[1].Value = colorValue.g;
+                        prop.Values[2].Value = colorValue.b;
+                        prop.Values[3].Value = colorValue.a;
+                        serializedObject.ApplyModifiedProperties();
+
+                        OnValueChanged();
+                    }
+                    
+                    break;
+                case ShaderPropertyType.Float:
+                    for (int i = 0; i < prop.Values.Count; i++)
+                    {
+                        Rect r = new Rect(rect.x, rect.y + (i * 40f), rect.width, rect.height);
+
+                        var floatValue = EditorGUI.FloatField(r, new GUIContent(prop.Values[i].Name), prop.Values[i].Value);
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            prop.Values[i].Value = floatValue;
+                            serializedObject.ApplyModifiedProperties();
+
+                            OnValueChanged();
+                        }
+                    }
+                    break;
+                case ShaderPropertyType.Vector2:
+                    if (prop.Values.Count == 2)
+                    {
+                        var vector2Value = EditorGUI.Vector2Field(rect, new GUIContent(prop.Name), new Vector2(prop.Values[0].Value, prop.Values[1].Value));
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            prop.Values[0].Value = vector2Value.x;
+                            prop.Values[1].Value = vector2Value.y;
+                            serializedObject.ApplyModifiedProperties();
+
+                            OnValueChanged();
+                        }
+                    }
+                    break;
+                case ShaderPropertyType.Vector3:
+                    if (prop.Values.Count == 3)
+                    {
+                        var vector3Value = EditorGUI.Vector3Field(rect, new GUIContent(prop.Name), new Vector3(prop.Values[0].Value, prop.Values[1].Value, prop.Values[2].Value));
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            prop.Values[0].Value = vector3Value.x;
+                            prop.Values[1].Value = vector3Value.y;
+                            prop.Values[2].Value = vector3Value.z;
+                            serializedObject.ApplyModifiedProperties();
+
+                            OnValueChanged();
+                        }
+                    }
+                    break;
+                case ShaderPropertyType.Vector4:
+                    if (prop.Values.Count == 4)
+                    {
+                        var vector4Value = EditorGUI.Vector4Field(rect, new GUIContent(prop.Name), new Vector4(prop.Values[0].Value, prop.Values[1].Value, prop.Values[2].Value, prop.Values[3].Value));
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            prop.Values[0].Value = vector4Value.x;
+                            prop.Values[1].Value = vector4Value.y;
+                            prop.Values[2].Value = vector4Value.z;
+                            prop.Values[3].Value = vector4Value.w;
+                            serializedObject.ApplyModifiedProperties();
+
+                            OnValueChanged();
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            
         }
 
         private void UpdateSceneMateriaSettersColors()

@@ -62,11 +62,11 @@ namespace Materiator
             var renderPipelineType = RenderPipelineUtils.GetActivePipelineType();
             if (renderPipelineType == RenderPipelineUtils.PipelineType.Universal)
             {
-                _settings.DefaultShaderData = shaderDatas.Where(sd => sd.SourceShader == Shader.Find("Universal Render Pipeline/Lit")).FirstOrDefault();
+                _settings.DefaultShaderData = shaderDatas.Where(sd => sd.Shader == Shader.Find("Universal Render Pipeline/Lit")).FirstOrDefault();
             }
             else if (renderPipelineType == RenderPipelineUtils.PipelineType.BuiltIn)
             {
-                _settings.DefaultShaderData = shaderDatas.Where(sd => sd.SourceShader == Shader.Find("Standard")).FirstOrDefault();
+                _settings.DefaultShaderData = shaderDatas.Where(sd => sd.Shader == Shader.Find("Standard")).FirstOrDefault();
             }
 
             _settings.DefaultMaterialData = CreateDefaultMaterialData("DefaultMaterialData");
@@ -105,12 +105,12 @@ namespace Materiator
                         new MateriatorShaderPropertyValue("B", "_BaseMap", MateriatorShaderPropertyValueChannel.B, defaultFloatValues.z),
                         new MateriatorShaderPropertyValue("A", "_BaseMap", MateriatorShaderPropertyValueChannel.A, defaultFloatValues.w),
                     }),
-                    new MateriatorShaderProperty("Metallic/Smoothness", "_MetallicGlossMap", ShaderPropertyType.Vector, new List<MateriatorShaderPropertyValue>()
+                    new MateriatorShaderProperty("Metallic/Smoothness", "_MetallicGlossMap", ShaderPropertyType.Float, new List<MateriatorShaderPropertyValue>()
                     {
                         new MateriatorShaderPropertyValue("Metallic", "_MetallicGlossMap", MateriatorShaderPropertyValueChannel.R, defaultFloatValues.x),
                         new MateriatorShaderPropertyValue("Smoothness", "_MetallicGlossMap", MateriatorShaderPropertyValueChannel.A, defaultFloatValues.w)
                     }), // combine into one
-                    new MateriatorShaderProperty("Glossiness", "_SpecGlossMap", ShaderPropertyType.Vector, new List<MateriatorShaderPropertyValue>()
+                    new MateriatorShaderProperty("Glossiness", "_SpecGlossMap", ShaderPropertyType.Float, new List<MateriatorShaderPropertyValue>()
                     {
                         new MateriatorShaderPropertyValue("X", "_SpecGlossMap", MateriatorShaderPropertyValueChannel.R, defaultFloatValues.x) // this probably wont work needs to be tested
                     }), // combine into one
@@ -182,8 +182,7 @@ namespace Materiator
             shaderData.name.Replace(' ', '_');
             shaderData.name.Replace('/', '_');
 
-            shaderData.SourceShader = shader;
-            shaderData.Shader = shader; // only temp for testing!!!
+            shaderData.Shader = shader;
 
             foreach (var prop in properties)
                 shaderData.MateriatorShaderProperties.Add(prop);
@@ -198,7 +197,7 @@ namespace Materiator
 
         private static MaterialData CreateDefaultMaterialData(string name)
         {
-            var material = Utils.CreateMaterial(_settings.DefaultShaderData.SourceShader);
+            var material = Utils.CreateMaterial(_settings.DefaultShaderData.Shader);
             material.name = "DefaultMaterial";
 
             var materialData = ScriptableObject.CreateInstance<MaterialData>();

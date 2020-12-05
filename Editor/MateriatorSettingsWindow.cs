@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using UnityEditor;
-using UnityEngine;
+﻿using UnityEditor;
 
 namespace Materiator
 {

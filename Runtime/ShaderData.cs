@@ -5,19 +5,12 @@ using UnityEngine;
 namespace Materiator
 {
     [CreateAssetMenu(menuName = "Materiator/Shader Data", fileName = "ShaderData")]
-    public class ShaderData : ScriptableObject
+    public class ShaderData : MateriatorScriptableObject
     {
-        [HideInInspector] // Temporarily
-        public Shader SourceShader;
         public Shader Shader;
 
         public List<MateriatorShaderProperty> MateriatorShaderProperties = new List<MateriatorShaderProperty>();
         public List<string> Keywords = new List<string>();
-
-#if UNITY_EDITOR
-        public List<ShaderProperty> AvailableShaderProperties = new List<ShaderProperty>();
-        public List<ShaderProperty> SelectedShaderProperties = new List<ShaderProperty>();
-#endif
 
         public bool IsEditable = true;
     }
@@ -26,8 +19,11 @@ namespace Materiator
 
     public enum ShaderPropertyType
     {
-        Color,
-        Vector
+        Float,
+        Vector2,
+        Vector3,
+        Vector4,
+        Color
     }
 
     [Serializable]
