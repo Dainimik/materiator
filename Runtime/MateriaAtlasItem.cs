@@ -1,17 +1,21 @@
 ﻿using System;
+using UnityEngine;
 
 namespace Materiator
 {
     [Serializable]
     public class MateriaAtlasItem
     {
-        public MateriaSetter MateriaSetter;
-        public MateriaSetterData MateriaSetterData;
+        public MateriaSlot MateriaSlot;
+        public Rect Rect;
 
-        public MateriaAtlasItem(MateriaSetter materiaSetter, MateriaSetterData materiaSetterData)
+        //[NonSerialized]
+        public Textures Textures;
+
+        public MateriaAtlasItem(MateriaSlot materiaSlot, Textures textures)
         {
-            MateriaSetter = materiaSetter;
-            MateriaSetterData = materiaSetterData;
+            MateriaSlot = materiaSlot;
+            Textures = textures;
         }
     }
 }

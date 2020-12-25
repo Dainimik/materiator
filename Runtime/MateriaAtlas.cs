@@ -1,16 +1,20 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Materiator
 {
-    public class MateriaAtlas : ScriptableObject
+    [CreateAssetMenu(menuName = "Materiator/Materia Atlas", fileName = "MateriaAtlas")]
+    public class MateriaAtlas : MateriatorScriptableObject
     {
-        public Vector2Int GridSize;
-
         public MaterialData MaterialData;
+        public List<MateriaSlot> MateriaSlots;
+
+        public List<MateriaAtlasItem> AtlasItems = new List<MateriaAtlasItem>();
+
         public Material Material;
         public Textures Textures = new Textures();
 
-        public SerializableDictionary<int, MateriaAtlasItem> AtlasItems = new SerializableDictionary<int, MateriaAtlasItem>();
+        public Vector2Int GridSize;
 
 #if UNITY_EDITOR
         public Texture2D PreviewIcon;

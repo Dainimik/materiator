@@ -59,21 +59,23 @@ namespace Materiator
 
             for (int i = 0; i < props.Count; i++)
             {
+                var name = props[i].PropertyName;
+
                 if (!Texs.ContainsKey(props[i].PropertyName))
                 {
-                    Texs.Add(props[i].PropertyName, CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode));
+                    Texs.Add(props[i].PropertyName, CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode, name));
                 }
                 else
                 {
                     if (Texs[props[i].PropertyName] == null || (Size.x != width || Size.y != height))
                     {
-                        Texs[props[i].PropertyName] = CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode);
+                        Texs[props[i].PropertyName] = CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode, name);
                     }
                 }
             }
         }
 
-        public void SetNames(string name)
+        public void SetNames(string name = "")
         {
             foreach (var tex in Texs)
                 tex.Value.name = name + tex.Key;
@@ -138,10 +140,11 @@ namespace Materiator
             Apply();
         }
 
-        private Texture2D CreateTexture2D(int x, int y, TextureFormat textureFormat, FilterMode filterMode, Color? color = null)
+        private Texture2D CreateTexture2D(int x, int y, TextureFormat textureFormat, FilterMode filterMode, string name = "", Color? color = null)
         {
             var tex = new Texture2D(x, y, textureFormat, false);
             tex.filterMode = filterMode;
+            tex.name = name;
             if (color != null)
             {
                 var colors = new Color[x * y];

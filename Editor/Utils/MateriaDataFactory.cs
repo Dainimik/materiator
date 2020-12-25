@@ -217,8 +217,8 @@ namespace Materiator
             if (remakeAtlas)
             {
                 var setters = new List<MateriaSetter>();
-                foreach (var item in materiaSetter.MateriaSetterData.MateriaAtlas.AtlasItems.Values)
-                    setters.Add(item.MateriaSetter);
+                //foreach (var item in materiaSetter.MateriaSetterData.MateriaAtlas.AtlasItems.Values)
+                //    setters.Add(item.MateriaSetter);
 
                 AtlasFactory.CreateAtlas(new KeyValuePair<MaterialData, List<MateriaSetter>>(materiaSetter.MateriaSetterData.MaterialData, setters), AssetDatabase.GetAssetPath(materiaSetter.MateriaSetterData.MateriaAtlas), materiaSetter.MateriaSetterData.MateriaAtlas, true);
             }

@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:Label text="Materia Atlas" class="title-header" />
+    <ui:IMGUIContainer name="IMGUIContainer" />
+    <ui:VisualElement name="OutputSectionContainer" class="section-container">
+        <ui:Label text="Output" class="section-header" />
+        <ui:VisualElement name="OutputIndicator" class="status-indicator" />
+        <ui:VisualElement name="ButtonContainer">
+            <ui:Button text="Generate Atlas" name="GenerateAtlasButton" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

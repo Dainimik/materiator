@@ -49,7 +49,7 @@ namespace Materiator
                 _editor.SetMateriaSetterDirty(true);
             }
 
-            _materiaSection = new MateriaSection(_editor);
+            _materiaSection = new MateriaSection(_editor, "MateriaSlots");
 
             // TODO: Refactor this
             if (_materiaSetter.EditMode == EditMode.Native)

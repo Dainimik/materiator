@@ -175,8 +175,8 @@ namespace Materiator
         {
             var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.MateriaSetterData == _msData).FirstOrDefault();
 
-            if (!_atlas.AtlasItems.ContainsKey(i))
-                _atlas.AtlasItems.Add(i, new MateriaAtlasItem(prefabMS, _msData));
+            //if (!_atlas.AtlasItems.ContainsKey(i))
+             //   _atlas.AtlasItems.Add(i, new MateriaAtlasItem(prefabMS, _msData));
         }
 
         private static void CreateAtlasedMesh()
