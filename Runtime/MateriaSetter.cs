@@ -6,8 +6,7 @@ namespace Materiator
     [DisallowMultipleComponent]
     public class MateriaSetter : MonoBehaviour
     {
-        public bool IsDirty = true;
-
+        public Mesh Mesh;
         public Renderer Renderer;
         public MeshFilter MeshFilter;
         public MeshRenderer MeshRenderer;
@@ -15,12 +14,8 @@ namespace Materiator
 
         public List<MateriaSetterSlot> MateriaSetterSlots;
 
-        public Mesh Mesh;
-
         public MateriaAtlas MateriaAtlas;
-
         public Material Material;
-        public Textures Textures;
 
         public void Initialize()
         {
@@ -30,25 +25,6 @@ namespace Materiator
         public void Refresh()
         {
             GetMeshReferences();
-            //SetUpMaterial();
-            //SetUpGridSize();
-            //AnalyzeMesh();
-            //GenerateMateriaSlots();
-
-            //if (IsDirty)
-                //UpdateColorsOfAllTextures();
-        }
-
-        public void ResetMateriaSetter()
-        {
-            Renderer.sharedMaterial = null;
-
-            var fields = GetType().GetFields();
-
-            for (int i = 0; i < fields.Length; i++)
-                fields[i].SetValue(this, null);
-
-            Initialize();
         }
 
         public void GetMeshReferences()
@@ -69,70 +45,10 @@ namespace Materiator
             }
         }
 
-        private void SetUpMaterial()
-        {
-            //if (MaterialData == null)
-             //   MaterialData = SystemData.Settings.DefaultMaterialData;
-
-            if (Renderer != null)
-            {
-                if (Renderer.sharedMaterial == null || Material == null)
-                {
-                    Material = Instantiate(SystemData.Settings.DefaultMaterialData.Material);
-                    Material.name = gameObject.name;
-                }
-
-                UpdateRenderer(false, true);
-            }
-        }
-
-        public void UpdateRenderer(bool updateMesh = true, bool updateMaterial = true)
-        {
-            if (updateMesh)
-            {
-                if (MeshFilter != null)
-                    MeshFilter.sharedMesh = Mesh;
-
-                if (SkinnedMeshRenderer != null)
-                    SkinnedMeshRenderer.sharedMesh = Mesh;
-            }
-        }
-
-        private void SetUpGridSize()
-        {
-
-        }
-
-        public void AnalyzeMesh()
-        {
-            //if (MateriaSetterData != null && !IsDirty) // this here can probably be removed because it is being checked in SetUpGridSize fn
-             //   GridSize = MateriaSetterData.NativeGridSize;
-
-            //Rects = MeshAnalyzer.CalculateRects(GridSize, UVRect);
-            //Rects = MeshAnalyzer.FilterRects(Rects, Mesh.uv);
-        }
-
-        // TODO: Refactor this function (it is confusing)
-        public void GenerateMateriaSlots()
-        {
-            var materiaSlotCount = 0;
-
-            // Rebuild Materia Slots
-            if (MateriaSetterSlots != null)
-            {
-                var newMateriaSlots = new List<MateriaSlot>();
-
-                foreach (var slot in MateriaSetterSlots)
-                {
-                }
-
-                materiaSlotCount = MateriaSetterSlots.Count;
-
-            }
-        }
-
         public void LoadAtlas(MateriaAtlas atlas)
         {
+            if (atlas == null) return;
+
             Renderer.sharedMaterial = atlas.Material;
 
             for (int i = 0; i < MateriaSetterSlots.Count; i++)
@@ -143,17 +59,12 @@ namespace Materiator
                 {
                     slot.Materia = atlas.AtlasItems[slot.Tag].MateriaSlot.Materia;
 
-                    Debug.Log("MS rect: " + slot.Rect);
-                    Debug.Log("Atlas rect: " + atlas.AtlasItems[slot.Tag].Rect);
-
                     var atlasRect = atlas.AtlasItems[slot.Tag].Rect;
                     if (slot.Rect != atlasRect)
                     {
-                        Debug.Log("UVs need to be moved!");
                         ShiftUVs(slot, atlasRect);
 
                         slot.Rect.Set(atlasRect.x, atlasRect.y, atlasRect.width, atlasRect.height);
-                        Debug.Log("MS rect AFTER: " + slot.Rect);
                     }
                 }
             }

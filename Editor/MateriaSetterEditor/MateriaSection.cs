@@ -101,7 +101,7 @@ namespace Materiator
                     _editor.serializedObject.ApplyModifiedProperties();
                 }
 
-                Rect cdExpandRect = new Rect(EditorGUIUtility.currentViewWidth - 70f, rect.y, 20f, 20f);
+                Rect cdExpandRect = new Rect(EditorGUIUtility.currentViewWidth - 40f, rect.y, 20f, 20f);
                 if (GUI.Button(cdExpandRect, new GUIContent(EditorGUIUtility.IconContent("d_editicon.sml").image, "Edit Color Data")))
                     EditorUtils.InspectTarget(elementMateria);
             };

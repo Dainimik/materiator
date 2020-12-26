@@ -9,33 +9,16 @@
             <ui:VisualElement name="AtlasIndicator" class="status-indicator" />
             <ui:VisualElement name="AtlasContentContainer" class="content-container">
                 <uie:ObjectField label="Atlas" name="MateriaAtlasObjectField" allow-scene-objects="false" />
+                <ui:VisualElement name="ButtonContainer" style="flex-direction: row-reverse; justify-content: space-between;">
+                    <ui:Button text="Reload Atlas" name="ReloadAtlasButton" style="align-items: flex-end;" />
+                </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="Space" class="space" />
         </ui:VisualElement>
         <ui:VisualElement name="DataSectionContainer" class="section-container">
             <ui:Label text="Data" class="section-header" />
             <ui:VisualElement name="DataIndicator" class="status-indicator" />
             <ui:VisualElement name="ContentContainer" class="content-container">
-                <ui:VisualElement name="ButtonContainer" style="flex-direction: row; justify-content: space-between; margin-bottom: 15px;">
-                    <ui:VisualElement name="LeftAlignedButtonContainer" style="flex-direction: row;">
-                        <ui:Button text="N" name="NewMateriaSetterDataButton" />
-                    </ui:VisualElement>
-                    <ui:Button text="Reload Data" name="ReloadMateriaSetterDataButton" />
-                </ui:VisualElement>
                 <ui:VisualElement name="IMGUIContainer" />
-                <uie:ObjectField label="Material Data" name="MaterialDataObjectField" allow-scene-objects="false" />
-                <ui:VisualElement name="CurrentShaderContainer" style="flex-direction: row; justify-content: space-between;">
-                    <ui:Label text="Shader" style="margin-left: 3px; margin-right: 3px;" />
-                    <ui:Label name="CurrentShaderLabel" binding-path="_currentShaderLabel" />
-                </ui:VisualElement>
-            </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:VisualElement name="OutputSectionContainer" class="section-container">
-            <ui:Label text="Output" class="section-header" />
-            <ui:VisualElement name="OutputIndicator" class="status-indicator" style="background-color: rgb(166, 166, 166);" />
-            <ui:VisualElement name="ButtonContainer">
-                <ui:Button text="Overwrite" name="OverwriteMateriaSetterDataButton" />
-                <ui:Button text="Save As New" name="SaveAsNewMateriaSetterDataButton" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

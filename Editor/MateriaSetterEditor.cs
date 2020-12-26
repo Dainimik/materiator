@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -10,29 +9,18 @@ namespace Materiator
     [CustomEditor(typeof(MateriaSetter))]
     public class MateriaSetterEditor : MateriatorEditor
     {
+        public Action OnTagChanged;
+
         public MateriaSetter MateriaSetter;
 
-        public Action<bool> OnDirtyChanged;
-        public Action OnMateriaSetterUpdated;
-
-        public SerializedProperty EditMode;
-        public SerializedProperty IsDirty;
         public SerializedProperty Material;
 
-        public SerializedProperty UseCustomGridSize;
-        public SerializedProperty GridSize;
-
-        public VisualElement Root;
-
         public AtlasSection AtlasSection;
-
-        private Button _reloadButton;
-
-        private SerializedProperty _materiaSetterData;
-
         private ReorderableList _materiaReorderableList;
 
+        public VisualElement Root;
         private VisualElement _IMGUIContainer;
+        private Button _reloadButton;
 
         private void OnEnable()
         {
@@ -47,12 +35,6 @@ namespace Materiator
                 AtlasSection = new AtlasSection(this);
 
                 DrawDefaultGUI();
-            }
-
-            // Temp for debugging
-            if (MateriaSetter.Textures.ID == 0)
-            {
-                MateriaSetter.Textures.ID = UnityEngine.Random.Range(-999999, 9999999);
             }
         }
 
@@ -128,7 +110,6 @@ namespace Materiator
                 if (EditorGUI.EndChangeCheck())
                 {
                     Undo.RegisterCompleteObjectUndo(MateriaSetter, "Change Materia Tag");
-                    //_editor.SetMateriaSetterDirty(true);hja
 
                     if (elementTag == null)
                         elementTag = SystemData.Settings.DefaultTag;
@@ -138,8 +119,8 @@ namespace Materiator
                     serializedObject.Update();
 
                     serializedObject.ApplyModifiedProperties();
-                    //_editor.OnMateriaSetterUpdated?.Invoke();
-                    //_emissionInUse = IsEmissionInUse(_materiaSetter.Materia);
+
+                    OnTagChanged?.Invoke();
                 }
 
                 EditorGUI.LabelField(new Rect(rect.x + 170f, rect.y, rect.width - 195f, rect.height), MateriaSetter.MateriaSetterSlots[index].Name);
@@ -148,46 +129,9 @@ namespace Materiator
             };
         }
 
-        public void ResetMateriaSetter()
-        {
-            MateriaSetter.ResetMateriaSetter();
-
-            SetMateriaSetterDirty(true);
-        }
-
-        public void SetMateriaSetterDirty(bool value)
-        {
-            serializedObject.Update();
-            if (value)
-            {
-                if (!IsDirty.boolValue)
-                {
-                    IsDirty.boolValue = true;
-                }
-            }
-            else
-            {
-                if (IsDirty.boolValue)
-                {
-                    IsDirty.boolValue = false;
-                }  
-            }
-
-            serializedObject.ApplyModifiedProperties();
-
-            OnDirtyChanged?.Invoke(value);
-        }
-
         protected override void GetProperties()
         {
-            EditMode = serializedObject.FindProperty("EditMode");
-            IsDirty = serializedObject.FindProperty("IsDirty");
             Material = serializedObject.FindProperty("Material");
-
-            UseCustomGridSize = serializedObject.FindProperty("UseCustomGridSize");
-            GridSize = serializedObject.FindProperty("GridSize");
-
-            _materiaSetterData = serializedObject.FindProperty("MateriaSetterData");
 
             _reloadButton = root.Q<Button>("ReloadButton");
             _IMGUIContainer = root.Q<VisualElement>("IMGUIContainer");

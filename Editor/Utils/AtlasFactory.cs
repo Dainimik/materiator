@@ -59,7 +59,6 @@ namespace Materiator
                 var textures = InitializeTextures(atlas);
 
                 textures.UpdateColors(rect, materiaSlot.Materia.Properties);
-
                 atlas.AtlasItems.Add(materiaSlot.Tag, new MateriaAtlasItem(materiaSlot, textures));
             }
         }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 using UnityEditor;
+using UnityEngine;
 
 namespace Materiator
 {
@@ -9,11 +10,13 @@ namespace Materiator
         private MateriaSetterEditor _editor;
         private MateriaSetter _materiaSetter;
 
-        private SerializedProperty _materiaAtlas;
+        public SerializedProperty _materiaAtlas;
 
         private ObjectField _materiaAtlasObjectField;
 
         public VisualElement _atlasIndicator;
+
+        private Button _reloadAtlasButton;
 
         public AtlasSection(MateriaSetterEditor editor)
         {
@@ -24,10 +27,8 @@ namespace Materiator
             BindProperties();
             RegisterButtons();
             RegisterCallbacks();
-
-            UpdateIndicator();
-
-            OnMateriaAtlasChanged();
+            
+            OnMateriaAtlasChanged(_materiaAtlas.objectReferenceValue as MateriaAtlas);
         }
 
         private void UpdateIndicator()
@@ -40,14 +41,14 @@ namespace Materiator
 
         private void OnMateriaAtlasChanged(MateriaAtlas atlas = null)
         {
+            Debug.Log("Atlas: " + atlas);
+            Debug.Log("Atlas SERIALIZED: " + _materiaAtlas.objectReferenceValue);
+            _materiaAtlas.objectReferenceValue = atlas;
+            _editor.serializedObject.ApplyModifiedProperties();
+
+            _editor.MateriaSetter.LoadAtlas(atlas);
+
             UpdateIndicator();
-
-            if (atlas != null)
-            {
-                _editor.MateriaSetter.LoadAtlas(atlas);
-
-                _editor.serializedObject.Update();
-            }
         }
 
         private void GetProperties()
@@ -60,6 +61,7 @@ namespace Materiator
             _materiaAtlasObjectField.objectType = typeof(MateriaAtlas);
 
             _atlasIndicator = root.Q<VisualElement>("AtlasIndicator");
+            _reloadAtlasButton = root.Q<Button>("ReloadAtlasButton");
         }
 
         private void BindProperties()
@@ -74,12 +76,14 @@ namespace Materiator
 
         private void RegisterCallbacks()
         {
-            _materiaAtlasObjectField.RegisterCallback<ChangeEvent<UnityEngine.Object>>(e =>
+            _reloadAtlasButton.clicked += () => OnMateriaAtlasChanged((MateriaAtlas)_materiaAtlas.objectReferenceValue);
+
+            _materiaAtlasObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
             {
                 OnMateriaAtlasChanged((MateriaAtlas)e.newValue);
             });
 
-            _editor.OnMateriaSetterUpdated += UpdateIndicator;
+            _editor.OnTagChanged += () => OnMateriaAtlasChanged(_materiaAtlas.objectReferenceValue as MateriaAtlas);
         }
     }
 }
