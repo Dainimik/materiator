@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Materiator
@@ -9,34 +8,19 @@ namespace Materiator
     {
         public bool IsDirty = true;
 
-        public EditMode EditMode;
-
         public Renderer Renderer;
         public MeshFilter MeshFilter;
         public MeshRenderer MeshRenderer;
         public SkinnedMeshRenderer SkinnedMeshRenderer;
 
-        public List<MateriaSlot> MateriaSlots;
+        public List<MateriaSetterSlot> MateriaSetterSlots;
 
         public Mesh Mesh;
-        public Rect[] Rects;
-        public SerializableDictionary<int, Rect> FilteredRects;
-
-        public MateriaSetterData MateriaSetterData;
 
         public MateriaAtlas MateriaAtlas;
-        public MateriaPreset MateriaPreset;
-        public MaterialData MaterialData;
 
-        public Material PreviousMaterial;
         public Material Material;
         public Textures Textures;
-
-        public bool UseCustomGridSize;
-        public Vector2Int GridSize;
-
-        public Rect UVRect;
-
 
         public void Initialize()
         {
@@ -46,14 +30,13 @@ namespace Materiator
         public void Refresh()
         {
             GetMeshReferences();
-            SetUpMaterial();
-            SetUpGridSize();
-            InitializeTextures();
-            AnalyzeMesh();
-            GenerateMateriaSlots();
+            //SetUpMaterial();
+            //SetUpGridSize();
+            //AnalyzeMesh();
+            //GenerateMateriaSlots();
 
-            if (IsDirty)
-                UpdateColorsOfAllTextures();
+            //if (IsDirty)
+                //UpdateColorsOfAllTextures();
         }
 
         public void ResetMateriaSetter()
@@ -88,8 +71,8 @@ namespace Materiator
 
         private void SetUpMaterial()
         {
-            if (MaterialData == null)
-                MaterialData = SystemData.Settings.DefaultMaterialData;
+            //if (MaterialData == null)
+             //   MaterialData = SystemData.Settings.DefaultMaterialData;
 
             if (Renderer != null)
             {
@@ -113,76 +96,20 @@ namespace Materiator
                 if (SkinnedMeshRenderer != null)
                     SkinnedMeshRenderer.sharedMesh = Mesh;
             }
-
-            if (updateMaterial)
-            {
-                MaterialUtils.UpdateRendererMaterials(Renderer, Material, ref PreviousMaterial);
-            }
         }
 
         private void SetUpGridSize()
         {
-            if (EditMode == EditMode.Native)
-            {
-                if (!UseCustomGridSize)
-                    GridSize = SystemData.Settings.DefaultGridSize;
 
-                if (MateriaSetterData && !IsDirty)
-                    GridSize = MateriaSetterData.NativeGridSize;
-                
-                UVRect = SystemData.Settings.UVRect;
-            }
-            else if (EditMode == EditMode.Atlas)
-            {
-                if (IsDirty)
-                    GridSize = MateriaSetterData.NativeGridSize;
-                else
-                    GridSize = MateriaSetterData.MateriaAtlas.GridSize;
-                
-                UVRect = MateriaSetterData.AtlasedUVRect;
-            }
-        }
-
-        private void InitializeTextures()
-        {
-            var shaderProps = MaterialData.ShaderData.MateriatorShaderProperties;
-
-            if (Textures == null)
-                Textures = new Textures();
-
-            var gridSize = GridSize;
-            if (EditMode == EditMode.Atlas)
-                gridSize = MateriaSetterData.MateriaAtlas.GridSize;
-
-            Textures.RemoveTextures(shaderProps, gridSize.x, gridSize.y);
-            Textures.CreateTextures(shaderProps, gridSize.x, gridSize.y);
-            
-            SetTextures();
-        }
-
-        public void SetTextures()
-        {
-            if (Material == null) return;
-
-            Textures.SetTexturesToMaterial(Material);
-
-            // Is this the best place for this?
-            foreach (var kw in MaterialData.ShaderData.Keywords)
-            {
-                if (!Material.IsKeywordEnabled(kw))
-                {
-                    Material.EnableKeyword(kw);
-                }
-            }
         }
 
         public void AnalyzeMesh()
         {
-            if (MateriaSetterData != null && !IsDirty) // this here can probably be removed because it is being checked in SetUpGridSize fn
-                GridSize = MateriaSetterData.NativeGridSize;
+            //if (MateriaSetterData != null && !IsDirty) // this here can probably be removed because it is being checked in SetUpGridSize fn
+             //   GridSize = MateriaSetterData.NativeGridSize;
 
-            Rects = MeshAnalyzer.CalculateRects(GridSize, UVRect);
-            FilteredRects = MeshAnalyzer.FilterRects(Rects, Mesh.uv);
+            //Rects = MeshAnalyzer.CalculateRects(GridSize, UVRect);
+            //Rects = MeshAnalyzer.FilterRects(Rects, Mesh.uv);
         }
 
         // TODO: Refactor this function (it is confusing)
@@ -191,105 +118,89 @@ namespace Materiator
             var materiaSlotCount = 0;
 
             // Rebuild Materia Slots
-            if (MateriaSlots != null)
+            if (MateriaSetterSlots != null)
             {
                 var newMateriaSlots = new List<MateriaSlot>();
 
-                foreach (var slot in MateriaSlots)
+                foreach (var slot in MateriaSetterSlots)
                 {
-                    if (FilteredRects.ContainsKey(slot.ID))
-                    {
-                        if (slot.Materia != null)
-                            newMateriaSlots.Add(new MateriaSlot(slot.ID, slot.Materia, slot.Tag));
-                        else
-                            newMateriaSlots.Add(new MateriaSlot(slot.ID, SystemData.Settings.DefaultMateria, slot.Tag));
-                    }
                 }
 
-                if (newMateriaSlots.Count != MateriaSlots.Count)
-                    MateriaSlots = newMateriaSlots;
+                materiaSlotCount = MateriaSetterSlots.Count;
 
-                materiaSlotCount = MateriaSlots.Count;
-
-                if (!IsDirty && MateriaSetterData != null)
-                    MateriaSlots = MateriaSetterData.MateriaSlots;
-            }
-
-            // If there are no slots or mesh was updated with extra UVs that led to more filtered rects than materia slots
-            if (materiaSlotCount == 0 || FilteredRects.Count != materiaSlotCount)
-            {
-                if (MateriaSlots == null)
-                    MateriaSlots = new List<MateriaSlot>();
-
-                var materiaSlotIDs = new int[MateriaSlots.Count];
-
-                for (int i = 0; i < materiaSlotIDs.Length; i++)
-                    materiaSlotIDs[i] = MateriaSlots[i].ID;
-
-                foreach (var rect in FilteredRects)
-                    if (!materiaSlotIDs.Contains(rect.Key))
-                        MateriaSlots.Add(new MateriaSlot(rect.Key));
             }
         }
 
-        public void UpdateColorsOfAllTextures()
-        {
-            foreach (var rect in FilteredRects)
-                Textures.UpdateColors(rect.Value, MateriaSlots.Where(ms => ms.ID == rect.Key).First().Materia.Properties);
-        }
-
-        public void LoadPreset(MateriaPreset preset)
-        {
-            if (preset == null) return;
-
-            for (int i = 0; i < MateriaSlots.Count; i++)
-                for (int j = 0; j < preset.MateriaPresetItems.Count; j++)
-                    if (MateriaSlots[i].Tag.Name == preset.MateriaPresetItems[j].Tag.Name)
-                        if (MateriaSlots[i].Materia != preset.MateriaPresetItems[j].Materia)
-                            MateriaSlots[i].Materia = preset.MateriaPresetItems[j].Materia;
-        }
-
-        // Texture assigning needs to be figured out here
         public void LoadAtlas(MateriaAtlas atlas)
         {
-            if (atlas != null)
+            Renderer.sharedMaterial = atlas.Material;
+
+            for (int i = 0; i < MateriaSetterSlots.Count; i++)
             {
-                EditMode = EditMode.Atlas;
+                var slot = MateriaSetterSlots[i];
 
-                MateriaAtlas = atlas;
+                if (atlas.AtlasItems.ContainsKey(slot.Tag))
+                {
+                    slot.Materia = atlas.AtlasItems[slot.Tag].MateriaSlot.Materia;
 
-                Mesh = MateriaSetterData.AtlasedMesh;
-                MaterialData = atlas.MaterialData;
-                Material = atlas.Material;
-                Textures = atlas.Textures;
+                    Debug.Log("MS rect: " + slot.Rect);
+                    Debug.Log("Atlas rect: " + atlas.AtlasItems[slot.Tag].Rect);
 
-                GridSize = MateriaSetterData.MateriaAtlas.GridSize;
-                UVRect = MateriaSetterData.AtlasedUVRect;
+                    var atlasRect = atlas.AtlasItems[slot.Tag].Rect;
+                    if (slot.Rect != atlasRect)
+                    {
+                        Debug.Log("UVs need to be moved!");
+                        ShiftUVs(slot, atlasRect);
 
-                Textures.SetTexturesToMaterial(Material);
-                UpdateRenderer();
+                        slot.Rect.Set(atlasRect.x, atlasRect.y, atlasRect.width, atlasRect.height);
+                        Debug.Log("MS rect AFTER: " + slot.Rect);
+                    }
+                }
             }
         }
 
-        public void UnloadAtlas(bool removeAtlasData = false)
+        private void ShiftUVs(MateriaSetterSlot mss, Rect atlasRect)
         {
-            EditMode = EditMode.Native;
+            var uvs = new Vector2[Mesh.uv.Length];
+            Mesh.uv.CopyTo(uvs, 0);
 
-            if (removeAtlasData)
+            foreach (var item in mss.UVs)
             {
-                MateriaAtlas = null;
+                var index = item.Key;
+                var uv = item.Value;
+
+                var widthMultiplier = atlasRect.width / mss.Rect.width; // 0.5
+                var heightMultiplier = atlasRect.height / mss.Rect.height; // 1.0
+                var xShift = atlasRect.x - mss.Rect.x;
+                var yShift = atlasRect.y - mss.Rect.y;
+
+                uv = Scale2D(uv, new Vector2(widthMultiplier, heightMultiplier), mss.Rect.center);
+                //uv.x *= widthMultiplier;
+                //uv.y *= heightMultiplier;
+
+                uv.x += xShift;
+                uv.y += yShift;
+
+
+                uvs[index] = uv;
             }
 
-            Mesh = MateriaSetterData.NativeMesh;
-            MaterialData = MateriaSetterData.MaterialData;
-            Material = MateriaSetterData.Material;
-            Textures = MateriaSetterData.Textures;
+            Mesh.uv = uvs;
+        }
 
-            GridSize = MateriaSetterData.NativeGridSize;
-            UVRect = SystemData.Settings.UVRect;
+        private Vector2 Scale2D(Vector2 vector, Vector2 scale, Vector2 pivot)
+        {
+            return new Vector2(pivot.x + scale.x * (vector.x - pivot.x), pivot.y + scale.y * (vector.y - pivot.y));
+        }
 
-            Textures.SetTexturesToMaterial(Material);
-            UpdateRenderer();
+        private Vector2[] ScaleUVs(Vector2[] uvs, Vector2 scale, Vector2 pivot)
+        {
+            for (int i = 0; i < uvs.Length; i++)
+            {
+                uvs[i] = Scale2D(uvs[i], scale, pivot);
+            }
+
+            return uvs;
         }
     }
 }

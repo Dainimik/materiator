@@ -53,7 +53,7 @@ namespace Materiator
                     Texs.Remove(tex.Key);
         }
 
-        public void CreateTextures(List<MateriatorShaderProperty> props, int width, int height)
+        public void CreateTextures(List<MateriatorShaderProperty> props, int width, int height, bool temporary = false)
         {
             FilterMode = SystemData.Settings.FilterMode;
 
@@ -63,13 +63,13 @@ namespace Materiator
 
                 if (!Texs.ContainsKey(props[i].PropertyName))
                 {
-                    Texs.Add(props[i].PropertyName, CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode, name));
+                    Texs.Add(props[i].PropertyName, CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode, name, temporary));
                 }
                 else
                 {
                     if (Texs[props[i].PropertyName] == null || (Size.x != width || Size.y != height))
                     {
-                        Texs[props[i].PropertyName] = CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode, name);
+                        Texs[props[i].PropertyName] = CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode, name, temporary);
                     }
                 }
             }
@@ -140,11 +140,17 @@ namespace Materiator
             Apply();
         }
 
-        private Texture2D CreateTexture2D(int x, int y, TextureFormat textureFormat, FilterMode filterMode, string name = "", Color? color = null)
+        private Texture2D CreateTexture2D(int x, int y, TextureFormat textureFormat, FilterMode filterMode, string name, bool temporary = false, Color ? color = null)
         {
             var tex = new Texture2D(x, y, textureFormat, false);
             tex.filterMode = filterMode;
             tex.name = name;
+
+            if (temporary)
+            {
+                tex.hideFlags = HideFlags.HideAndDontSave;
+            }
+
             if (color != null)
             {
                 var colors = new Color[x * y];

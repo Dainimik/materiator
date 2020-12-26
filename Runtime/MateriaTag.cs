@@ -1,17 +1,12 @@
 ﻿using System;
+using UnityEngine;
 
 namespace Materiator
 {
-    [Serializable]
-    public class MateriaTag
+    [CreateAssetMenu(menuName = "Materiator/Materia Tag", fileName = "MateriaTag")]
+    public class MateriaTag: MateriatorScriptableObject
     {
         public string Name;
         public string Description;
-
-        public MateriaTag(string name = null, string description = null)
-        {
-            Name = name;
-            Description = description;
-        }
     }
 }

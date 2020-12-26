@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
+using UnityEditorInternal;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Materiator
@@ -23,13 +25,14 @@ namespace Materiator
         public VisualElement Root;
 
         public AtlasSection AtlasSection;
-        public PresetSection PresetSection;
-        public DataSection DataSection;
-        public OutputSection OutputSection;
 
         private Button _reloadButton;
 
         private SerializedProperty _materiaSetterData;
+
+        private ReorderableList _materiaReorderableList;
+
+        private VisualElement _IMGUIContainer;
 
         private void OnEnable()
         {
@@ -42,9 +45,6 @@ namespace Materiator
             if (Initialize())
             {
                 AtlasSection = new AtlasSection(this);
-                PresetSection = new PresetSection(this);
-                DataSection = new DataSection(this);
-                OutputSection = new OutputSection(this);
 
                 DrawDefaultGUI();
             }
@@ -60,6 +60,8 @@ namespace Materiator
         {
             IMGUIContainer defaultInspector = new IMGUIContainer(() => DrawDefaultInspector());
             root.Add(defaultInspector);
+
+            DrawIMGUI();
         }
 
         public override VisualElement CreateInspectorGUI()
@@ -88,6 +90,64 @@ namespace Materiator
             MateriaSetter.Refresh();           
         }
 
+        private void DrawIMGUI()
+        {
+            _materiaReorderableList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaSetterSlots"), false, true, false, false);
+            DrawMateriaReorderableList();
+            IMGUIContainer materiaReorderableList = new IMGUIContainer(() => MateriaReorderableList());
+            _IMGUIContainer.Add(materiaReorderableList);
+        }
+
+        private void MateriaReorderableList()
+        {
+            _materiaReorderableList.DoLayoutList();
+        }
+
+        public void DrawMateriaReorderableList()
+        {
+            _materiaReorderableList.drawHeaderCallback = (Rect rect) =>
+            {
+                EditorGUI.LabelField(new Rect(rect.x + 25f, rect.y, 50f, 20f), new GUIContent("Tag", "Tag"), EditorStyles.boldLabel);
+                EditorGUI.LabelField(new Rect(rect.x + 170f, rect.y, 100f, 20f), new GUIContent("Slot Name"), EditorStyles.boldLabel);
+            };
+
+            _materiaReorderableList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+            {
+                serializedObject.Update();
+                var element = _materiaReorderableList.serializedProperty.GetArrayElementAtIndex(index);
+                var elementID = element.FindPropertyRelative("ID");
+                var elementTag = element.FindPropertyRelative("Tag").objectReferenceValue as MateriaTag;
+                var materiaTag = MateriaSetter.MateriaSetterSlots[index].Tag;
+
+                Rect r = new Rect(rect.x, rect.y, 22f, 22f);
+
+                serializedObject.Update();
+
+                EditorGUI.BeginChangeCheck();
+                elementTag = (MateriaTag)EditorGUI.ObjectField(new Rect(rect.x + 25f, rect.y, 95f, rect.height), elementTag, typeof(MateriaTag), false);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RegisterCompleteObjectUndo(MateriaSetter, "Change Materia Tag");
+                    //_editor.SetMateriaSetterDirty(true);hja
+
+                    if (elementTag == null)
+                        elementTag = SystemData.Settings.DefaultTag;
+                    else
+                        MateriaSetter.MateriaSetterSlots[index].Tag = elementTag;
+
+                    serializedObject.Update();
+
+                    serializedObject.ApplyModifiedProperties();
+                    //_editor.OnMateriaSetterUpdated?.Invoke();
+                    //_emissionInUse = IsEmissionInUse(_materiaSetter.Materia);
+                }
+
+                EditorGUI.LabelField(new Rect(rect.x + 170f, rect.y, rect.width - 195f, rect.height), MateriaSetter.MateriaSetterSlots[index].Name);
+
+                Rect cdExpandRect = new Rect(EditorGUIUtility.currentViewWidth - 70f, rect.y, 20f, 20f);
+            };
+        }
+
         public void ResetMateriaSetter()
         {
             MateriaSetter.ResetMateriaSetter();
@@ -103,8 +163,6 @@ namespace Materiator
                 if (!IsDirty.boolValue)
                 {
                     IsDirty.boolValue = true;
-
-                    CreateEditModeData(EditMode.enumValueIndex);
                 }
             }
             else
@@ -120,47 +178,6 @@ namespace Materiator
             OnDirtyChanged?.Invoke(value);
         }
 
-        private void CreateEditModeData(int editMode)
-        {
-            if (_materiaSetterData.objectReferenceValue != null)
-            {
-                var newTextures = new Textures();
-
-                Textures sourceTextures = null;
-
-                if (editMode == 0)
-                {
-                    sourceTextures = MateriaSetter.MateriaSetterData.Textures;
-                }
-                else if (editMode == 1)
-                {
-                    sourceTextures = MateriaSetter.MateriaSetterData.MateriaAtlas.Textures;
-                }
-
-                newTextures.CreateTextures(MateriaSetter.MaterialData.ShaderData.MateriatorShaderProperties, sourceTextures.Size.x, sourceTextures.Size.y);
-                var mat = Instantiate(Material.objectReferenceValue);
-                MateriaSetter.UpdateColorsOfAllTextures();
-
-                if (name != null)
-                    mat.name = name;
-
-                Material.objectReferenceValue = mat;
-                serializedObject.ApplyModifiedProperties(); // This should be after assigning newTextures to Textures or else editing Setter prefab in project view fails! But then any materia modification will apply changes to texture immediately
-
-                MateriaSetter.Textures = newTextures;
-                MateriaSetter.SetTextures();
-
-                var newMateriaSlots = new List<MateriaSlot>();
-
-                foreach (var item in MateriaSetter.MateriaSetterData.MateriaSlots)
-                    newMateriaSlots.Add(new MateriaSlot(item.ID, item.Materia, item.Tag));
-
-                MateriaSetter.MateriaSlots = newMateriaSlots;
-
-                MateriaSetter.UpdateRenderer();
-            }
-        }
-
         protected override void GetProperties()
         {
             EditMode = serializedObject.FindProperty("EditMode");
@@ -173,6 +190,7 @@ namespace Materiator
             _materiaSetterData = serializedObject.FindProperty("MateriaSetterData");
 
             _reloadButton = root.Q<Button>("ReloadButton");
+            _IMGUIContainer = root.Q<VisualElement>("IMGUIContainer");
         }
 
         protected override void SetUpView()

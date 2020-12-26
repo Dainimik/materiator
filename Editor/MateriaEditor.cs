@@ -241,18 +241,18 @@ namespace Materiator
 
         private void UpdateSceneMateriaSettersColors()
         {
-            var materiaSetters = FindObjectsOfType<MateriaSetter>().Where(ms => ms.MateriaSlots.Select(s => s.Materia).Contains(_materia)).ToArray();
+            //var materiaSetters = FindObjectsOfType<MateriaSetter>().Where(ms => ms.MateriaTags.Select(s => s.Materia).Contains(_materia)).ToArray();
 
-            foreach (var ms in materiaSetters)
-                ms.UpdateColorsOfAllTextures();
+            //foreach (var ms in materiaSetters)
+            //    ms.UpdateColorsOfAllTextures();
         }
 
         private void UpdatePrefabMateriaSettersColors()
         {
-            var materiaSetters = AssetUtils.FindAllComponentsInPrefabs<MateriaSetter>().Where(ms => ms.MateriaSlots.Select(s => s.Materia).Contains(_materia)).ToArray();
+            //var materiaSetters = AssetUtils.FindAllComponentsInPrefabs<MateriaSetter>().Where(ms => ms.MateriaTags.Select(s => s.Materia).Contains(_materia)).ToArray();
 
-            foreach (var ms in materiaSetters)
-                ms.UpdateColorsOfAllTextures();
+            //foreach (var ms in materiaSetters)
+            //    ms.UpdateColorsOfAllTextures();
 
             var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
             if (prefabStage != null)

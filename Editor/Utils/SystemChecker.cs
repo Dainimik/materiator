@@ -81,18 +81,6 @@ namespace Materiator
                         [ContextActions.Retry] = "Retry"
                     });
             }
-            else if (
-                (materiaSetter.MeshFilter != null && materiaSetter.MeshFilter.sharedMesh.subMeshCount > 1) ||
-                (materiaSetter.SkinnedMeshRenderer != null && materiaSetter.SkinnedMeshRenderer.sharedMesh.subMeshCount > 1))
-            {
-                return ErrorMessage(
-                    editor,
-                    "Mesh has more than 1 sub-meshes. This usually happens when a mesh is exported with more than one materials. Please re-export the mesh so that it has only one sub-mesh.",
-                    new Dictionary<ContextAction, string>
-                    {
-                        [ContextActions.Retry] = "Retry"
-                    });
-            }
             else if (PrefabUtility.IsPartOfPrefabAsset(materiaSetter) && !PrefabStageUtility.GetCurrentPrefabStage()) // This is here because switching edit mode in project view prefab causes bugs
             {
                 return ErrorMessage(

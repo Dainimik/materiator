@@ -34,7 +34,7 @@ namespace Materiator
         public MaterialData DefaultMaterialData;
         public ShaderData DefaultShaderData;
         public Materia DefaultMateria;
-        public MateriaTag DefaultTag = new MateriaTag("-");
+        public MateriaTag DefaultTag;
 
         public bool PackAssets;
 

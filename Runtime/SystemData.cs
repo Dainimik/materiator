@@ -8,12 +8,6 @@ using UnityEngine;
 
 namespace Materiator
 {
-    public enum EditMode
-    {
-        Native = 0,
-        Atlas = 1
-    }
-
     public class SystemData
     {
         public static MateriatorSettings Settings { get { return LoadSettings(); } }
