@@ -13,8 +13,6 @@ namespace Materiator
 
         public MateriaSetter MateriaSetter;
 
-        public SerializedProperty Material;
-
         public AtlasSection AtlasSection;
         private ReorderableList _materiaReorderableList;
 
@@ -131,8 +129,6 @@ namespace Materiator
 
         protected override void GetProperties()
         {
-            Material = serializedObject.FindProperty("Material");
-
             _reloadButton = root.Q<Button>("ReloadButton");
             _IMGUIContainer = root.Q<VisualElement>("IMGUIContainer");
         }

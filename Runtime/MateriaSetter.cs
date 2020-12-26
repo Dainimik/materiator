@@ -15,7 +15,6 @@ namespace Materiator
         public List<MateriaSetterSlot> MateriaSetterSlots;
 
         public MateriaAtlas MateriaAtlas;
-        public Material Material;
 
         public void Initialize()
         {
