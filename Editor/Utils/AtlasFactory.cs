@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,215 +6,74 @@ namespace Materiator
 {
     public class AtlasFactory
     {
-        private static MateriaAtlas _atlas;
-
-        private static MateriaSetterData _msData;
-
-        private static Rect[] _rects;
-        private static int _rectIndex;
-        private static Mesh _atlasedMesh;
-
-        public static void CreateAtlas(KeyValuePair<MaterialData, List<MateriaSetter>> group, string path, MateriaAtlas existingAtlas = null, bool updateAtlas = false)
+        public static MateriaAtlas GenerateAtlas(MateriaAtlas atlas)
         {
-            var materialData = group.Key;
-            var materiaSetters = group.Value;
-            List<KeyValuePair<KeyValuePair<string, Texture2D>, Rect[]>> output = PackIntoAtlasTextures(group);
+            atlas.AtlasItems.Clear();
+            atlas.Textures.RemoveTexturesFromAsset();
 
-            // create atlas asset
-            _atlas = existingAtlas;
-            if (existingAtlas != null)
-            {
-                _atlas.Textures.RemoveTexturesFromAsset();
+            GenerateAtlasItemTextures(atlas);
+            GenerateAtlasTextures(atlas);
 
-                foreach (var item in output)
-                    _atlas.Textures.Texs.Add(item.Key.Key, item.Key.Value);
+            atlas.Textures.SetTexturesToMaterial(atlas.Material);
 
-                _atlas.Textures.SetNames(AssetUtils.GetFileName(path));
-                _atlas.Textures.AddTexturesToAsset(_atlas);
+            atlas.Textures.AddTexturesToAsset(atlas);
 
-                AssetDatabase.SaveAssets();
-            }
-            else
-            {
-                _atlas = CreateMateriaAtlasAsset(AssetUtils.GetDirectoryName(path), AssetUtils.GetFileName(path), materialData, output);
-            }
+            // AssetDatabase.AddObjectToAsset(atlas.Material, atlas);
 
-            var processedPrefabs = new HashSet<GameObject>();
-            _rectIndex = 0;
-
-            var includeAllPrefabs = DeterminePrefabProcessing(existingAtlas, updateAtlas);
-            var prefabs = GetPrefabs(materiaSetters, includeAllPrefabs);
-
-            try
-            {
-                AssetDatabase.StartAssetEditing();
-
-                for (var i = 0; i < prefabs.Length; i++)
-                {
-                    var prefab = PrefabUtility.LoadPrefabContents(AssetDatabase.GetAssetPath(prefabs[i]));
-                    var ms = prefab.GetComponentsInChildren<MateriaSetter>();
-
-                    if (!processedPrefabs.Contains(prefab))
-                    {
-                        for (int j = 0; j < ms.Length; j++)
-                        {
-                            //var nearestPrefabInstanceRoot = PrefabUtility.GetNearestPrefabInstanceRoot(ms[j]);
-                            //if (processedPrefabs.Contains(nearestPrefabInstanceRoot))
-                            //continue;
-
-                            //processedPrefabs.Add(nearestPrefabInstanceRoot);
-
-                            if (ms[j].MateriaSetterData.MateriaAtlas != null && !includeAllPrefabs)
-                                continue;
-
-                            _msData = ms[j].MateriaSetterData;
-
-                            FillAtlasWithItems(prefabs, i);
-
-                            _atlas.Textures.ID = 111; // For debugging purposes
-
-                            CreateAtlasedMesh();
-
-                            UpdateMateriaSetterData();
-
-                            ms[j].LoadAtlas(_atlas);
-
-                            _rectIndex++;
-                        }
-
-                        processedPrefabs.Add(prefab);
-
-                        PrefabUtility.SaveAsPrefabAsset(prefab, AssetDatabase.GetAssetPath(prefabs[i])); // Saves changes madate in unloaded scene to prefab
-                    }
-
-                    PrefabUtility.UnloadPrefabContents(prefab);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("[Materiator] Atlas creation was interrupted: " + ex);
-            }
-            finally
-            {
-                AssetDatabase.StopAssetEditing();
-            }
-
-            _atlas.Textures.Apply();
             AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
 
-            foreach (var item in prefabs)
-                AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(item));
+            return atlas;
         }
 
-        private static List<KeyValuePair<KeyValuePair<string, Texture2D>, Rect[]>> PackIntoAtlasTextures(KeyValuePair<MaterialData, List<MateriaSetter>> group)
+        private static void GenerateAtlasTextures(MateriaAtlas atlas)
         {
-            // collect textures
-            var texs = new Dictionary<string, List<Texture2D>>();
-            foreach (var item in group.Value)
-            {
-                foreach (var kvp in item.MateriaSetterData.Textures.Texs)
-                {
-                    if (!texs.ContainsKey(kvp.Key))
-                    {
-                        texs.Add(kvp.Key, new List<Texture2D>() { kvp.Value });
-                    }
-                    else
-                    {
-                        if (!texs[kvp.Key].Contains(kvp.Value))
-                        {
-                            texs[kvp.Key].Add(kvp.Value);
-                        }
-                    }
-                }
-            }
+            atlas.Textures = InitializeTextures(atlas);
 
-            // create textures
-            var output = new List<KeyValuePair<KeyValuePair<string, Texture2D>, Rect[]>>();
-            foreach (var item in texs)
+            foreach (var texture in atlas.Textures.Texs.ToArray())
             {
                 var newTex = new Texture2D(8192, 8192);
                 newTex.filterMode = SystemData.Settings.FilterMode;
-                _rects = newTex.PackTextures(item.Value.ToArray(), 0, 8192, false);
-                output.Add(new KeyValuePair<KeyValuePair<string, Texture2D>, Rect[]>(new KeyValuePair<string, Texture2D>(item.Key, newTex), _rects));
+
+                var atlasItemTextures = atlas.AtlasItems.Values.SelectMany(item => item.Textures.Texs.Where(tex => tex.Key == texture.Key)).Select(pairs => pairs.Value).ToArray();
+                var rects = newTex.PackTextures(atlasItemTextures, 0, 8192, false);
+
+                for (int i = 0; i < atlasItemTextures.Length; i++)
+                {
+                    atlas.AtlasItems.Values.Where(item => item.Textures.Texs[atlasItemTextures[i].name] == atlasItemTextures[i]).First().Rect = rects[i];
+                }
+
+                atlas.Textures.Texs[texture.Key] = newTex;
+
+                for (int i = 0; i < atlasItemTextures.Length; i++)
+                {
+                    Object.DestroyImmediate(atlasItemTextures[i]);
+                }
             }
-
-            return output;
         }
 
-        private static bool DeterminePrefabProcessing(MateriaAtlas atlas, bool updateAtlas)
+        private static void GenerateAtlasItemTextures(MateriaAtlas atlas)
         {
-            if (atlas == null || updateAtlas)
-                return true;
-            else
-                return false;
-        }
-
-        private static GameObject[] GetPrefabs(List<MateriaSetter> setters, bool includeAllPrefabs)
-        {
-            var prefabs = new List<GameObject>();
-
-            foreach (var ms in setters)
+            var rect = new Rect(0f, 0f, 1f, 1f);
+            foreach (var materiaSlot in atlas.MateriaSlots)
             {
-                if (ms.MateriaSetterData.MateriaAtlas != null && !includeAllPrefabs)
-                    continue;
+                var textures = InitializeTextures(atlas);
 
-                var root = ms.transform.root;
-                var prefabGO = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GetAssetPath(root));
+                textures.UpdateColors(rect, materiaSlot.Materia.Properties);
 
-                if (!prefabs.Contains(prefabGO))
-                    prefabs.Add(prefabGO);
+                atlas.AtlasItems.Add(materiaSlot.Tag, new MateriaAtlasItem(materiaSlot, textures));
             }
-
-            return prefabs.ToArray();
         }
 
-        private static void FillAtlasWithItems(GameObject[] prefabs, int i)
+        private static Textures InitializeTextures(MateriaAtlas atlas)
         {
-            var prefabMS = prefabs[i].GetComponentsInChildren<MateriaSetter>().Where(setter => setter.MateriaSetterData == _msData).FirstOrDefault();
+            var shaderProps = atlas.MaterialData.ShaderData.MateriatorShaderProperties;
+            var textures = new Textures();
+            var gridSize = SystemData.Settings.DefaultGridSize;
 
-            //if (!_atlas.AtlasItems.ContainsKey(i))
-             //   _atlas.AtlasItems.Add(i, new MateriaAtlasItem(prefabMS, _msData));
-        }
+            textures.RemoveTextures(shaderProps, gridSize.x, gridSize.y);
+            textures.CreateTextures(shaderProps, gridSize.x, gridSize.y, true);
 
-        private static void CreateAtlasedMesh()
-        {
-            _atlasedMesh = Utils.CopyMesh(_msData.NativeMesh);
-            _atlasedMesh.uv = MeshAnalyzer.RemapUVs(_atlasedMesh.uv, _rects[_rectIndex]);
-        }
-
-        private static void UpdateMateriaSetterData()
-        {
-            if (_msData.AtlasedMesh != null)
-                AssetDatabase.RemoveObjectFromAsset(_msData.AtlasedMesh);
-
-            AssetDatabase.AddObjectToAsset(_atlasedMesh, _msData);
-
-            _msData.MateriaAtlas = _atlas;
-            _msData.AtlasedMesh = _atlasedMesh;
-            _msData.AtlasedUVRect = _rects[_rectIndex];
-        }
-
-        private static MateriaAtlas CreateMateriaAtlasAsset(string directory, string name, MaterialData materialData, List<KeyValuePair<KeyValuePair<string, Texture2D>, Rect[]>> output)
-        {
-            var atlas = AssetUtils.CreateScriptableObjectAsset<MateriaAtlas>(directory, name);
-            atlas.GridSize = new Vector2Int(output[0].Key.Value.width, output[0].Key.Value.height);
-            atlas.MaterialData = materialData;            
-            atlas.Material = UnityEngine.Object.Instantiate(materialData.Material);
-            atlas.Material.name = name;
-            AssetDatabase.AddObjectToAsset(atlas.Material, atlas);
-
-            foreach (var item in output)
-                atlas.Textures.Texs.Add(item.Key.Key, item.Key.Value);
-
-            atlas.Textures.SetNames(name);
-            atlas.Textures.AddTexturesToAsset(atlas);
-
-            AssetDatabase.SaveAssets();
-
-            atlas.Textures.ImportTextureAssets();
-
-            return atlas;
+            return textures;
         }
     }
 }

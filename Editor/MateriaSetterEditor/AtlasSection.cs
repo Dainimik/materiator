@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using UnityEngine.UIElements;
+﻿using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 using UnityEditor;
 
@@ -14,8 +13,6 @@ namespace Materiator
 
         private ObjectField _materiaAtlasObjectField;
 
-        private Button _switchEditModeButton;
-
         public VisualElement _atlasIndicator;
 
         public AtlasSection(MateriaSetterEditor editor)
@@ -26,69 +23,31 @@ namespace Materiator
             GetProperties();
             BindProperties();
             RegisterButtons();
+            RegisterCallbacks();
 
             UpdateIndicator();
-            SetButtonState();
 
             OnMateriaAtlasChanged();
         }
 
         private void UpdateIndicator()
         {
-            if (_materiaSetter.MateriaSetterData != null)
-            {
-                if (_materiaSetter.MateriaAtlas != null)
-                    _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIGreen;
-                else
-                    _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
-            }
+            if (_materiaSetter.MateriaAtlas != null)
+                _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIGreen;
             else
                 _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
         }
 
-        private void SetButtonState()
-        {
-            if (_materiaSetter.MateriaAtlas == null)
-                _switchEditModeButton.SetEnabled(false);
-            else
-                _switchEditModeButton.SetEnabled(true);
-        }
-
-        private void SwitchEditMode()
-        {
-            EditorUtility.SetDirty(_editor.MateriaSetter);
-            if (_materiaSetter.EditMode == EditMode.Native)
-                LoadAtlas(_materiaSetter.MateriaSetterData.MateriaAtlas);
-            else if (_materiaSetter.EditMode == EditMode.Atlas)
-                UnloadAtlas();
-
-            OnMateriaAtlasChanged();
-        }
-
-        public void LoadAtlas(MateriaAtlas atlas)
-        {
-            if (atlas != null)
-            {
-                _materiaSetter.MateriaSlots = _materiaSetter.MateriaSetterData.MateriaSlots;
-
-                _materiaSetter.LoadAtlas(atlas);
-            }
-
-            _editor.SetMateriaSetterDirty(false);
-        }
-
-        public void UnloadAtlas()
-        {
-            _materiaSetter.UnloadAtlas();
-        }
-
-        private void OnMateriaAtlasChanged()
+        private void OnMateriaAtlasChanged(MateriaAtlas atlas = null)
         {
             UpdateIndicator();
 
-            SetButtonState();
+            if (atlas != null)
+            {
+                _editor.MateriaSetter.LoadAtlas(atlas);
 
-            _switchEditModeButton.text = _editor.EditMode.enumNames[_editor.EditMode.enumValueIndex] + " Mode";
+                _editor.serializedObject.Update();
+            }
         }
 
         private void GetProperties()
@@ -99,9 +58,6 @@ namespace Materiator
 
             _materiaAtlasObjectField = root.Q<ObjectField>("MateriaAtlasObjectField");
             _materiaAtlasObjectField.objectType = typeof(MateriaAtlas);
-            _materiaAtlasObjectField.SetEnabled(false);
-
-            _switchEditModeButton = root.Q<Button>("SwitchEditMode");
 
             _atlasIndicator = root.Q<VisualElement>("AtlasIndicator");
         }
@@ -113,7 +69,17 @@ namespace Materiator
 
         private void RegisterButtons()
         {
-            _switchEditModeButton.clicked += SwitchEditMode;
+            
+        }
+
+        private void RegisterCallbacks()
+        {
+            _materiaAtlasObjectField.RegisterCallback<ChangeEvent<UnityEngine.Object>>(e =>
+            {
+                OnMateriaAtlasChanged((MateriaAtlas)e.newValue);
+            });
+
+            _editor.OnMateriaSetterUpdated += UpdateIndicator;
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using UnityEditor;
+﻿using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -8,12 +8,17 @@ namespace Materiator
     [CustomEditor(typeof(MateriaAtlas))]
     public class MateriaAtlasEditor : MateriatorEditor
     {
-        public MateriaSection MateriaSection;
-
         public MateriaAtlas MateriaAtlas;
 
-        public IMGUIContainer IMGUIContainer;
+        public MateriaSection MateriaSection;
 
+        private SerializedProperty _materialData;
+        private SerializedProperty _material;
+        private SerializedProperty _materiaSlots;
+
+        public IMGUIContainer IMGUIContainer;
+        private ObjectField _materialDataObjectField;
+        private ObjectField _materialObjectField;
         private Button _generateAtlasButton;
 
         private void OnEnable()
@@ -25,7 +30,7 @@ namespace Materiator
         {
             InitializeEditor<MateriaAtlas>();
 
-            IMGUIContainer defaultInspector = new IMGUIContainer(() => IMGUI());
+            IMGUIContainer defaultInspector = new IMGUIContainer(() => DrawDefaultInspector());
             IMGUIContainer.Add(defaultInspector);
 
             MateriaSection = new MateriaSection(this, "MateriaSlots");
@@ -33,78 +38,25 @@ namespace Materiator
             return root;
         }
 
-        private void IMGUI()
-        {
-            base.DrawDefaultInspector();
-        }
-
         private void GenerateAtlas()
         {
-            MateriaAtlas.AtlasItems.Clear();
+            if (_materialData.objectReferenceValue == null) return;
+            if (_material.objectReferenceValue == null) return;
+            if (_materiaSlots.arraySize < 1) return;
 
-            var r = new Rect(0f, 0f, 1f, 1f);
-
-            foreach (var materiaSlot in MateriaAtlas.MateriaSlots)
-            {
-                var textures = InitializeTextures();
-                var rect = new Rect(0f, 0f, textures.Size.x, textures.Size.y);
-
-                textures.UpdateColors(r, materiaSlot.Materia.Properties);
-
-                MateriaAtlas.AtlasItems.Add(new MateriaAtlasItem(materiaSlot, textures));
-            }
-
-            MateriaAtlas.Textures = InitializeTextures();
-            Rect[] atlasRects;
-
-            foreach (var texture in MateriaAtlas.Textures.Texs.ToArray())
-            {
-                var newTex = new Texture2D(8192, 8192);
-                newTex.filterMode = SystemData.Settings.FilterMode;
-
-                var atlasItemTextures = MateriaAtlas.AtlasItems.SelectMany(item => item.Textures.Texs.Where(tex => tex.Key == texture.Key)).Select(pairs => pairs.Value).ToArray();
-
-                atlasRects = newTex.PackTextures(atlasItemTextures, 0, 8192, false);
-
-                for (int i = 0; i < atlasRects.Length; i++)
-                {
-                    MateriaAtlas.AtlasItems[i].Rect = atlasRects[i];
-                }
-
-                MateriaAtlas.Textures.Texs[texture.Key] = newTex;
-            }
-
-            MateriaAtlas.Textures.AddTexturesToAsset(MateriaAtlas);
-
-            SetTextures();
-
-            AssetDatabase.SaveAssets();
+            AtlasFactory.GenerateAtlas(MateriaAtlas);
         }
 
-        private Textures InitializeTextures()
+        protected override void SetUpView()
         {
-            var shaderProps = MateriaAtlas.MaterialData.ShaderData.MateriatorShaderProperties;
 
-            var textures = new Textures();
-
-            var gridSize = SystemData.Settings.DefaultGridSize;
-
-            textures.RemoveTextures(shaderProps, gridSize.x, gridSize.y);
-            textures.CreateTextures(shaderProps, gridSize.x, gridSize.y);
-
-            return textures;
-        }
-
-        public void SetTextures()
-        {
-            if (MateriaAtlas.Material == null) return;
-
-            MateriaAtlas.Textures.SetTexturesToMaterial(MateriaAtlas.Material);
         }
 
         protected override void GetProperties()
         {
-
+            _materialData = serializedObject.FindProperty("MaterialData");
+            _material = serializedObject.FindProperty("Material");
+            _materiaSlots = serializedObject.FindProperty("MateriaSlots"); 
         }
 
         protected override void BindProperties()
@@ -112,11 +64,12 @@ namespace Materiator
             IMGUIContainer = root.Q<IMGUIContainer>("IMGUIContainer");
 
             _generateAtlasButton = root.Q<Button>("GenerateAtlasButton");
-        }
-
-        protected override void SetUpView()
-        {
-            
+            _materialDataObjectField = root.Q<ObjectField>("MaterialDataObjectField");
+            _materialDataObjectField.objectType = typeof(MaterialData);
+            _materialDataObjectField.BindProperty(_materialData);
+            _materialObjectField = root.Q<ObjectField>("MaterialObjectField");
+            _materialObjectField.objectType = typeof(Material);
+            _materialObjectField.BindProperty(_material);
         }
 
         protected override void RegisterCallbacks()

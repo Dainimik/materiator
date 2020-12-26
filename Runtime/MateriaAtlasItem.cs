@@ -9,7 +9,7 @@ namespace Materiator
         public MateriaSlot MateriaSlot;
         public Rect Rect;
 
-        //[NonSerialized]
+        [NonSerialized]
         public Textures Textures;
 
         public MateriaAtlasItem(MateriaSlot materiaSlot, Textures textures)

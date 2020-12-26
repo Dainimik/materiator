@@ -7,14 +7,11 @@ namespace Materiator
     public class MateriaAtlas : MateriatorScriptableObject
     {
         public MaterialData MaterialData;
+        public Material Material;
         public List<MateriaSlot> MateriaSlots;
 
-        public List<MateriaAtlasItem> AtlasItems = new List<MateriaAtlasItem>();
-
-        public Material Material;
+        public SerializableDictionary<MateriaTag, MateriaAtlasItem> AtlasItems = new SerializableDictionary<MateriaTag, MateriaAtlasItem>();
         public Textures Textures = new Textures();
-
-        public Vector2Int GridSize;
 
 #if UNITY_EDITOR
         public Texture2D PreviewIcon;

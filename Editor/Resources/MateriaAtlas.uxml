@@ -1,5 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <ui:Label text="Materia Atlas" class="title-header" />
+    <ui:VisualElement>
+        <uie:ObjectField label="Material Data" name="MaterialDataObjectField" allow-scene-objects="false" />
+        <uie:ObjectField label="Material" name="MaterialObjectField" allow-scene-objects="false" />
+    </ui:VisualElement>
     <ui:IMGUIContainer name="IMGUIContainer" />
     <ui:VisualElement name="OutputSectionContainer" class="section-container">
         <ui:Label text="Output" class="section-header" />
