@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -110,6 +109,22 @@ namespace Materiator
                 Rect cdExpandRect = new Rect(EditorGUIUtility.currentViewWidth - 70f, rect.y, 20f, 20f);
                 if (GUI.Button(cdExpandRect, new GUIContent(EditorGUIUtility.IconContent("d_editicon.sml").image, "Edit Color Data")))
                     EditorUtils.InspectTarget(elementMateria);
+            };
+
+            _materiaReorderableList.onAddCallback = (ReorderableList list) =>
+            {
+                var index = list.serializedProperty.arraySize;
+                list.serializedProperty.arraySize++;
+                list.index = index;
+
+                var element = list.serializedProperty.GetArrayElementAtIndex(index);
+                var materia = element.FindPropertyRelative("Materia");
+                var tag = element.FindPropertyRelative("Tag");
+
+                materia.objectReferenceValue = SystemData.Settings.DefaultMateria;
+
+                _editor.serializedObject.ApplyModifiedProperties();
+
             };
         }
     }

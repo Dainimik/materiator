@@ -8,7 +8,7 @@ namespace Materiator
     {
         public MaterialData MaterialData;
         public Material Material;
-        public List<MateriaSlot> MateriaSlots;
+        public List<MateriaSlot> MateriaSlots = new List<MateriaSlot>();
 
         public SerializableDictionary<MateriaTag, MateriaAtlasItem> AtlasItems = new SerializableDictionary<MateriaTag, MateriaAtlasItem>();
         public Textures Textures = new Textures();
