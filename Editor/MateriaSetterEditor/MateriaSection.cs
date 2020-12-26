@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Linq;
+using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -43,9 +44,9 @@ namespace Materiator
         {
             _materiaReorderableList.drawHeaderCallback = (Rect rect) =>
             {
-                EditorGUI.LabelField(new Rect(rect.x + 25f, rect.y, 50f, 20f), new GUIContent("Tag", "Tag"), EditorStyles.boldLabel);
-                EditorGUI.LabelField(new Rect(rect.x + 135f, rect.y, 20f, 20f), new GUIContent("C", "Base Color"), EditorStyles.boldLabel);
-                EditorGUI.LabelField(new Rect(rect.x + 170f, rect.y, 100f, 20f), new GUIContent("Materia " + "(" + _materiaAtlas.MateriaSlots.Count + ")"), EditorStyles.boldLabel);
+                EditorGUI.LabelField(new Rect(rect.x + 40f, rect.y, 50f, 20f), new GUIContent("Tag", "Tag"), EditorStyles.boldLabel);
+                EditorGUI.LabelField(new Rect(rect.x + 150f, rect.y, 20f, 20f), new GUIContent("C", "Base Color"), EditorStyles.boldLabel);
+                EditorGUI.LabelField(new Rect(rect.x + 185f, rect.y, 100f, 20f), new GUIContent("Materia " + "(" + _materiaAtlas.MateriaSlots.Count + ")"), EditorStyles.boldLabel);
             };
 
             _materiaReorderableList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
@@ -66,31 +67,29 @@ namespace Materiator
 
                 _editor.serializedObject.Update();
 
-                int _materiaTagIndex = 0;
                 EditorGUI.BeginChangeCheck();
                 elementTag = (MateriaTag)EditorGUI.ObjectField(new Rect(rect.x + 25f, rect.y, 95f, rect.height), elementTag, typeof(MateriaTag), false);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    Undo.RegisterCompleteObjectUndo(_materiaAtlas, "Change Materia Tag");
-                    //_editor.SetMateriaSetterDirty(true);hja
-
-                    if (elementTag == null)
-                        elementTag = SystemData.Settings.DefaultTag;
+                    if (IsTagInUse(elementTag))
+                    {
+                        elementTag = null;
+                    }
                     else
-                        _materiaAtlas.MateriaSlots[index].Tag = elementTag;
+                    {
+                        Undo.RegisterCompleteObjectUndo(_materiaAtlas, "Change Materia Tag");
 
+                        if (elementTag != null)
+                            _materiaAtlas.MateriaSlots[index].Tag = elementTag;
+                    }
                     _editor.serializedObject.ApplyModifiedProperties();
-                    //_editor.OnMateriaSetterUpdated?.Invoke();
-                    //_emissionInUse = IsEmissionInUse(_materiaSetter.Materia);
                 }
-                //_editor.SetMateriaSetterDirty(true);
 
                 EditorGUI.BeginChangeCheck();
                 elementMateria = (Materia)EditorGUI.ObjectField(new Rect(rect.x + 170f, rect.y, rect.width - 195f, rect.height), elementMateria, typeof(Materia), false);
                 if (EditorGUI.EndChangeCheck())
                 {
                     Undo.RegisterCompleteObjectUndo(_materiaAtlas, "Change Materia");
-                    //_editor.SetMateriaSetterDirty(true);hja
 
                     if (elementMateria == null)
                         elementMateria = SystemData.Settings.DefaultMateria;
@@ -99,11 +98,7 @@ namespace Materiator
 
                     _editor.serializedObject.Update();
 
-                    //_materiaAtlas.UpdateColorsOfAllTextures();
-
                     _editor.serializedObject.ApplyModifiedProperties();
-                    //_editor.OnMateriaSetterUpdated?.Invoke();
-                    //_emissionInUse = IsEmissionInUse(_materiaSetter.Materia);
                 }
 
                 Rect cdExpandRect = new Rect(EditorGUIUtility.currentViewWidth - 70f, rect.y, 20f, 20f);
@@ -122,10 +117,19 @@ namespace Materiator
                 var tag = element.FindPropertyRelative("Tag");
 
                 materia.objectReferenceValue = SystemData.Settings.DefaultMateria;
+                if (IsTagInUse(tag.objectReferenceValue as MateriaTag))
+                {
+                    tag.objectReferenceValue = null;
+                }
 
                 _editor.serializedObject.ApplyModifiedProperties();
 
             };
+        }
+
+        private bool IsTagInUse(MateriaTag tag)
+        {
+            return _editor.MateriaAtlas.MateriaSlots.Where(slot => slot.Tag == tag).Count() != 0;
         }
     }
 }
