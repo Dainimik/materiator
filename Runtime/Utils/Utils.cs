@@ -30,11 +30,6 @@ namespace Materiator
             return new RectInt((int)(gridSize.x * rect.x), (int)(gridSize.y * rect.y), (int)(gridSize.x * rect.width), (int)(gridSize.y * rect.height));
         }
 
-        public static Mesh CopyMesh(Mesh mesh)
-        {
-            return Mesh.Instantiate(mesh);
-        }
-
         public static Color32[] ColorToColor32Array(Color[] colors)
         {
             Color32[] color32 = new Color32[colors.Length];
