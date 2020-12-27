@@ -46,24 +46,6 @@ namespace Materiator
             return Mesh.Instantiate(mesh);
         }
 
-        public static void ShallowCopyFields<P, C>(P source, C destination) where P : class where C : class
-        {
-            var sourceFields = source.GetType().GetFields();
-            var destinationFields = destination.GetType().GetFields();
-
-            foreach (var sourceField in sourceFields)
-            {
-                foreach (var destinationField in destinationFields)
-                {
-                    if (sourceField.Name == destinationField.Name && sourceField.FieldType == destinationField.FieldType)
-                    {
-                        destinationField.SetValue(destination, sourceField.GetValue(source));
-                        break;
-                    }
-                }
-            }
-        }
-
         public static Color32[] ColorToColor32Array(Color[] colors)
         {
             Color32[] color32 = new Color32[colors.Length];
