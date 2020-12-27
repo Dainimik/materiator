@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEngine.UIElements;
@@ -14,8 +13,6 @@ namespace Materiator
         {
             var materiaSetter = editor.MateriaSetter;
             var root = editor.Root;
-
-            materiaSetter.GetMeshReferences();
 
             if ((materiaSetter.MeshRenderer != null && materiaSetter.SkinnedMeshRenderer != null) || (materiaSetter.MeshFilter != null && materiaSetter.SkinnedMeshRenderer != null))
             {
