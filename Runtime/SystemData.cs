@@ -191,7 +191,7 @@ namespace Materiator
 
         private static MaterialData CreateDefaultMaterialData(string name)
         {
-            var material = Utils.CreateMaterial(_settings.DefaultShaderData.Shader);
+            var material = MaterialUtils.CreateMaterial(_settings.DefaultShaderData.Shader);
             material.name = "DefaultMaterial";
 
             var materialData = ScriptableObject.CreateInstance<MaterialData>();

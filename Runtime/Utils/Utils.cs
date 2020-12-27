@@ -4,17 +4,6 @@ namespace Materiator
 {
     public static class Utils
     {
-        public static Material CreateMaterial(Shader shader, string name = null)
-        {
-            var mat = new Material(shader);
-            if (name != null)
-                mat.name = name;
-
-            //mat.SetColor(SystemData.Settings.DefaultShaderData.BaseColorPropertyName, Color.white);
-            //mat.EnableKeyword(SystemData.Settings.DefaultShaderData.MetallicSmoothnessKeywordName);
-            return mat;
-        }
-
         public static void PackTextures(Texture2D[] textures, Rect[] rects, Texture2D atlasTexture)
         {
             var rt = new RenderTexture(atlasTexture.width, atlasTexture.height, 16, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
