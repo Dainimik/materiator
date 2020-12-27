@@ -11,7 +11,7 @@ namespace Materiator
         public ContextAction _contextAction;
         public static bool CheckAllSystems(MateriaSetterEditor editor)
         {
-            var materiaSetter = editor.MateriaSetter;
+            /*var materiaSetter = editor.MateriaSetter;
             var root = editor.Root;
 
             if ((materiaSetter.MeshRenderer != null && materiaSetter.SkinnedMeshRenderer != null) || (materiaSetter.MeshFilter != null && materiaSetter.SkinnedMeshRenderer != null))
@@ -91,7 +91,8 @@ namespace Materiator
             else
             {
                 return true;
-            }
+            }*/
+            return true;
         }
 
         public static bool ErrorMessage(MateriaSetterEditor editor, string text, Dictionary<ContextAction, string> actionContent = null)

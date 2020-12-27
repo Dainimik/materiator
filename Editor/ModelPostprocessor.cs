@@ -50,17 +50,13 @@ namespace Materiator
                 var name = data.M;
                 var rect = GetRectFromFloatArray(data.R);
 
-                Debug.Log(name);
-                Debug.Log(rect);
-
-                ms.Mesh = go.GetComponent<MeshFilter>().sharedMesh;
-
+                var mesh = MeshUtils.GetSharedMesh(go);
                 var tag = SystemData.MateriaTags.MateriaTags.Where(tag => tag.Name == name).FirstOrDefault();
+                var slot = new MateriaSetterSlot(i, rect, name, tag != null ? tag : SystemData.Settings.DefaultTag);
 
-                var mss = new MateriaSetterSlot(i, rect, name, tag != null ? tag : SystemData.Settings.DefaultTag);
-                mss.MeshData = GetMeshData(rect, ms.Mesh);
+                slot.MeshData = GetMeshData(rect, mesh);
 
-                ms.MateriaSetterSlots.Add(mss);
+                ms.MateriaSetterSlots.Add(slot);
 
                 i++;
             }
@@ -87,6 +83,7 @@ namespace Materiator
                 }
             }
 
+            meshData.Mesh = mesh;
             meshData.Indices = indices.ToArray();
             meshData.Colors = colors.ToArray();
             meshData.UVs = uvs.ToArray();

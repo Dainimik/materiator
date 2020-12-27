@@ -29,6 +29,7 @@ namespace Materiator
     [Serializable]
     public struct MeshData
     {
+        public Mesh Mesh;
         public int[] Indices;
         public Color[] Colors;
         public Vector2[] UVs;
