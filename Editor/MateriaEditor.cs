@@ -261,7 +261,7 @@ namespace Materiator
                 for (int i = 0; i < rootGameObjects.Length; i++)
                 {
                     var obj = rootGameObjects[i].GetComponent<MateriaSetter>();
-                    if (obj != null) obj.Refresh();
+                    if (obj != null) obj.Initialize();
                 }
                 EditorSceneManager.MarkSceneDirty(prefabStage.scene);
             }
