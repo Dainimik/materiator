@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Materiator
@@ -11,14 +12,27 @@ namespace Materiator
         public ContextAction _contextAction;
         public static bool CheckAllSystems(MateriaSetterEditor editor)
         {
-            /*var materiaSetter = editor.MateriaSetter;
+            var materiaSetter = editor.MateriaSetter;
             var root = editor.Root;
 
-            if ((materiaSetter.MeshRenderer != null && materiaSetter.SkinnedMeshRenderer != null) || (materiaSetter.MeshFilter != null && materiaSetter.SkinnedMeshRenderer != null))
+            Mesh m = null;
+            Mesh sm = null;
+            var mf = materiaSetter.gameObject.GetComponent<MeshFilter>();
+            var r = materiaSetter.gameObject.GetComponent<Renderer>();
+            var mr = materiaSetter.gameObject.GetComponent<MeshRenderer>();
+            var smr = materiaSetter.gameObject.GetComponent<SkinnedMeshRenderer>();
+            
+            if (mf != null)
+                m = mf.sharedMesh;
+
+            if (smr != null)
+                sm = smr.sharedMesh;
+
+            if ((mr != null && smr != null) || (mf != null && smr != null))
             {
                 return ErrorMessage(editor, "Please use either only a SKINNED MESH RENDERER component alone or a MESH FILTER + MESH RENDERER component combo.");
             }
-            else if (materiaSetter.Renderer == null && materiaSetter.MeshFilter == null)
+            else if (r == null && mf == null)
             {
                 return ErrorMessage(
                     editor,
@@ -29,25 +43,17 @@ namespace Materiator
                         [ContextActions.AddSkinnedMeshRenderer] = "Add Skinned Mesh Renderer"
                     });
             }
-            else if (materiaSetter.MeshRenderer != null && materiaSetter.MeshFilter == null)
+            else if (mr != null && mf == null)
             {
                 return ErrorMessage(
                     editor,
-                    "Please first add a MESH FILTER component to this Game Object.",
+                    "Please first add a MESH FILTER component to this Game Object. ",
                     new Dictionary<ContextAction, string>
                     {
                         [ContextActions.AddMeshFilter] = "Add Mesh Filter"
                     });
             }
-            else if (materiaSetter.SkinnedMeshRenderer == null && materiaSetter.MeshFilter.sharedMesh == null)
-            {
-                return ErrorMessage(
-                    editor,
-                    "Please add a MESH and hit the Retry button.",
-                    new Dictionary<ContextAction, string> { [ContextActions.Retry] = "Retry" }
-                    );
-            }
-            else if (materiaSetter.SkinnedMeshRenderer == null && materiaSetter.MeshRenderer == null && materiaSetter.MeshFilter == null)
+            else if (smr == null && mr == null && mf == null)
             {
                 return ErrorMessage(
                     editor,
@@ -58,7 +64,7 @@ namespace Materiator
                         [ContextActions.AddSkinnedMeshRenderer] = "Add Skinned Mesh Renderer"
                     });
             }
-            else if (materiaSetter.SkinnedMeshRenderer == null && materiaSetter.MeshRenderer == null && materiaSetter.MeshFilter != null)
+            else if (smr == null && mr == null && mf != null)
             {
                 return ErrorMessage(
                     editor,
@@ -66,16 +72,6 @@ namespace Materiator
                     new Dictionary<ContextAction, string>
                     {
                         [ContextActions.AddMeshRenderer] = "Add Mesh Renderer"
-                    });
-            }
-            else if (materiaSetter.SkinnedMeshRenderer != null && materiaSetter.SkinnedMeshRenderer.sharedMesh == null)
-            {
-                return ErrorMessage(
-                    editor,
-                    "Please first add a MESH to a SKINNED MESH RENDERER component and hit the Retry Button.",
-                    new Dictionary<ContextAction, string>
-                    {
-                        [ContextActions.Retry] = "Retry"
                     });
             }
             else if (PrefabUtility.IsPartOfPrefabAsset(materiaSetter) && !PrefabStageUtility.GetCurrentPrefabStage()) // This is here because switching edit mode in project view prefab causes bugs
@@ -91,8 +87,7 @@ namespace Materiator
             else
             {
                 return true;
-            }*/
-            return true;
+            }
         }
 
         public static bool ErrorMessage(MateriaSetterEditor editor, string text, Dictionary<ContextAction, string> actionContent = null)
