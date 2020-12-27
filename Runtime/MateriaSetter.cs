@@ -18,12 +18,12 @@ namespace Materiator
 
         public void Initialize()
         {
-            Renderer = GetComponent<Renderer>();
+            SetUpMesh();
         }
 
         public void LoadAtlas(MateriaAtlas atlas)
         {
-            if (atlas == null) return;
+            if (atlas == null || Renderer == null) return;
 
             Renderer.sharedMaterial = atlas.Material;
 
@@ -72,6 +72,35 @@ namespace Materiator
                     return item;
 
             return null;
+        }
+
+        private void SetUpMesh()
+        {
+            Renderer = GetComponent<Renderer>();
+
+            var mf = GetComponent<MeshFilter>();
+            var smr = GetComponent<SkinnedMeshRenderer>();
+
+            if (smr != null)
+            {
+                if (MateriaSetterSlots.Count != 0)
+                {
+                    if (smr.sharedMesh != MateriaSetterSlots[0].MeshData.Mesh)
+                    {
+                        smr.sharedMesh = MateriaSetterSlots[0].MeshData.Mesh;
+                    }
+                }
+            }
+            else if (mf != null)
+            {
+                if (MateriaSetterSlots.Count > 0)
+                {
+                    if (mf.sharedMesh != MateriaSetterSlots[0].MeshData.Mesh)
+                    {
+                        mf.sharedMesh = MateriaSetterSlots[0].MeshData.Mesh;
+                    }
+                }
+            }
         }
     }
 }
