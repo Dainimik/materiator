@@ -45,10 +45,7 @@ namespace Materiator
             EditorUtility.SetDirty(_settings);
             AssetDatabase.ImportAsset(path + "/MateriatorSettings.asset");
             _settings = AssetDatabase.LoadAssetAtPath<MateriatorSettings>(path + "/MateriatorSettings.asset");
-
-
             _settings.PackAssets = true;
-            _settings.HighlightColor = new Color(1f, 1f, 0f, 1f);
 
             var shaderDataPath = CreateDefaultShaderDataAssets();
             var shaderDatas = AssetDatabase.LoadAllAssetsAtPath(shaderDataPath).Where(asset => asset.GetType() == typeof(ShaderData)).Cast<ShaderData>().ToArray();
@@ -208,7 +205,6 @@ namespace Materiator
         {
             var collection = ScriptableObject.CreateInstance<MateriaTagCollection>();
             collection.name = name;
-
             collection.MateriaTags.Add(Settings.DefaultTag);
 
             AssetDatabase.AddObjectToAsset(collection, _settings);

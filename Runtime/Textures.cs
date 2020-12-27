@@ -177,20 +177,6 @@ namespace Materiator
 
 #if UNITY_EDITOR
 
-        public void CopyPixelColors(Textures source, Vector2Int sourceGridSize, Rect sourceRect, Vector2Int destinationGridSize, Rect destinationRect)
-        {
-            var sourceRectInt = new RectInt((int)(sourceRect.x * sourceGridSize.x), (int)(sourceRect.y * sourceGridSize.y), (int)(sourceRect.width * sourceGridSize.x), (int)(sourceRect.height * sourceGridSize.y));
-            var destinationRectInt = new RectInt((int)(destinationRect.x * destinationGridSize.x), (int)(destinationRect.y * destinationGridSize.y), (int)(destinationRect.width * destinationGridSize.x), (int)(destinationRect.height * destinationGridSize.y));
-
-            foreach (var tex in source.Texs)
-            {
-                var sourceColors = tex.Value.GetPixels(sourceRectInt.x, sourceRectInt.y, sourceRectInt.width, sourceRectInt.height);
-                Texs.Where(t => t.Key == tex.Key).FirstOrDefault().Value.SetPixels(destinationRectInt.x, destinationRectInt.y, destinationRectInt.width, destinationRectInt.height, sourceColors);
-            }
-
-            Apply();
-        }
-
         public void AddTexturesToAsset(Object objectToAddTo)
         {
             foreach (var tex in Texs)
@@ -253,12 +239,6 @@ namespace Materiator
                 AssetDatabase.ImportAsset(assetPath);
                 AssetDatabase.Refresh();
             }
-        }
-
-        public void ImportTextureAssets()
-        {
-            foreach (var tex in Texs)
-                AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(tex.Value));
         }
 
         private Texture2D WriteTextureToDisk(Texture2D texture, string path, FilterMode filterMode)

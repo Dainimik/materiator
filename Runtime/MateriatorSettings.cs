@@ -5,25 +5,12 @@ using UnityEngine;
 
 namespace Materiator
 {
-    public enum HighlightMode
-    {
-        WhileLMBHeld,
-        Continuous
-    }
-
     public enum MateriaTextureFormat
     {
         RGB24,
         RGBA32,
         RGB9e5Float,
         RGBAHalf
-    }
-
-    public enum TextureUpdateMode
-    {
-        Immediate,
-        Delayed,
-        Manual
     }
 
     public class MateriatorSettings : ScriptableObject
@@ -40,12 +27,6 @@ namespace Materiator
 
         [HideInInspector]
         public MateriaTagCollection MateriaTags;
-
-        [Header("Materia Editor Settings")]
-        public TextureUpdateMode TextureUpdateMode = TextureUpdateMode.Immediate;
-
-        public Color HighlightColor;
-        public HighlightMode HighlightMode;
 
         [Header("Texture Settings")]
         public TextureFormat TextureFormat = TextureFormat.RGBAHalf;

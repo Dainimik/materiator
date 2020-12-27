@@ -71,22 +71,6 @@ namespace Materiator
             return null;
         }
 
-        public static void SetSharedMesh(Mesh mesh, GameObject go)
-        {
-            var mf = go.GetComponent<MeshFilter>();
-
-            if (mf == null)
-            {
-                var smr = go.GetComponent<SkinnedMeshRenderer>();
-                if (smr != null)
-                    smr.sharedMesh = mesh;
-            }
-            else
-            {
-                mf.sharedMesh = mesh;
-            }
-        }
-
         public static Mesh CopyMesh(Mesh mesh)
         {
             return Mesh.Instantiate(mesh);

@@ -12,9 +12,5 @@ namespace Materiator
 
         public SerializableDictionary<MateriaTag, MateriaAtlasItem> AtlasItems = new SerializableDictionary<MateriaTag, MateriaAtlasItem>();
         public Textures Textures = new Textures();
-
-#if UNITY_EDITOR
-        public Texture2D PreviewIcon;
-#endif
     }
 }

@@ -11,6 +11,11 @@ namespace Materiator
         public MateriaAtlas MateriaAtlas;
         public List<MateriaSetterSlot> MateriaSetterSlots;
 
+        private void Awake()
+        {
+            Initialize();
+        }
+
         public void Initialize()
         {
             Renderer = GetComponent<Renderer>();
