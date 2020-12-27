@@ -59,7 +59,7 @@ namespace Materiator
                 var tag = SystemData.MateriaTags.MateriaTags.Where(tag => tag.Name == name).FirstOrDefault();
 
                 var mss = new MateriaSetterSlot(i, rect, name, tag != null ? tag : SystemData.Settings.DefaultTag);
-                mss.UVs = GetUVs(rect, ms.Mesh);
+                mss.MeshData = GetMeshData(rect, ms.Mesh);
 
                 ms.MateriaSetterSlots.Add(mss);
 
@@ -67,20 +67,32 @@ namespace Materiator
             }
         }
 
-        private SerializableDictionary<int, Vector2> GetUVs(Rect rect, Mesh mesh)
+        private MeshData GetMeshData(Rect rect, Mesh mesh)
         {
-            var uvs = new SerializableDictionary<int, Vector2>();
+            var meshData = new MeshData();
+
+            var indices = new List<int>();
+            var colors = new List<Color>();
+            var uvs = new List<Vector2>();
 
             for (int i = 0; i < mesh.uv.Length; i++)
             {
                 var uv = mesh.uv[i];
+                var color = mesh.colors[i];
 
                 if (rect.Contains(uv))
-                    uvs.Add(i, uv);
+                {
+                    indices.Add(i);
+                    colors.Add(color);
+                    uvs.Add(uv);
+                }
             }
 
+            meshData.Indices = indices.ToArray();
+            meshData.Colors = colors.ToArray();
+            meshData.UVs = uvs.ToArray();
 
-            return uvs;
+            return meshData;
         }
 
         public static MateriatorInfoCollection CreateFromJSON(string jsonString)

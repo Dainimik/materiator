@@ -67,7 +67,7 @@ namespace Materiator
 
         private void Refresh()
         {
-            MateriaSetter.Refresh();           
+            MateriaSetter.Initialize();           
         }
 
         private void DrawIMGUI()

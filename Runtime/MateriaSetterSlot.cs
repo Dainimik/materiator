@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Materiator
@@ -9,7 +10,7 @@ namespace Materiator
         public int ID;
         public string Name;
         public Rect Rect;
-        public SerializableDictionary<int, Vector2> UVs;
+        public MeshData MeshData;
         public MateriaTag Tag;
 
         public Materia Materia;
@@ -25,5 +26,13 @@ namespace Materiator
             else
                 Tag = SystemData.Settings.DefaultTag;
         }
+    }
+
+    [Serializable]
+    public struct MeshData
+    {
+        public int[] Indices;
+        public Color[] Colors;
+        public Vector2[] UVs;
     }
 }
