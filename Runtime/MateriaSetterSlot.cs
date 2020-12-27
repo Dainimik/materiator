@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Materiator
@@ -10,10 +9,9 @@ namespace Materiator
         public int ID;
         public string Name;
         public Rect Rect;
-        public MeshData MeshData;
         public MateriaTag Tag;
-
         public Materia Materia;
+        public MeshData MeshData;
 
         public MateriaSetterSlot(int id, Rect rect, string name = "", MateriaTag tag = null)
         {

@@ -41,8 +41,6 @@ namespace Materiator
 
         private void OnMateriaAtlasChanged(MateriaAtlas atlas = null)
         {
-            Debug.Log("Atlas: " + atlas);
-            Debug.Log("Atlas SERIALIZED: " + _materiaAtlas.objectReferenceValue);
             _materiaAtlas.objectReferenceValue = atlas;
             _editor.serializedObject.ApplyModifiedProperties();
 
