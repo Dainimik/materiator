@@ -12,7 +12,6 @@ namespace Materiator
     public class MateriatorShaderProperty
     {
         public string Name;
-        //[HideInInspector]
         public string PropertyName;
         public ShaderPropertyType Type;
         public List<MateriatorShaderPropertyValue> Values;

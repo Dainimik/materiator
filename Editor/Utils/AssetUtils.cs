@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using UnityEditor;
-using UnityEditor.Experimental.SceneManagement;
 using UnityEngine;
 
 namespace Materiator
@@ -86,27 +85,6 @@ namespace Materiator
         }
 
         /// <summary>
-        /// Returns a list of components from all Prefabs from a given directory.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="directory"> Relative prefab directory. If null, scans project Assets folder and deeper.</param>
-        /// <returns></returns>
-        public static List<T> FindAllComponentsInPrefabs<T>(string[] searchDirectories = null) where T : MonoBehaviour
-        {
-            List<T> objects = new List<T>();
-
-            var prefabs = FindAssets<GameObject>(searchDirectories);
-            foreach (var prefab in prefabs)
-            {
-                var components = prefab.GetComponentsInChildren<T>();
-                foreach (var comp in components)
-                    objects.Add(comp);
-            }
-
-            return objects;
-        }
-
-        /// <summary>
         /// 
         /// </summary>
         /// <typeparam name="T"> Type of asset to look for.</typeparam>
@@ -149,24 +127,6 @@ namespace Materiator
                 }
             }
             return AssetDatabase.LoadAssetAtPath<T>(aAssetPath);
-        }
-
-        public static T[] FindObjectsOfTypeInOpenedPrefabStage<T>(out PrefabStage prefabStage)
-        {
-            var ps = PrefabStageUtility.GetCurrentPrefabStage();
-            prefabStage = ps;
-            if (ps != null)
-            {
-                var rootGameObjects = ps.scene.GetRootGameObjects();
-                T[] objs = new T[rootGameObjects.Length];
-                for (int i = 0; i < rootGameObjects.Length; i++)
-                {
-                    var obj = rootGameObjects[i].GetComponent<T>();
-                    if (obj != null) objs[i] = obj;
-                }
-                return objs;
-            }
-            return null;
         }
     }
 }

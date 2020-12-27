@@ -10,12 +10,10 @@ namespace Materiator
         private MateriaSetterEditor _editor;
         private MateriaSetter _materiaSetter;
 
-        public SerializedProperty _materiaAtlas;
+        private SerializedProperty _materiaAtlas;
 
         private ObjectField _materiaAtlasObjectField;
-
-        public VisualElement _atlasIndicator;
-
+        private VisualElement _atlasIndicator;
         private Button _reloadAtlasButton;
 
         public AtlasSection(MateriaSetterEditor editor)
@@ -25,7 +23,6 @@ namespace Materiator
 
             GetProperties();
             BindProperties();
-            RegisterButtons();
             RegisterCallbacks();
             
             OnMateriaAtlasChanged(_materiaAtlas.objectReferenceValue as MateriaAtlas);
@@ -65,11 +62,6 @@ namespace Materiator
         private void BindProperties()
         {
             _materiaAtlasObjectField.BindProperty(_materiaAtlas);
-        }
-
-        private void RegisterButtons()
-        {
-            
         }
 
         private void RegisterCallbacks()

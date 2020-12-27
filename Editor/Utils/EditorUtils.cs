@@ -1,7 +1,5 @@
 ﻿using System.Reflection;
 using UnityEditor;
-using UnityEditor.Experimental.SceneManagement;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace Materiator
@@ -21,13 +19,6 @@ namespace Materiator
             var isLocked = inspectorType.GetProperty("isLocked", BindingFlags.Instance | BindingFlags.Public);
             isLocked.GetSetMethod().Invoke(inspectorInstance, new object[] { true });
             Selection.activeGameObject = prevSelection;
-        }
-
-        public static void MarkOpenPrefabSceneDirty()
-        {
-            var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
-            if (prefabStage != null)
-                EditorSceneManager.MarkSceneDirty(prefabStage.scene);
         }
 
         public static Vector2 Drag2D(Vector2 scrollPosition, Rect position)
