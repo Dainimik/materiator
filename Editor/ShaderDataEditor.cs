@@ -132,14 +132,12 @@ namespace Materiator
 
             foreach (var materia in materias)
             {
-                if (materia.MaterialData?.ShaderData == _shaderData)
-                {
-                    RemoveOldPropertiesFromMateria(materia);
+                if (materia.MaterialData.ShaderData != _shaderData)
+                    continue;
 
-                    AddNewPropertiesToMateria(materia);
-
-                    UpdateMateriaFloatPropertyDescriptiveNames(materia);
-                }
+                RemoveOldPropertiesFromMateria(materia);
+                AddNewPropertiesToMateria(materia);
+                UpdateMateriaFloatPropertyDescriptiveNames(materia);
             }
         }
 

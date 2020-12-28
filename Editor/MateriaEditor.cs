@@ -122,12 +122,10 @@ namespace Materiator
 
             _materiaPropertyList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
             {
-                var element = _materia.Properties[index];
-
-                Rect r = new Rect(rect.x, rect.y, rect.width, rect.height);
+                var property = _materia.Properties[index];
 
                 EditorGUI.BeginChangeCheck();
-                CreateShaderPropertyGUI(r, element);
+                CreateShaderPropertyGUI(rect, property);
                 serializedObject.Update();
                 if (EditorGUI.EndChangeCheck())
                 {
@@ -140,16 +138,16 @@ namespace Materiator
             _materiaPropertyList.elementHeightCallback = (int index) =>
             {
                 var element = _materiaPropertyList.serializedProperty.GetArrayElementAtIndex(index);
-                float propertyHeight = EditorGUI.GetPropertyHeight(element, true);
-                float spacing = EditorGUIUtility.singleLineHeight;
+                var property = _materia.Properties[index];
+                var propertyHeight = EditorGUI.GetPropertyHeight(element, true);
+                var heightCorrection = EditorGUIUtility.singleLineHeight;
 
-                if (element.managedReferenceFullTypename == "")
+                if (property.Type == ShaderPropertyType.Vector3 || property.Type == ShaderPropertyType.Vector2 || property.Type == ShaderPropertyType.Vector4 || property.Type == ShaderPropertyType.Float)
                 {
-                    spacing += 20;
+                    heightCorrection += EditorGUIUtility.singleLineHeight;
                 }
 
-                //return propertyHeight + spacing;
-                return 20f + spacing;
+                return propertyHeight + heightCorrection;
             };
         }
 
@@ -176,7 +174,7 @@ namespace Materiator
                 case ShaderPropertyType.Float:
                     for (int i = 0; i < prop.Values.Count; i++)
                     {
-                        Rect r = new Rect(rect.x, rect.y + (i * 40f), rect.width, rect.height);
+                        Rect r = new Rect(rect.x, rect.y + (i * EditorGUIUtility.singleLineHeight), rect.width, EditorGUIUtility.singleLineHeight);
 
                         var floatValue = EditorGUI.FloatField(r, new GUIContent(prop.Values[i].Name), prop.Values[i].Value);
                         if (EditorGUI.EndChangeCheck())
