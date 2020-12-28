@@ -10,7 +10,7 @@ namespace Materiator
         /// <param name="size"> Size in pixels</param>
         /// <param name="offset"> Relative rect to calculate rects against</param>
         /// <returns></returns>
-        public static Rect[] CalculateRects(Vector2Int size, Rect offset) // This function has nothing to do with meshes and needs to be moved out of here
+        public static Rect[] CalculateRects(Vector2Int size, Rect offset)
         {
             var rects = new Rect[size.x * size.y];
             var rectSize = new Vector2();

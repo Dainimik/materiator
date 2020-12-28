@@ -31,12 +31,12 @@ namespace Materiator
             {
                 if (atlas.AtlasItems.ContainsKey(slot.Tag))
                 {
-                    var atlasRect = atlas.AtlasItems[slot.Tag].Rect;
-                    if (slot.Rect != atlasRect)
+                    var destRect = atlas.AtlasItems[slot.Tag].Rect;
+                    if (slot.Rect != destRect)
                     {
-                        MeshUtils.ShiftUVs(slot.MeshData, slot.Rect, atlasRect);
+                        MeshUtils.ShiftUVs(slot.MeshData, slot.Rect, destRect);
 
-                        slot.Rect.Set(atlasRect.x, atlasRect.y, atlasRect.width, atlasRect.height);
+                        slot.Rect.Set(destRect.x, destRect.y, destRect.width, destRect.height);
                     }
 
                     slot.Materia = atlas.AtlasItems[slot.Tag].MateriaSlot.Materia;

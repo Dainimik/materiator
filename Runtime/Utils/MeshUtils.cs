@@ -15,20 +15,23 @@ namespace Materiator
                 var index = meshData.Indices[i];
                 var uv = meshData.UVs[i];
 
-                var widthMultiplier = destRect.width / sourceRect.width; // 0.5
-                var heightMultiplier = destRect.height / sourceRect.height; // 1.0
+                var widthMultiplier = 1f;
+                var heightMultiplier = 1f;
+
+                if (sourceRect.width != destRect.width)
+                    widthMultiplier = destRect.width;
+
+                if (sourceRect.height != destRect.height)
+                    heightMultiplier = destRect.height;
+
                 var xShift = destRect.x - sourceRect.x;
                 var yShift = destRect.y - sourceRect.y;
 
-                uv = MathUtils.Scale2D(uv, new Vector2(widthMultiplier, heightMultiplier), sourceRect.center);
-                //uv.x *= widthMultiplier;
-                //uv.y *= heightMultiplier;
-
-                uv.x += xShift;
-                uv.y += yShift;
-
+                uv.x = uv.x * widthMultiplier + xShift;
+                uv.y = uv.y * heightMultiplier + yShift;
 
                 uvs[index] = uv;
+                meshData.UVs[i] = uv;
             }
 
             mesh.uv = uvs;
