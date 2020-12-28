@@ -25,6 +25,7 @@ namespace Materiator
 
         private Button _createMateriaButton;
         private Button _restoreDefaultsButton;
+        private Button _applyChangesButton;
 
         private PreviewRenderUtility _previewRenderUtility;
         private Mesh _previewMesh;
@@ -77,8 +78,6 @@ namespace Materiator
         private void OnValueChanged()
         {
             UpdatePreview();
-            UpdateSceneMateriaSettersColors();
-            UpdatePrefabMateriaSettersColors();
 
             if (_materia.Properties.Count > 0)
                 _materia.PreviewIcon = GenerateThumbnail();
@@ -88,25 +87,16 @@ namespace Materiator
 
         private void CreateMateria()
         {
-            var shaderData = _materia.MaterialData.ShaderData;
-            if (!shaderData) return;
+            if (!_materia.MaterialData.ShaderData) return;
 
             var shaderDataProperties = _materia.MaterialData.ShaderData.MateriatorShaderProperties;
 
             _materia.Properties.Clear();
 
             foreach (var prop in shaderDataProperties)
-            {
                 _materia.Properties.Add(ObjectCopier.Clone(prop));
-            }
-
-            //_materia.AddProperties(shaderDataProperties);
-
-            //AssetDatabase.ForceReserializeAssets(new string[]{ AssetDatabase.GetAssetPath(_materia) }, ForceReserializeAssetsOptions.ReserializeAssetsAndMetadata);
-           // AssetDatabase.SaveAssets();
 
             OnValueChanged();
-
             SetUpView();
         }
 
@@ -115,6 +105,17 @@ namespace Materiator
             if (EditorUtility.DisplayDialog("Restore Defaults", "All current settings will be lost. Are you sure?", "Yes", "No"))
             {
                 CreateMateria();
+                OnValueChanged();
+            }
+        }
+
+        private void UpdateMateriaAtlases()
+        {
+            var atlases = AssetUtils.FindAssets<MateriaAtlas>();
+
+            foreach (var atlas in atlases)
+            {
+                AtlasFactory.GenerateAtlas(atlas);
             }
         }
 
@@ -131,7 +132,6 @@ namespace Materiator
 
                 EditorGUI.BeginChangeCheck();
                 CreateShaderPropertyGUI(rect, property);
-                serializedObject.Update();
                 if (EditorGUI.EndChangeCheck())
                 {
                     serializedObject.ApplyModifiedProperties();
@@ -207,34 +207,6 @@ namespace Materiator
                 default:
                     break;
             }
-        }
-
-        private void UpdateSceneMateriaSettersColors()
-        {
-            //var materiaSetters = FindObjectsOfType<MateriaSetter>().Where(ms => ms.MateriaTags.Select(s => s.Materia).Contains(_materia)).ToArray();
-
-            //foreach (var ms in materiaSetters)
-            //    ms.UpdateColorsOfAllTextures();
-        }
-
-        private void UpdatePrefabMateriaSettersColors()
-        {
-            //var materiaSetters = AssetUtils.FindAllComponentsInPrefabs<MateriaSetter>().Where(ms => ms.MateriaTags.Select(s => s.Materia).Contains(_materia)).ToArray();
-
-            //foreach (var ms in materiaSetters)
-            //    ms.UpdateColorsOfAllTextures();
-
-            /*var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
-            if (prefabStage != null)
-            {
-                var rootGameObjects = prefabStage.scene.GetRootGameObjects();
-                for (int i = 0; i < rootGameObjects.Length; i++)
-                {
-                    var obj = rootGameObjects[i].GetComponent<MateriaSetter>();
-                    if (obj != null) obj.Initialize();
-                }
-                EditorSceneManager.MarkSceneDirty(prefabStage.scene);
-            }*/
         }
 
         private void OnShaderDataChanged(ChangeEvent<UnityEngine.Object> e)
@@ -409,6 +381,7 @@ namespace Materiator
 
             _createMateriaButton = root.Q<Button>("CreateMateriaButton");
             _restoreDefaultsButton = root.Q<Button>("RestoreDefaultsButton");
+            _applyChangesButton = root.Q<Button>("ApplyChangesButton");
 
         }
 
@@ -423,6 +396,7 @@ namespace Materiator
         {
             _createMateriaButton.clicked += CreateMateria;
             _restoreDefaultsButton.clicked += RestoreDefaults;
+            _applyChangesButton.clicked += UpdateMateriaAtlases;
 
             _materialDataObjectField.RegisterCallback<ChangeEvent<UnityEngine.Object>>(OnShaderDataChanged);
         }

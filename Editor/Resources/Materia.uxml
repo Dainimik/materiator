@@ -1,20 +1,10 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <ui:Label text="Materia" class="title-header">
-        <Style src="Materiator.uss" />
-    </ui:Label>
-    <uie:ObjectField label="Material Data" name="MaterialDataObjectField" allow-scene-objects="false">
-        <Style src="Materiator.uss" />
-    </uie:ObjectField>
-    <ui:TextField picking-mode="Ignore" label="Description" multiline="true" name="DescriptionTextField" style="align-items: flex-start; flex-grow: 1;">
-        <Style src="Materiator.uss" />
-    </ui:TextField>
-    <ui:Button text="Create" name="CreateMateriaButton">
-        <Style src="Materiator.uss" />
-    </ui:Button>
-    <ui:VisualElement name="IMGUIContainer" style="margin-left: 3px; margin-top: 3px; margin-bottom: 3px;">
-        <Style src="Materiator.uss" />
-    </ui:VisualElement>
-    <ui:Button text="Restore Defaults" name="RestoreDefaultsButton">
-        <Style src="Materiator.uss" />
-    </ui:Button>
+    <Style src="Materiator.uss" />
+    <ui:Label text="Materia" class="title-header" />
+    <uie:ObjectField label="Material Data" name="MaterialDataObjectField" allow-scene-objects="false" />
+    <ui:TextField picking-mode="Ignore" label="Description" multiline="true" name="DescriptionTextField" style="align-items: flex-start; flex-grow: 1;" />
+    <ui:Button text="Restore Defaults" name="RestoreDefaultsButton" />
+    <ui:Button text="Create" name="CreateMateriaButton" />
+    <ui:VisualElement name="IMGUIContainer" style="margin-left: 3px; margin-top: 3px; margin-bottom: 3px;" />
+    <ui:Button text="Apply Changes" name="ApplyChangesButton" />
 </ui:UXML>
