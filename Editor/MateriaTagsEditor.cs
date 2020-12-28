@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using UnityEditor;
-using UnityEditorInternal;
-using UnityEngine;
+﻿using UnityEditor;
 using UnityEngine.UIElements;
 
 namespace Materiator
@@ -10,8 +7,6 @@ namespace Materiator
     public class MateriaTagsEditor : MateriatorEditor
     {
         private MateriaTagCollection _materiaTags;
-
-        private ReorderableList _tagsList;
 
         private void OnEnable()
         {
@@ -22,9 +17,6 @@ namespace Materiator
         {
             InitializeEditor<MateriaTagCollection>();
 
-            _tagsList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaTagsList"), true, true, true, true);
-            SetUpTagList();
-
             IMGUIContainer materiaTagsReorderableListContainer = new IMGUIContainer(() => ExecuteIMGUI());
             root.Add(materiaTagsReorderableListContainer);
 
@@ -33,43 +25,7 @@ namespace Materiator
 
         private void ExecuteIMGUI()
         {
-            serializedObject.Update();
-            //_tagsList.DoLayoutList();
-            serializedObject.ApplyModifiedProperties();
-            base.DrawDefaultInspector();
-        }
-
-        private void SetUpTagList()
-        {
-            _tagsList.drawHeaderCallback = (Rect rect) =>
-            {
-                EditorGUI.LabelField(rect, new GUIContent("Tag", "Tag"), EditorStyles.boldLabel);
-            };
-
-            _tagsList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
-            {
-                var element = _tagsList.serializedProperty.GetArrayElementAtIndex(index);
-                Rect r = new Rect(rect.x, rect.y, 150f, 22f);
-
-                EditorGUI.BeginChangeCheck();
-                var value = EditorGUI.TextField(rect, element.stringValue);
-                if (EditorGUI.EndChangeCheck())
-                {
-                    if (!_materiaTags.MateriaTags.Select(t => t.Name).ToList().ConvertAll(s => s.ToLower()).Contains(value.ToLower()))
-                    {
-                        element.stringValue = value;
-                    }
-                    else
-                    {
-                        element.stringValue = "";
-                    }
-                }
-            };
-
-            _tagsList.onAddCallback = (ReorderableList list) =>
-            {
-                _materiaTags.MateriaTags.Add(SystemData.Settings.DefaultTag);
-            };
+            DrawDefaultInspector();
         }
 
         protected override void SetUpView()

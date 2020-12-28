@@ -15,7 +15,6 @@ namespace Materiator
             GenerateAtlasTextures(atlas);
 
             atlas.Textures.SetTexturesToMaterial(atlas.Material);
-
             atlas.Textures.AddTexturesToAsset(atlas);
 
             // AssetDatabase.AddObjectToAsset(atlas.Material, atlas);
