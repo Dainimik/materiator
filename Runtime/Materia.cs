@@ -12,7 +12,7 @@ namespace Materiator
         public MaterialData MaterialData;
 
         [SerializeReference]
-        [ShaderProperty(typeof(MateriatorShaderProperty))]
+        //[ShaderProperty(typeof(MateriatorShaderProperty))]
         public List<MateriatorShaderProperty> Properties = new List<MateriatorShaderProperty>();
 
 #if UNITY_EDITOR

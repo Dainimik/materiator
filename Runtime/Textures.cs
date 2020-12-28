@@ -112,20 +112,19 @@ namespace Materiator
                         {
                             foreach (var value in prop.Values)
                             {
-                                var texColor = colors[tex.Value][i];
                                 switch (value.Channel)
                                 {
                                     case MateriatorShaderPropertyValueChannel.R:
-                                        texColor.r = value.Value;
+                                        colors[tex.Value][i].r = value.Value;
                                         break;
                                     case MateriatorShaderPropertyValueChannel.G:
-                                        texColor.g = value.Value;
+                                        colors[tex.Value][i].g = value.Value;
                                         break;
                                     case MateriatorShaderPropertyValueChannel.B:
-                                        texColor.b = value.Value;
+                                        colors[tex.Value][i].b = value.Value;
                                         break;
                                     case MateriatorShaderPropertyValueChannel.A:
-                                        texColor.a = value.Value;
+                                        colors[tex.Value][i].a = value.Value;
                                         break;
                                     default:
                                         break;
