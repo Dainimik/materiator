@@ -16,6 +16,8 @@ namespace Materiator
 
         private SerializedProperty _shader;
 
+        private Button _updateMateriasButton;
+
         private List<KeyValuePair<int, MateriatorShaderProperty>> _newProperties;
 
         private void OnEnable()
@@ -137,22 +139,66 @@ namespace Materiator
 
                 RemoveOldPropertiesFromMateria(materia);
                 AddNewPropertiesToMateria(materia);
-                UpdateMateriaFloatPropertyDescriptiveNames(materia);
+
+                //UpdateMateriaFloatPropertyDescriptiveNames(materia);
             }
+
+            AssetDatabase.SaveAssets();
         }
 
         private void RemoveOldPropertiesFromMateria(Materia materia)
         {
-            for (var j = 0; j < materia.Properties.Count; j++)
-                for (int k = 0; k < _propertiesToRemove.Count; k++)
-                    if (materia.Properties[j].PropertyName == _propertiesToRemove[k])
-                        materia.Properties.RemoveAt(j);
+            for (int i = 0; i < materia.Properties.Count; i++)
+            {
+                var prop = materia.Properties[i];
+
+                if (_shaderData.MateriatorShaderProperties.Where(p => p.PropertyName == prop.PropertyName).Count() == 0)
+                {
+                    materia.Properties.Remove(prop);
+                }
+
+                for (int j = 0; j < prop.Values.Count; j++)
+                {
+                    var value = prop.Values[j];
+
+                    if (_shaderData.MateriatorShaderProperties.SelectMany(p => p.Values).Where(v => v.PropertyName == value.PropertyName).Count() == 0)
+                    {
+                        prop.Values.Remove(value);
+                    }
+                }
+            }
+            //for (var j = 0; j < materia.Properties.Count; j++)
+            //    for (int k = 0; k < _propertiesToRemove.Count; k++)
+            //       if (materia.Properties[j].PropertyName == _propertiesToRemove[k])
+            //            materia.Properties.RemoveAt(j);
         }
 
         private void AddNewPropertiesToMateria(Materia materia)
         {
-            foreach (var kvp in _newProperties)
-                materia.Properties.Insert(kvp.Key, kvp.Value);
+            for (int i = 0; i < _shaderData.MateriatorShaderProperties.Count; i++)
+            {
+                var prop = _shaderData.MateriatorShaderProperties[i];
+
+                if (materia.Properties.Where(p => p.PropertyName == prop.PropertyName).Count() == 0)
+                {
+                    materia.Properties.Insert(_shaderData.MateriatorShaderProperties.IndexOf(prop), ObjectCopier.Clone(prop));
+                    //materia.Properties.Insert(_shaderData.MateriatorShaderProperties.IndexOf(prop), prop);
+                }
+
+                for (int j = 0; j < prop.Values.Count; j++)
+                {
+                    var value = prop.Values[j];
+                    var materiaPropValues = materia.Properties.Where(p => p.PropertyName == prop.PropertyName).FirstOrDefault().Values;
+
+                    if (materiaPropValues.Where(v => v.PropertyName == value.PropertyName).Count() == 0)
+                    {
+                        materiaPropValues.Insert(_shaderData.MateriatorShaderProperties[i].Values.IndexOf(value), ObjectCopier.Clone(value));
+                    }
+                }
+            }
+
+            //foreach (var kvp in _newProperties)
+            //    materia.Properties.Insert(kvp.Key, kvp.Value);
         }
 
         private void UpdateMateriaFloatPropertyDescriptiveNames(Materia materia)
@@ -186,7 +232,7 @@ namespace Materiator
 
         protected override void RegisterCallbacks()
         {
-            
+            _updateMateriasButton.clicked += UpdateMaterias;
         }
 
         protected override void GetProperties()
@@ -194,6 +240,7 @@ namespace Materiator
             _shader = serializedObject.FindProperty("Shader");
 
             _IMGUIContainer = root.Q<IMGUIContainer>("IMGUIContainer");
+            _updateMateriasButton = root.Q<Button>("UpdateMateriasButton");
         }
 
         protected override void BindProperties()

@@ -96,9 +96,16 @@ namespace Materiator
             var shaderDataProperties = _materia.MaterialData.ShaderData.MateriatorShaderProperties;
 
             _materia.Properties.Clear();
-            _materia.AddProperties(shaderDataProperties);
 
-            AssetDatabase.ForceReserializeAssets(new string[]{ AssetDatabase.GetAssetPath(_materia) });
+            foreach (var prop in shaderDataProperties)
+            {
+                _materia.Properties.Add(ObjectCopier.Clone(prop));
+            }
+
+            //_materia.AddProperties(shaderDataProperties);
+
+            //AssetDatabase.ForceReserializeAssets(new string[]{ AssetDatabase.GetAssetPath(_materia) }, ForceReserializeAssetsOptions.ReserializeAssetsAndMetadata);
+           // AssetDatabase.SaveAssets();
 
             OnValueChanged();
 
