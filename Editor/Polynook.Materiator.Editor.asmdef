@@ -1,5 +1,5 @@
 {
-    "name": "GiriaStudios.Materiator.Editor",
+    "name": "Polynook.Materiator.Editor",
     "rootNamespace": "",
     "references": [
         "GUID:e65b46d419c891043811446eba923324"

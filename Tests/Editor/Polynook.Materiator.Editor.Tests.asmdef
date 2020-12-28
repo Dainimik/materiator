@@ -1,10 +1,11 @@
 {
-    "name": "GiriaStudios.Materiator.Editor.Tests",
+    "name": "Polynook.Materiator.Editor.Tests",
+    "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "GiriaStudios.Materiator",
-        "GiriaStudios.Materiator.Editor"
+        "Polynook.Materiator.Editor",
+        "Polynook.Materiator.Runtime"
     ],
     "includePlatforms": [
         "Editor"
