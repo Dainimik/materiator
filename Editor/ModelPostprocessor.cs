@@ -14,12 +14,12 @@ namespace Materiator
             _modelImporter = assetImporter as ModelImporter;
         }
 
-        void OnPostprocessModel(GameObject g)
+        private void OnPostprocessModel(GameObject g)
         {
             Init();
         }
 
-        void OnPostprocessGameObjectWithUserProperties(GameObject go, string[] names, object[] values)
+        private void OnPostprocessGameObjectWithUserProperties(GameObject go, string[] names, object[] values)
         {
             for (int i = 0; i < names.Length; i++)
             {
@@ -39,13 +39,13 @@ namespace Materiator
 
         private void ProcessMateriatorTag(string value, GameObject go)
         {
-            var mic = CreateFromJSON(value.Remove(0, 1));
+            var info = CreateFromJSON(value.Remove(0, 1));
 
             var ms = go.AddComponent<MateriaSetter>();
             ms.MateriaSetterSlots = new List<MateriaSetterSlot>();
 
             var i = 0;
-            foreach (var data in mic.Data)
+            foreach (var data in info.Data)
             {
                 var name = data.M;
                 var rect = GetRectFromFloatArray(data.R);
@@ -91,17 +91,17 @@ namespace Materiator
             return meshData;
         }
 
-        public static MateriatorInfoCollection CreateFromJSON(string jsonString)
-        {
-            return JsonUtility.FromJson<MateriatorInfoCollection>(jsonString);
-        }
-
         private Rect GetRectFromFloatArray(float[] array)
         {
             if (array.Length != 4)
                 return new Rect();
 
             return new Rect(array[0], array[1], array[2], array[3]);
+        }
+
+        public static MateriatorInfoCollection CreateFromJSON(string jsonString)
+        {
+            return JsonUtility.FromJson<MateriatorInfoCollection>(jsonString);
         }
 
         [System.Serializable]
