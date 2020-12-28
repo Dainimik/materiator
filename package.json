@@ -1,22 +1,19 @@
 {
-    "name": "com.giriastudios.materiator",
-    "version": "0.1.0",
-    "displayName": "Materiator",
-    "description": "",
-    "unity": "2019.1",
-    "unityRelease": "",
-    "dependencies": {
-      
-   },
-   "keywords": [
-      "low poly",
-      "low-poly",
-      "material",
-      "color"
-    ],
-    "author": {
-      "name": "Deimik",
-      "email": "",
-      "url": ""
-    }
+  "name": "com.polynook.materiator",
+  "version": "0.1.0",
+  "displayName": "Materiator",
+  "description": "",
+  "unity": "2019.2",
+  "unityRelease": "",
+  "dependencies": {},
+  "keywords": [
+    "shader",
+    "material",
+    "color"
+  ],
+  "author": {
+    "name": "Polynook",
+    "email": "polynook@polynook.com",
+    "url": "https://polynook.com"
   }
+}
