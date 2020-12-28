@@ -205,7 +205,6 @@ namespace Materiator
         {
             var collection = ScriptableObject.CreateInstance<MateriaTagCollection>();
             collection.name = name;
-            collection.MateriaTags.Add(Settings.DefaultTag);
 
             AssetDatabase.AddObjectToAsset(collection, _settings);
 

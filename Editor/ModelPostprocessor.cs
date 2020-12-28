@@ -54,7 +54,7 @@ namespace Materiator
 
                 var mesh = MeshUtils.GetSharedMesh(go);
                 var tag = materiaTags.Where(tag => tag.name == name).FirstOrDefault();
-                var slot = new MateriaSetterSlot(i, rect, name, tag != null ? tag : SystemData.Settings.DefaultTag);
+                var slot = new MateriaSetterSlot(i, rect, name, tag != null ? tag : null);
 
                 slot.MeshData = GetMeshData(rect, mesh);
 

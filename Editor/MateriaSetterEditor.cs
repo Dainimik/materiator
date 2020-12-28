@@ -109,13 +109,9 @@ namespace Materiator
                 {
                     Undo.RegisterCompleteObjectUndo(MateriaSetter, "Change Materia Tag");
 
-                    if (elementTag == null)
-                        elementTag = SystemData.Settings.DefaultTag;
-                    else
-                        MateriaSetter.MateriaSetterSlots[index].Tag = elementTag;
+                    MateriaSetter.MateriaSetterSlots[index].Tag = elementTag;
 
                     serializedObject.Update();
-
                     serializedObject.ApplyModifiedProperties();
 
                     OnTagChanged?.Invoke();

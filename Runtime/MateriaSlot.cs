@@ -16,9 +16,7 @@ namespace Materiator
                 Materia = SystemData.Settings.DefaultMateria;
             
             if (tag != null)
-                Tag = tag;
-            else
-                Tag = SystemData.Settings.DefaultTag;            
+                Tag = tag;         
         }
     }
 }
