@@ -4,7 +4,6 @@ using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.SceneManagement;
-using System.Linq;
 using UnityEditorInternal;
 using System;
 
@@ -98,6 +97,8 @@ namespace Materiator
 
             _materia.Properties.Clear();
             _materia.AddProperties(shaderDataProperties);
+
+            AssetDatabase.ForceReserializeAssets(new string[]{ AssetDatabase.GetAssetPath(_materia) });
 
             OnValueChanged();
 
