@@ -39,7 +39,9 @@ namespace Materiator
 
         private void ProcessMateriatorTag(string value, GameObject go)
         {
+            var materiaTags = AssetUtils.FindAssets<MateriaTag>();
             var info = CreateFromJSON(value.Remove(0, 1));
+            Debug.Log("TAG " + value + go);
 
             var ms = go.AddComponent<MateriaSetter>();
             ms.MateriaSetterSlots = new List<MateriaSetterSlot>();
@@ -51,7 +53,7 @@ namespace Materiator
                 var rect = GetRectFromFloatArray(data.R);
 
                 var mesh = MeshUtils.GetSharedMesh(go);
-                var tag = SystemData.MateriaTags.MateriaTags.Where(tag => tag.Name == name).FirstOrDefault();
+                var tag = materiaTags.Where(tag => tag.name == name).FirstOrDefault();
                 var slot = new MateriaSetterSlot(i, rect, name, tag != null ? tag : SystemData.Settings.DefaultTag);
 
                 slot.MeshData = GetMeshData(rect, mesh);
@@ -73,7 +75,10 @@ namespace Materiator
             for (int i = 0; i < mesh.uv.Length; i++)
             {
                 var uv = mesh.uv[i];
-                var color = mesh.colors[i];
+                var color = Color.white;
+
+                if (mesh.colors.Length > 0)
+                    color = mesh.colors[i];
 
                 if (rect.Contains(uv))
                 {
