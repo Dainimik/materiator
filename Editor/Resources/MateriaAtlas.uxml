@@ -4,7 +4,13 @@
         <uie:ObjectField label="Material Data" name="MaterialDataObjectField" allow-scene-objects="false" />
         <uie:ObjectField label="Material" name="MaterialObjectField" allow-scene-objects="false" />
     </ui:VisualElement>
+    <ui:VisualElement name="Space" style="height: 10px;" />
+    <ui:VisualElement name="TextureSettingsSection">
+        <uie:PropertyField name="Format" label="Format" />
+        <uie:PropertyField name="FilterMode" label="Filter Mode" />
+    </ui:VisualElement>
     <ui:IMGUIContainer name="IMGUIContainer" />
+    <ui:VisualElement name="Space" style="height: 100px;" />
     <ui:VisualElement name="OutputSectionContainer" class="section-container">
         <ui:Label text="Output" class="section-header" />
         <ui:VisualElement name="OutputIndicator" class="status-indicator" />
