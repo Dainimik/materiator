@@ -13,9 +13,7 @@ namespace Materiator
     {
         public string Name;
         public string PropertyName;
-#if UNITY_EDITOR
         public ShaderPropertyType Type;
-#endif
         public List<MateriatorShaderPropertyValue> Values;
 
         public MateriatorShaderProperty(string name, string propertyName, ShaderPropertyType type, List<MateriatorShaderPropertyValue> values)

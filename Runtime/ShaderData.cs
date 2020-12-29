@@ -15,8 +15,6 @@ namespace Materiator
         public bool IsEditable = true;
     }
 
-#if UNITY_EDITOR
-
     public enum ShaderPropertyType
     {
         Float,
@@ -46,5 +44,4 @@ namespace Materiator
             Range = range;
         }
     }
-#endif
 }
