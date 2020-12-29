@@ -30,6 +30,8 @@ namespace Materiator
 
             foreach (var slot in MateriaSetterSlots)
             {
+                if (slot.Tag == null) continue;
+
                 if (atlas.AtlasItems.ContainsKey(slot.Tag))
                 {
                     var destRect = atlas.AtlasItems[slot.Tag].Rect;
