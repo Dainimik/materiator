@@ -41,6 +41,8 @@ namespace Materiator
                     slot.Materia = atlas.AtlasItems[slot.Tag].MateriaSlot.Materia;
                 }
             }
+
+            MateriaAtlas = atlas;
         }
 
         public void SetVertexColor(MateriaTag tag, Color color, bool replace = false)

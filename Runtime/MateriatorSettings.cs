@@ -21,6 +21,7 @@ namespace Materiator
         public MaterialData DefaultMaterialData;
         public ShaderData DefaultShaderData;
         public Materia DefaultMateria;
+        public MateriaAtlas DefaultAtlas;
 
         public bool PackAssets;
 
