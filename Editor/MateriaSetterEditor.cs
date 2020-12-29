@@ -32,14 +32,14 @@ namespace Materiator
             {
                 AtlasSection = new AtlasSection(this);
 
-                //DrawDefaultGUI();
+                DrawDefaultGUI();
             }
         }
 
         private void DrawDefaultGUI()
         {
             IMGUIContainer defaultInspector = new IMGUIContainer(() => DrawDefaultInspector());
-            root.Add(defaultInspector);
+            //root.Add(defaultInspector);
 
             DrawIMGUI();
         }
