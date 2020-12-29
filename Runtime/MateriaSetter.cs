@@ -34,8 +34,7 @@ namespace Materiator
                     var destRect = atlas.AtlasItems[slot.Tag].Rect;
                     if (slot.Rect != destRect)
                     {
-                        MeshUtils.ShiftUVs(slot.MeshData, slot.Rect, destRect);
-
+                        MeshUtils.ShiftUVs(slot.MeshData, destRect);
                         slot.Rect.Set(destRect.x, destRect.y, destRect.width, destRect.height);
                     }
 

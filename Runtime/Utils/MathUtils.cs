@@ -4,6 +4,16 @@ namespace Materiator
 {
     public static class MathUtils
     {
+        public static Vector2 Transform2DCoord(Vector2 coord, Rect destRect)
+        {
+            coord.x = destRect.x + (coord.x * destRect.width);
+            coord.y = destRect.y + (coord.y * destRect.height);
+
+            return coord;
+        }
+
+
+
         /// <summary>
         /// Returns Rects with percent-based position and size values that are relative to the offset Rect.
         /// </summary>

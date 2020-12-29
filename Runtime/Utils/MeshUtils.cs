@@ -4,7 +4,7 @@ namespace Materiator
 {
     public static class MeshUtils
     {
-        public static void ShiftUVs(MeshData meshData, Rect sourceRect, Rect destRect)
+        public static void ShiftUVs(MeshData meshData, Rect destRect)
         {
             var mesh = meshData.Mesh;
             var uvs = new Vector2[mesh.uv.Length];
@@ -15,23 +15,8 @@ namespace Materiator
                 var index = meshData.Indices[i];
                 var uv = meshData.UVs[i];
 
-                var widthMultiplier = 1f;
-                var heightMultiplier = 1f;
-
-                if (sourceRect.width != destRect.width)
-                    widthMultiplier = destRect.width;
-
-                if (sourceRect.height != destRect.height)
-                    heightMultiplier = destRect.height;
-
-                var xShift = destRect.x - sourceRect.x;
-                var yShift = destRect.y - sourceRect.y;
-
-                uv.x = uv.x * widthMultiplier + xShift;
-                uv.y = uv.y * heightMultiplier + yShift;
-
-                uvs[index] = uv;
-                meshData.UVs[i] = uv;
+                uvs[index] = MathUtils.Transform2DCoord(uv, destRect);
+                //meshData.UVs[i] = uv;
             }
 
             mesh.uv = uvs;
