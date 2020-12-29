@@ -82,6 +82,7 @@ namespace Materiator
             var mf = GetComponent<MeshFilter>();
             var smr = GetComponent<SkinnedMeshRenderer>();
 
+            // TODO: This check is mostly for editor so move it to editor class
             if (smr != null)
             {
                 if (MateriaSetterSlots.Count != 0)
