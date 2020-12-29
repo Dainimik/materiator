@@ -19,6 +19,7 @@ namespace Materiator
         public void Initialize()
         {
             SetUpMesh();
+            LoadAtlas(MateriaAtlas);
         }
 
         public void LoadAtlas(MateriaAtlas atlas)
