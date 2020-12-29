@@ -62,6 +62,9 @@ namespace Materiator
 
                 i++;
             }
+            
+            if (ms.MateriaAtlas == null)
+                ms.MateriaAtlas = SystemData.Settings.DefaultAtlas;
         }
 
         private MeshData GetMeshData(Rect rect, Mesh mesh)
