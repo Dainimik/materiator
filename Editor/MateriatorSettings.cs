@@ -1,6 +1,4 @@
-﻿#if UNITY_EDITOR
-using UnityEditor;
-#endif
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace Materiator
@@ -24,13 +22,6 @@ namespace Materiator
         public MateriaAtlas DefaultAtlas;
 
         public bool PackAssets;
-
-        [HideInInspector]
-        public MateriaTagCollection MateriaTags;
-
-        [Header("Texture Settings")]
-        public TextureFormat TextureFormat = TextureFormat.RGBAHalf;
-        public FilterMode FilterMode;
 
         [HideInInspector]
         public readonly Rect UVRect = new Rect(0f, 0f, 1f, 1f);

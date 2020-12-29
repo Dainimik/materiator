@@ -1,9 +1,7 @@
-﻿#if UNITY_EDITOR
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
-#endif
 using UnityEngine;
 
 namespace Materiator
@@ -11,7 +9,6 @@ namespace Materiator
     public class SystemData
     {
         public static MateriatorSettings Settings { get { return LoadSettings(); } }
-        public static MateriaTagCollection MateriaTags = Settings.MateriaTags;
 
         [SerializeField] private static MateriatorSettings _settings { get; set; }
 
@@ -21,15 +18,12 @@ namespace Materiator
             {
                 _settings = Resources.Load<MateriatorSettings>("MateriatorSettings");
 
-#if UNITY_EDITOR
                 if (_settings == null) CreateDefaultSettingsData();
-#endif
             }
 
             return _settings;
         }
 
-#if UNITY_EDITOR
         private static void CreateDefaultSettingsData()
         {
             if (!Directory.Exists("Assets/Materiator"))
@@ -62,7 +56,6 @@ namespace Materiator
 
             _settings.DefaultMaterialData = CreateDefaultMaterialData("DefaultMaterialData");
             _settings.DefaultMateria = CreateDefaultMateria("DefaultMateria");
-            _settings.MateriaTags = CreateDefaultTagCollection("MateriaTags");
 
             AssetDatabase.SaveAssets();
         }
@@ -200,16 +193,5 @@ namespace Materiator
 
             return materialData;
         }
-
-        private static MateriaTagCollection CreateDefaultTagCollection(string name)
-        {
-            var collection = ScriptableObject.CreateInstance<MateriaTagCollection>();
-            collection.name = name;
-
-            AssetDatabase.AddObjectToAsset(collection, _settings);
-
-            return collection;
-        }
-#endif
     }
 }

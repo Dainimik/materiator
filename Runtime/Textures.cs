@@ -17,7 +17,14 @@ namespace Materiator
 
         public int ID;
 
-        public FilterMode FilterMode { get; private set; }
+        public TextureFormat Format;
+        public FilterMode FilterMode;
+
+        public Textures(TextureFormat format = TextureFormat.RGBA32, FilterMode filterMode = FilterMode.Bilinear)
+        {
+            Format = format;
+            FilterMode = filterMode;
+        }
                                       
         public string[] Names
         {
@@ -55,21 +62,19 @@ namespace Materiator
 
         public void CreateTextures(List<MateriatorShaderProperty> props, int width, int height, bool temporary = false)
         {
-            FilterMode = SystemData.Settings.FilterMode;
-
             for (int i = 0; i < props.Count; i++)
             {
                 var name = props[i].PropertyName;
 
                 if (!Texs.ContainsKey(props[i].PropertyName))
                 {
-                    Texs.Add(props[i].PropertyName, CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode, name, temporary));
+                    Texs.Add(props[i].PropertyName, CreateTexture2D(width, height, Format, FilterMode, name, temporary));
                 }
                 else
                 {
                     if (Texs[props[i].PropertyName] == null || (Size.x != width || Size.y != height))
                     {
-                        Texs[props[i].PropertyName] = CreateTexture2D(width, height, SystemData.Settings.TextureFormat, FilterMode, name, temporary);
+                        Texs[props[i].PropertyName] = CreateTexture2D(width, height, Format, FilterMode, name, temporary);
                     }
                 }
             }
@@ -214,7 +219,7 @@ namespace Materiator
         public Textures WriteTexturesToDisk(string dirName)
         {
             foreach (var tex in Texs)
-                WriteTextureToDisk(tex.Value, dirName + tex.Value.name + ".png", SystemData.Settings.FilterMode);
+                WriteTextureToDisk(tex.Value, dirName + tex.Value.name + ".png", FilterMode);
 
             return this;
         }

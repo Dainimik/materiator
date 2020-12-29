@@ -6,12 +6,6 @@ namespace Materiator
     {
         private const string MENU_NAME = "Tools/Materiator/";
 
-        [MenuItem(MENU_NAME + "Tag Editor")]
-        private static void TagEditor()
-        {
-            MateriaTagsWindow.OpenWindow();
-        }
-
         [MenuItem(MENU_NAME + "Settings")]
         private static void Settings()
         {

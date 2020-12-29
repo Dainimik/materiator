@@ -35,7 +35,7 @@ namespace Materiator
             InitializeEditor<MateriaAtlas>();
 
             IMGUIContainer defaultInspector = new IMGUIContainer(() => DrawDefaultInspector());
-            //IMGUIContainer.Add(defaultInspector);
+            IMGUIContainer.Add(defaultInspector);
 
             MateriaSection = new MateriaSection(this, "MateriaSlots");
 
@@ -79,10 +79,10 @@ namespace Materiator
             _materialObjectField.objectType = typeof(Material);
             _materialObjectField.BindProperty(_material);
 
-            _formatPropertyField = root.Q<PropertyField>("Format");
-            _formatPropertyField.BindProperty(_format);
+            _formatPropertyField = root.Q<PropertyField>("FormatPropertyField");
+            //_formatPropertyField.BindProperty(_format);
 
-            _filterModePropertyField = root.Q<PropertyField>("FilterMode");
+            _filterModePropertyField = root.Q<PropertyField>("FilterModePropertyField");
             _filterModePropertyField.BindProperty(_filterMode);
 
         }

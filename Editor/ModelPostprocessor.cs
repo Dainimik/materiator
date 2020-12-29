@@ -62,9 +62,10 @@ namespace Materiator
 
                 i++;
             }
-            
-            if (ms.MateriaAtlas == null)
-                ms.MateriaAtlas = SystemData.Settings.DefaultAtlas;
+
+            var defaultAtlas = SystemData.Settings.DefaultAtlas;
+            if (ms.MateriaAtlas == null && defaultAtlas != null)
+                ms.MateriaAtlas = defaultAtlas;
         }
 
         private MeshData GetMeshData(Rect rect, Mesh mesh)

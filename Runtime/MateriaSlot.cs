@@ -10,13 +10,8 @@ namespace Materiator
 
         public MateriaSlot(Materia materia = null, MateriaTag tag = null)
         {
-            if (materia != null)
-                Materia = materia;
-            else
-                Materia = SystemData.Settings.DefaultMateria;
-            
-            if (tag != null)
-                Tag = tag;         
+            Materia = materia;
+            Tag = tag;         
         }
     }
 }
