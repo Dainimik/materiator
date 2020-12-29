@@ -41,7 +41,6 @@ namespace Materiator
         {
             var materiaTags = AssetUtils.FindAssets<MateriaTag>();
             var info = CreateFromJSON(value.Remove(0, 1));
-            Debug.Log("TAG " + value + go);
 
             var ms = go.AddComponent<MateriaSetter>();
             ms.MateriaSetterSlots = new List<MateriaSetterSlot>();
