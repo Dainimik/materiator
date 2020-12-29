@@ -32,7 +32,7 @@ namespace Materiator
             {
                 AtlasSection = new AtlasSection(this);
 
-                DrawDefaultGUI();
+                //DrawDefaultGUI();
             }
         }
 
