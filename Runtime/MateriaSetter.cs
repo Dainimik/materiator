@@ -11,18 +11,22 @@ namespace Materiator
         public MateriaAtlas MateriaAtlas;
         public List<MateriaSetterSlot> MateriaSetterSlots;
 
+        public Mesh Mesh;
+
         private void Awake()
         {
             Initialize();
+
+            SetUpMesh();
+            LoadAtlas(MateriaAtlas, Mesh);
         }
 
         public void Initialize()
         {
-            SetUpMesh();
-            LoadAtlas(MateriaAtlas);
+            Renderer = GetComponent<Renderer>();
         }
 
-        public void LoadAtlas(MateriaAtlas atlas)
+        public void LoadAtlas(MateriaAtlas atlas, Mesh mesh)
         {
             if (atlas == null || Renderer == null) return;
 
@@ -37,7 +41,7 @@ namespace Materiator
                     var destRect = atlas.AtlasItems[slot.Tag].Rect;
                     if (slot.Rect != destRect)
                     {
-                        MeshUtils.ShiftUVs(slot.MeshData, destRect);
+                        MeshUtils.ShiftUVs(mesh, slot.MeshData, destRect);
                         slot.Rect.Set(destRect.x, destRect.y, destRect.width, destRect.height);
                     }
 
@@ -51,13 +55,19 @@ namespace Materiator
         public void SetVertexColor(MateriaTag tag, Color color, bool replace = false)
         {
             var meshData = GetMateriaSetterSlotFromTag(tag).MeshData;
-            MeshUtils.SetVertexColor(meshData, color, replace);
+            MeshUtils.SetVertexColor(Mesh, meshData, color, replace);
         }
 
         public void SetVertexColor(string slotName, Color color, bool replace = false)
         {
             var meshData = GetMateriaSetterSlotFromName(slotName).MeshData;
-            MeshUtils.SetVertexColor(meshData, color, replace);
+            MeshUtils.SetVertexColor(Mesh, meshData, color, replace);
+        }
+
+        private void SetUpMesh()
+        {
+            Mesh = MeshUtils.CopyMesh(Mesh);
+            MeshUtils.SetSharedMesh(Mesh, gameObject);
         }
 
         private MateriaSetterSlot GetMateriaSetterSlotFromTag(MateriaTag tag)
@@ -76,36 +86,6 @@ namespace Materiator
                     return item;
 
             return null;
-        }
-
-        private void SetUpMesh()
-        {
-            Renderer = GetComponent<Renderer>();
-
-            var mf = GetComponent<MeshFilter>();
-            var smr = GetComponent<SkinnedMeshRenderer>();
-
-            // TODO: This check is mostly for editor so move it to editor class
-            if (smr != null)
-            {
-                if (MateriaSetterSlots.Count != 0)
-                {
-                    if (smr.sharedMesh != MateriaSetterSlots[0].MeshData.Mesh)
-                    {
-                        smr.sharedMesh = MateriaSetterSlots[0].MeshData.Mesh;
-                    }
-                }
-            }
-            else if (mf != null)
-            {
-                if (MateriaSetterSlots.Count > 0)
-                {
-                    if (mf.sharedMesh != MateriaSetterSlots[0].MeshData.Mesh)
-                    {
-                        mf.sharedMesh = MateriaSetterSlots[0].MeshData.Mesh;
-                    }
-                }
-            }
         }
     }
 }

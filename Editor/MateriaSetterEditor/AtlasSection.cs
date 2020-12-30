@@ -28,22 +28,22 @@ namespace Materiator
             OnMateriaAtlasChanged(_materiaAtlas.objectReferenceValue as MateriaAtlas);
         }
 
+        private void OnMateriaAtlasChanged(MateriaAtlas atlas = null)
+        {
+            _materiaAtlas.objectReferenceValue = atlas;
+            _editor.serializedObject.ApplyModifiedProperties();
+
+            _editor.MateriaSetter.LoadAtlas(atlas, _editor.InstanceMesh);
+
+            UpdateIndicator();
+        }
+
         private void UpdateIndicator()
         {
             if (_materiaSetter.MateriaAtlas != null)
                 _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIGreen;
             else
                 _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
-        }
-
-        private void OnMateriaAtlasChanged(MateriaAtlas atlas = null)
-        {
-            _materiaAtlas.objectReferenceValue = atlas;
-            _editor.serializedObject.ApplyModifiedProperties();
-
-            _editor.MateriaSetter.LoadAtlas(atlas);
-
-            UpdateIndicator();
         }
 
         private void GetProperties()

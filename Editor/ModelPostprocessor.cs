@@ -7,18 +7,6 @@ namespace Materiator
 {
     public class ModelPostprocessor : AssetPostprocessor
     {
-        private ModelImporter _modelImporter;
-
-        private void Init()
-        {
-            _modelImporter = assetImporter as ModelImporter;
-        }
-
-        private void OnPostprocessModel(GameObject g)
-        {
-            Init();
-        }
-
         private void OnPostprocessGameObjectWithUserProperties(GameObject go, string[] names, object[] values)
         {
             for (int i = 0; i < names.Length; i++)
@@ -44,6 +32,7 @@ namespace Materiator
 
             var ms = go.AddComponent<MateriaSetter>();
             ms.MateriaSetterSlots = new List<MateriaSetterSlot>();
+            ms.Mesh = MeshUtils.GetSharedMesh(go);
 
             var i = 0;
             foreach (var data in info.Data)
@@ -51,11 +40,10 @@ namespace Materiator
                 var name = data.M;
                 var rect = GetRectFromFloatArray(data.R);
 
-                var mesh = MeshUtils.GetSharedMesh(go);
                 var tag = materiaTags.Where(tag => tag.name == name).FirstOrDefault();
                 var slot = new MateriaSetterSlot(i, rect, name, tag != null ? tag : null);
 
-                slot.MeshData = GetMeshData(rect, mesh);
+                slot.MeshData = GetMeshData(rect, ms.Mesh);
 
                 ms.MateriaSetterSlots.Add(slot);
 

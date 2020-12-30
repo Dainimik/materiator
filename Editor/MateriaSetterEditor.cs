@@ -18,7 +18,9 @@ namespace Materiator
 
         public VisualElement Root;
         private VisualElement _IMGUIContainer;
-        private Button _reloadButton;
+
+        public Mesh OriginalMesh;
+        public Mesh InstanceMesh;
 
         private void OnEnable()
         {
@@ -39,7 +41,7 @@ namespace Materiator
         private void DrawDefaultGUI()
         {
             IMGUIContainer defaultInspector = new IMGUIContainer(() => DrawDefaultInspector());
-            //root.Add(defaultInspector);
+            root.Add(defaultInspector);
 
             DrawIMGUI();
         }
@@ -54,6 +56,10 @@ namespace Materiator
             if (SystemChecker.CheckAllSystems(this))
             {
                 MateriaSetter.Initialize();
+                SetUpMeshes();
+
+                if (MateriaSetter.MateriaAtlas != null)
+                    MateriaSetter.LoadAtlas(MateriaSetter.MateriaAtlas, InstanceMesh);
 
                 Root = root;
 
@@ -65,9 +71,16 @@ namespace Materiator
             }
         }
 
-        private void Refresh()
+        private void OnDisable()
         {
-            MateriaSetter.Initialize();           
+            DestroyImmediate(InstanceMesh);
+        }
+
+        private void SetUpMeshes()
+        {
+            OriginalMesh = MateriaSetter.Mesh;
+            InstanceMesh = MeshUtils.CopyMesh(MateriaSetter.Mesh);
+            InstanceMesh.hideFlags = HideFlags.HideAndDontSave;
         }
 
         private void DrawIMGUI()
@@ -76,6 +89,9 @@ namespace Materiator
             DrawMateriaReorderableList();
             IMGUIContainer materiaReorderableList = new IMGUIContainer(() => MateriaReorderableList());
             _IMGUIContainer.Add(materiaReorderableList);
+
+            IMGUIContainer preview = new IMGUIContainer(() => HandlePreview());
+            _IMGUIContainer.Add(preview);
         }
 
         private void MateriaReorderableList()
@@ -125,7 +141,6 @@ namespace Materiator
 
         protected override void GetProperties()
         {
-            _reloadButton = root.Q<Button>("ReloadButton");
             _IMGUIContainer = root.Q<VisualElement>("IMGUIContainer");
         }
 
@@ -141,7 +156,21 @@ namespace Materiator
 
         protected override void RegisterCallbacks()
         {
-            _reloadButton.clicked += Refresh;
+            //
+        }
+
+        private void HandlePreview()
+        {
+            if (GUILayout.RepeatButton(new GUIContent("Preview")))
+            {
+                MeshUtils.SetSharedMesh(InstanceMesh, MateriaSetter.gameObject);
+                MateriaSetter.Mesh = InstanceMesh;
+            }
+            else
+            {
+                MeshUtils.SetSharedMesh(OriginalMesh, MateriaSetter.gameObject);
+                MateriaSetter.Mesh = OriginalMesh;
+            }
         }
     }
 }
