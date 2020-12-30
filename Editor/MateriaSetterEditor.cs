@@ -73,7 +73,8 @@ namespace Materiator
 
         private void OnDisable()
         {
-            DestroyImmediate(InstanceMesh);
+            if (!Application.isPlaying)
+                DestroyImmediate(InstanceMesh);
         }
 
         private void SetUpMeshes()
