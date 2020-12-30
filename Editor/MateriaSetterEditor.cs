@@ -79,8 +79,14 @@ namespace Materiator
         private void SetUpMeshes()
         {
             OriginalMesh = MateriaSetter.Mesh;
-            InstanceMesh = MeshUtils.CopyMesh(MateriaSetter.Mesh);
-            InstanceMesh.hideFlags = HideFlags.HideAndDontSave;
+            InstanceMesh = OriginalMesh;
+
+            if (!Application.isPlaying)
+            {
+                InstanceMesh = MeshUtils.CopyMesh(MateriaSetter.Mesh);
+                InstanceMesh.hideFlags = HideFlags.HideAndDontSave;
+            }
+            
         }
 
         private void DrawIMGUI()
