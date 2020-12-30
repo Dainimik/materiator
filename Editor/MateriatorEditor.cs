@@ -27,11 +27,6 @@ namespace Materiator
             SetUpView();
         }
 
-        protected virtual void OnDisable()
-        {
-            //UnregisterCallbacks();
-        }
-
         protected abstract void SetUpView();
 
         protected abstract void GetProperties();
@@ -39,7 +34,5 @@ namespace Materiator
         protected abstract void BindProperties();
 
         protected abstract void RegisterCallbacks();
-
-        //protected abstract void UnregisterCallbacks();
     }
 }

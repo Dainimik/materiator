@@ -100,7 +100,7 @@ namespace Materiator
 
         public void UpdateColors(Rect rect, List<MateriatorShaderProperty> shaderProperties)
         {
-            var rectInt = Utils.GetRectIntFromRect(Size, rect);
+            var rectInt = MathUtils.GetRectIntFromRect(Size, rect);
             var numberOfColors = rectInt.width * rectInt.height;
 
             var colors = new Dictionary<Texture2D, Color[]>();

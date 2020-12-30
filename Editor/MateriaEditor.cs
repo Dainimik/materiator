@@ -41,10 +41,8 @@ namespace Materiator
             UpdatePreview();
         }
 
-        protected override void OnDisable()
+        private void OnDisable()
         {
-            base.OnDisable();
-
             _previewRenderUtility?.Cleanup();
         }
 

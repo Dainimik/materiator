@@ -25,6 +25,24 @@ namespace Materiator
             editor.MateriaSetter.gameObject.AddComponent<SkinnedMeshRenderer>();
         }
 
+        public static void RevertToOriginalMesh(MateriaSetterEditor editor)
+        {
+            var originalMesh = editor.MateriaSetter.MateriaSetterSlots[0].MeshData.Mesh;
+            var mf = editor.MateriaSetter.gameObject.GetComponent<MeshFilter>();
+            if (mf != null)
+            {
+                mf.sharedMesh = originalMesh;
+            }
+            else
+            {
+                var smr = editor.MateriaSetter.gameObject.GetComponent<SkinnedMeshRenderer>();
+                if (smr != null)
+                {
+                    smr.sharedMesh = originalMesh;
+                }
+            }
+        }
+
         public static void OpenPrefab(MateriaSetterEditor editor)
         {
             AssetDatabase.OpenAsset(editor.MateriaSetter.gameObject);

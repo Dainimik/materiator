@@ -74,6 +74,18 @@ namespace Materiator
                         [ContextActions.AddMeshRenderer] = "Add Mesh Renderer"
                     });
             }
+            /*else if (!Application.isPlaying
+                && (mf != null && m != materiaSetter.MateriaSetterSlots[0].MeshData.Mesh)
+                || (smr != null && sm != materiaSetter.MateriaSetterSlots[0].MeshData.Mesh))
+            {
+                return ErrorMessage(
+                    editor,
+                    "Current mesh is different than this object was originally imported with.",
+                    new Dictionary<ContextAction, string>
+                    {
+                        [ContextActions.RevertToOriginalMesh] = "Revert to Original Mesh"
+                    });
+            }*/
             else if (PrefabUtility.IsPartOfPrefabAsset(materiaSetter) && !PrefabStageUtility.GetCurrentPrefabStage()) // This is here because switching edit mode in project view prefab causes bugs
             {
                 return ErrorMessage(
