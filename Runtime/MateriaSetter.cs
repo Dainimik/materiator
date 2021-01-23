@@ -39,11 +39,18 @@ namespace Materiator
                 if (atlas.AtlasItems.ContainsKey(slot.Tag))
                 {
                     var destRect = atlas.AtlasItems[slot.Tag].Rect;
-                    if (slot.Rect != destRect)
-                    {
-                        MeshUtils.ShiftUVs(mesh, slot.MeshData, destRect);
-                        slot.Rect.Set(destRect.x, destRect.y, destRect.width, destRect.height);
-                    }
+
+                    /*
+                     * Optimization can be made here to only shift the UVs if (slot.Rect != destRect).
+                     * However, when implemenmted this way, slot.Rect refers to the MateriaSetterSlot
+                     * rect value which is set when loading an atlas and not the rect value of the actual
+                     * UVs of the mesh. Threfore, if we load an atlas in the editor, rect values
+                     * are set and when we enter play mode, (slot.Rect == destRect) returns true and
+                     * the UVs are not shifted.
+                     * */
+
+                    MeshUtils.ShiftUVs(mesh, slot.MeshData, destRect);
+                    slot.Rect.Set(destRect.x, destRect.y, destRect.width, destRect.height);
 
                     slot.Materia = atlas.AtlasItems[slot.Tag].MateriaSlot.Materia;
                 }
