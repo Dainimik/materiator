@@ -24,8 +24,8 @@ namespace Materiator
             GetProperties();
             BindProperties();
             RegisterCallbacks();
-            
-            OnMateriaAtlasChanged(_materiaAtlas.objectReferenceValue as MateriaAtlas);
+
+            UpdateIndicator();
         }
 
         private void OnMateriaAtlasChanged(MateriaAtlas atlas = null)
@@ -41,9 +41,20 @@ namespace Materiator
         private void UpdateIndicator()
         {
             if (_materiaSetter.MateriaAtlas != null)
-                _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIGreen;
+            {
+                if (_materiaSetter.MateriaAtlas.Material == _materiaSetter.Renderer.sharedMaterial)
+                {
+                    _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIGreen;
+                }
+                else
+                {
+                    _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
+                }
+            }
             else
-                _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIRed;
+            {
+                _atlasIndicator.style.backgroundColor = SystemData.Settings.GUIGray;
+            }  
         }
 
         private void GetProperties()

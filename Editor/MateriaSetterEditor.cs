@@ -58,9 +58,6 @@ namespace Materiator
                 MateriaSetter.Initialize();
                 SetUpMeshes();
 
-                if (MateriaSetter.MateriaAtlas != null)
-                    MateriaSetter.LoadAtlas(MateriaSetter.MateriaAtlas, InstanceMesh);
-
                 Root = root;
 
                 return true;
