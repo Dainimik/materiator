@@ -18,7 +18,7 @@ namespace Materiator
             Initialize();
 
             SetUpMesh();
-            LoadAtlas(MateriaAtlas, Mesh);
+            ExecuteAtlas();
         }
 
         public void Initialize()
@@ -26,11 +26,49 @@ namespace Materiator
             Renderer = GetComponent<Renderer>();
         }
 
+        public void ExecuteAtlas(MateriaAtlas atlas = null, Mesh mesh = null)
+        {
+            if (atlas != null && mesh != null)
+            {
+                ShiftUVs(atlas, mesh);
+            }
+            else
+            {
+                ShiftUVs(MateriaAtlas, Mesh);
+            }
+        }
+
         public void LoadAtlas(MateriaAtlas atlas, Mesh mesh)
         {
-            if (atlas == null || Renderer == null) return;
+            if (Renderer == null) return;
 
             Renderer.sharedMaterial = atlas.Material;
+
+            ExecuteAtlas(atlas, mesh);
+
+            MateriaAtlas = atlas;
+        }
+
+        public void LoadAtlas()
+        {
+            LoadAtlas(MateriaAtlas, Mesh);
+        }
+
+        public void SetVertexColor(MateriaTag tag, Color color, bool replace = false)
+        {
+            var meshData = GetMateriaSetterSlotFromTag(tag).MeshData;
+            MeshUtils.SetVertexColor(Mesh, meshData, color, replace);
+        }
+
+        public void SetVertexColor(string slotName, Color color, bool replace = false)
+        {
+            var meshData = GetMateriaSetterSlotFromName(slotName).MeshData;
+            MeshUtils.SetVertexColor(Mesh, meshData, color, replace);
+        }
+
+        private void ShiftUVs(MateriaAtlas atlas, Mesh mesh)
+        {
+            if (atlas == null) return;
 
             foreach (var slot in MateriaSetterSlots)
             {
@@ -55,25 +93,6 @@ namespace Materiator
                     slot.Materia = atlas.AtlasItems[slot.Tag].MateriaSlot.Materia;
                 }
             }
-
-            MateriaAtlas = atlas;
-        }
-
-        public void LoadAtlas()
-        {
-            LoadAtlas(MateriaAtlas, Mesh);
-        }
-
-        public void SetVertexColor(MateriaTag tag, Color color, bool replace = false)
-        {
-            var meshData = GetMateriaSetterSlotFromTag(tag).MeshData;
-            MeshUtils.SetVertexColor(Mesh, meshData, color, replace);
-        }
-
-        public void SetVertexColor(string slotName, Color color, bool replace = false)
-        {
-            var meshData = GetMateriaSetterSlotFromName(slotName).MeshData;
-            MeshUtils.SetVertexColor(Mesh, meshData, color, replace);
         }
 
         private void SetUpMesh()
