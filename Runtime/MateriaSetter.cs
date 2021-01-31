@@ -59,6 +59,11 @@ namespace Materiator
             MateriaAtlas = atlas;
         }
 
+        public void LoadAtlas()
+        {
+            LoadAtlas(MateriaAtlas, Mesh);
+        }
+
         public void SetVertexColor(MateriaTag tag, Color color, bool replace = false)
         {
             var meshData = GetMateriaSetterSlotFromTag(tag).MeshData;
