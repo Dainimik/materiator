@@ -23,6 +23,13 @@ namespace Materiator
         public static void SetVertexColor(Mesh mesh, MeshData meshData, Color color, bool replace = false)
         {
             var colors = new Color[mesh.colors.Length];
+
+            if (colors.Length == 0)
+            {
+                Debug.LogWarning("You're trying to set vertex colors on a mesh that does not have any vertex colors.", mesh);
+                return;
+            }
+
             mesh.colors.CopyTo(colors, 0);
 
             for (int i = 0; i < meshData.Indices.Length; i++)
