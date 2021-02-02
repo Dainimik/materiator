@@ -30,8 +30,9 @@ namespace Materiator
 
             foreach (var texture in atlas.Textures.Texs.ToArray())
             {
-                var newTex = new Texture2D(8192, 8192);
+                var newTex = new Texture2D(8192, 8192, atlas.Textures.Format, false);
                 newTex.filterMode = atlas.FilterMode;
+                newTex.name = texture.Key;
 
                 var atlasItemTextures = atlas.AtlasItems.Values.SelectMany(item => item.Textures.Texs.Where(tex => tex.Key == texture.Key)).Select(pairs => pairs.Value).ToArray();
                 var rects = newTex.PackTextures(atlasItemTextures, 0, 8192, false);

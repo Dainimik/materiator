@@ -20,7 +20,7 @@ namespace Materiator
         public TextureFormat Format;
         public FilterMode FilterMode;
 
-        public Textures(TextureFormat format = TextureFormat.RGBA32, FilterMode filterMode = FilterMode.Bilinear)
+        public Textures(TextureFormat format = TextureFormat.RGBAFloat, FilterMode filterMode = FilterMode.Bilinear)
         {
             Format = format;
             FilterMode = filterMode;
@@ -68,13 +68,13 @@ namespace Materiator
 
                 if (!Texs.ContainsKey(props[i].PropertyName))
                 {
-                    Texs.Add(props[i].PropertyName, CreateTexture2D(width, height, Format, FilterMode, name, temporary));
+                    Texs.Add(name, CreateTexture2D(width, height, Format, FilterMode, name, temporary));
                 }
                 else
                 {
-                    if (Texs[props[i].PropertyName] == null || (Size.x != width || Size.y != height))
+                    if (Texs[name] == null || (Size.x != width || Size.y != height))
                     {
-                        Texs[props[i].PropertyName] = CreateTexture2D(width, height, Format, FilterMode, name, temporary);
+                        Texs[name] = CreateTexture2D(width, height, Format, FilterMode, name, temporary);
                     }
                 }
             }
