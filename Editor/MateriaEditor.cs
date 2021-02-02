@@ -109,6 +109,8 @@ namespace Materiator
 
         private void UpdateMateriaAtlases()
         {
+            EditorUtility.SetDirty(_materia);
+
             var atlases = AssetUtils.FindAssets<MateriaAtlas>();
 
             foreach (var atlas in atlases)

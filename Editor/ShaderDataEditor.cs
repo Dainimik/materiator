@@ -140,6 +140,7 @@ namespace Materiator
                 RemoveOldPropertiesFromMateria(materia);
                 AddNewPropertiesToMateria(materia);
 
+                EditorUtility.SetDirty(materia);
                 //UpdateMateriaFloatPropertyDescriptiveNames(materia);
             }
 
