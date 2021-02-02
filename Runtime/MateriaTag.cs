@@ -3,8 +3,5 @@
 namespace Materiator
 {
     [CreateAssetMenu(menuName = "Materiator/Materia Tag", fileName = "MateriaTag")]
-    public class MateriaTag: MateriatorScriptableObject
-    {
-        public string Description;
-    }
+    public class MateriaTag: MateriatorScriptableObject { }
 }
