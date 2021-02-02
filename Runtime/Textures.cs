@@ -20,7 +20,7 @@ namespace Materiator
         public TextureFormat Format;
         public FilterMode FilterMode;
 
-        public Textures(TextureFormat format = TextureFormat.RGBAFloat, FilterMode filterMode = FilterMode.Bilinear)
+        public Textures(TextureFormat format = TextureFormat.RGBA32, FilterMode filterMode = FilterMode.Bilinear)
         {
             Format = format;
             FilterMode = filterMode;

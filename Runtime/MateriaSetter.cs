@@ -40,7 +40,7 @@ namespace Materiator
 
         public void LoadAtlas(MateriaAtlas atlas, Mesh mesh)
         {
-            if (Renderer == null) return;
+            if (atlas == null || Renderer == null) return;
 
             Renderer.sharedMaterial = atlas.Material;
 

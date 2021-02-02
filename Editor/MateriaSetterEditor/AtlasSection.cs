@@ -28,8 +28,16 @@ namespace Materiator
             UpdateIndicator();
         }
 
-        private void OnMateriaAtlasChanged(MateriaAtlas atlas = null)
+        public void OnMateriaAtlasChanged(MateriaAtlas atlas = null)
         {
+            if (atlas == null)
+            {
+                if (_materiaAtlas.objectReferenceValue != null)
+                {
+                    atlas = _materiaAtlas.objectReferenceValue as MateriaAtlas;
+                }
+            }
+
             _materiaAtlas.objectReferenceValue = atlas;
             _editor.serializedObject.ApplyModifiedProperties();
 

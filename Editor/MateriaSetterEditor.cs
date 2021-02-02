@@ -167,6 +167,7 @@ namespace Materiator
         {
             if (GUILayout.RepeatButton(new GUIContent("Preview")))
             {
+                AtlasSection.OnMateriaAtlasChanged();
                 MeshUtils.SetSharedMesh(InstanceMesh, MateriaSetter.gameObject);
                 MateriaSetter.Mesh = InstanceMesh;
             }

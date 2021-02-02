@@ -10,6 +10,7 @@ namespace Materiator
         {
             atlas.AtlasItems.Clear();
             atlas.Textures.RemoveTexturesFromAsset();
+            atlas.Textures.Texs.Clear();
 
             GenerateAtlasItemTextures(atlas);
             GenerateAtlasTextures(atlas);
@@ -69,7 +70,6 @@ namespace Materiator
             var textures = new Textures();
             var gridSize = SystemData.Settings.DefaultGridSize;
 
-            textures.RemoveTextures(shaderProps, gridSize.x, gridSize.y);
             textures.CreateTextures(shaderProps, gridSize.x, gridSize.y, true);
 
             return textures;

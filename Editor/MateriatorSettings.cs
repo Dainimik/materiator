@@ -7,8 +7,8 @@ namespace Materiator
     {
         RGB24,
         RGBA32,
-        RGB9e5Float,
-        RGBAHalf
+        RGBAHalf,
+        RGBAFloat
     }
 
     public class MateriatorSettings : ScriptableObject
