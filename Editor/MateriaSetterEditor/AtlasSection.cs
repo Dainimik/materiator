@@ -41,7 +41,7 @@ namespace Materiator
             _materiaAtlas.objectReferenceValue = atlas;
             _editor.serializedObject.ApplyModifiedProperties();
 
-            _editor.MateriaSetter.LoadAtlas(atlas, _editor.InstanceMesh);
+            _editor.MateriaSetter.LoadAtlas(atlas, _materiaSetter.Mesh);
 
             UpdateIndicator();
         }

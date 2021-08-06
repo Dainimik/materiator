@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Materiator
@@ -6,36 +7,38 @@ namespace Materiator
     [DisallowMultipleComponent]
     public class MateriaSetter : MonoBehaviour
     {
+        public bool IsInitialized;
+        
         public Renderer Renderer;
 
         public MateriaAtlas MateriaAtlas;
         public List<MateriaSetterSlot> MateriaSetterSlots;
 
+        public Mesh OriginalMesh;
         public Mesh Mesh;
 
         private void Awake()
         {
             Initialize();
-
-            SetUpMesh();
+            
             ExecuteAtlas();
         }
 
         public void Initialize()
         {
             Renderer = GetComponent<Renderer>();
+            
+            SetUpMesh();
+
+            IsInitialized = true;
         }
 
         public void ExecuteAtlas(MateriaAtlas atlas = null, Mesh mesh = null)
         {
-            if (atlas != null && mesh != null)
-            {
-                ShiftUVs(atlas, mesh);
-            }
-            else
-            {
-                ShiftUVs(MateriaAtlas, Mesh);
-            }
+            if (atlas == null) atlas = MateriaAtlas;
+            if (mesh == null) mesh = Mesh;
+
+            ShiftUVs(atlas, mesh);
         }
 
         public void LoadAtlas(MateriaAtlas atlas, Mesh mesh)
@@ -97,7 +100,9 @@ namespace Materiator
 
         private void SetUpMesh()
         {
-            Mesh = MeshUtils.CopyMesh(Mesh);
+            OriginalMesh = MeshUtils.GetSharedMesh(gameObject);
+            
+            Mesh = MeshUtils.CopyMesh(OriginalMesh);
             MeshUtils.SetSharedMesh(Mesh, gameObject);
         }
 

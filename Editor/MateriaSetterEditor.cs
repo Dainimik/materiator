@@ -19,9 +19,6 @@ namespace Materiator
         public VisualElement Root;
         private VisualElement _IMGUIContainer;
 
-        public Mesh OriginalMesh;
-        public Mesh InstanceMesh;
-
         private void OnEnable()
         {
             MateriaSetter = (MateriaSetter)target;
@@ -30,17 +27,15 @@ namespace Materiator
 
             Root = new VisualElement();
 
-            if (Initialize())
-            {
-                AtlasSection = new AtlasSection(this);
+            if (!Initialize()) return;
+            AtlasSection = new AtlasSection(this);
 
-                DrawDefaultGUI();
-            }
+            DrawDefaultGUI();
         }
 
         private void DrawDefaultGUI()
         {
-            IMGUIContainer defaultInspector = new IMGUIContainer(() => DrawDefaultInspector());
+            var defaultInspector = new IMGUIContainer(() => DrawDefaultInspector());
             root.Add(defaultInspector);
 
             DrawIMGUI();
@@ -55,8 +50,10 @@ namespace Materiator
         {
             if (SystemChecker.CheckAllSystems(this))
             {
-                MateriaSetter.Initialize();
-                SetUpMeshes();
+                if (!MateriaSetter.IsInitialized)
+                {
+                    MateriaSetter.Initialize();
+                }
 
                 Root = root;
 
@@ -68,34 +65,12 @@ namespace Materiator
             }
         }
 
-        private void OnDisable()
-        {
-            if (!Application.isPlaying)
-                DestroyImmediate(InstanceMesh);
-        }
-
-        private void SetUpMeshes()
-        {
-            OriginalMesh = MateriaSetter.Mesh;
-            InstanceMesh = OriginalMesh;
-
-            if (!Application.isPlaying)
-            {
-                InstanceMesh = MeshUtils.CopyMesh(MateriaSetter.Mesh);
-                InstanceMesh.hideFlags = HideFlags.HideAndDontSave;
-            }
-            
-        }
-
         private void DrawIMGUI()
         {
             _materiaReorderableList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaSetterSlots"), false, true, false, false);
             DrawMateriaReorderableList();
-            IMGUIContainer materiaReorderableList = new IMGUIContainer(() => MateriaReorderableList());
+            var materiaReorderableList = new IMGUIContainer(() => MateriaReorderableList());
             _IMGUIContainer.Add(materiaReorderableList);
-
-            IMGUIContainer preview = new IMGUIContainer(() => HandlePreview());
-            _IMGUIContainer.Add(preview);
         }
 
         private void MateriaReorderableList()
@@ -119,7 +94,7 @@ namespace Materiator
                 var elementTag = element.FindPropertyRelative("Tag").objectReferenceValue as MateriaTag;
                 var materiaTag = MateriaSetter.MateriaSetterSlots[index].Tag;
 
-                Rect r = new Rect(rect.x, rect.y, 22f, 22f);
+                var r = new Rect(rect.x, rect.y, 22f, 22f);
 
                 serializedObject.Update();
 
@@ -139,7 +114,7 @@ namespace Materiator
 
                 EditorGUI.LabelField(new Rect(rect.x + 170f, rect.y, rect.width - 195f, rect.height), MateriaSetter.MateriaSetterSlots[index].Name);
 
-                Rect cdExpandRect = new Rect(EditorGUIUtility.currentViewWidth - 70f, rect.y, 20f, 20f);
+                var cdExpandRect = new Rect(EditorGUIUtility.currentViewWidth - 70f, rect.y, 20f, 20f);
             };
         }
 
@@ -161,21 +136,6 @@ namespace Materiator
         protected override void RegisterCallbacks()
         {
             //
-        }
-
-        private void HandlePreview()
-        {
-            if (GUILayout.RepeatButton(new GUIContent("Preview")))
-            {
-                AtlasSection.OnMateriaAtlasChanged();
-                MeshUtils.SetSharedMesh(InstanceMesh, MateriaSetter.gameObject);
-                MateriaSetter.Mesh = InstanceMesh;
-            }
-            else
-            {
-                MeshUtils.SetSharedMesh(OriginalMesh, MateriaSetter.gameObject);
-                MateriaSetter.Mesh = OriginalMesh;
-            }
         }
     }
 }
