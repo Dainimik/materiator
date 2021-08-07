@@ -40,6 +40,8 @@ namespace Materiator
 
             _materiaAtlas.objectReferenceValue = atlas;
             _editor.serializedObject.ApplyModifiedProperties();
+            
+            _editor.SetUpMesh(); // If this func is called before ApplyModifiedProperties, _materiaSetter.Mesh becomes null.
 
             _editor.MateriaSetter.LoadAtlas(atlas, _materiaSetter.Mesh);
 
@@ -89,6 +91,9 @@ namespace Materiator
 
             _materiaAtlasObjectField.RegisterCallback<ChangeEvent<Object>>(e =>
             {
+                if (e.previousValue == e.newValue) return;
+                Debug.Log("NEW VAL: " + e.newValue);
+                
                 OnMateriaAtlasChanged((MateriaAtlas)e.newValue);
             });
 

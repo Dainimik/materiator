@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEditor;
+using UnityEditor.Experimental.SceneManagement;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -12,8 +13,7 @@ namespace Materiator
         public Action OnTagChanged;
 
         public MateriaSetter MateriaSetter;
-
-        public AtlasSection AtlasSection;
+        
         private ReorderableList _materiaReorderableList;
 
         public VisualElement Root;
@@ -28,7 +28,7 @@ namespace Materiator
             Root = new VisualElement();
 
             if (!Initialize()) return;
-            AtlasSection = new AtlasSection(this);
+            var atlasSection = new AtlasSection(this);
 
             DrawDefaultGUI();
         }
@@ -50,11 +50,6 @@ namespace Materiator
         {
             if (SystemChecker.CheckAllSystems(this))
             {
-                if (!MateriaSetter.IsInitialized)
-                {
-                    MateriaSetter.Initialize();
-                }
-
                 Root = root;
 
                 return true;
@@ -65,11 +60,34 @@ namespace Materiator
             }
         }
 
+        public void SetUpMesh()
+        {
+            var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+            Debug.Log("CURRENT PREFAB STAGE: " + prefabStage);
+            if (prefabStage == null)
+            {
+                MateriaSetter.SetUpMesh();
+            }
+            else
+            {
+                var subassets = AssetDatabase.LoadAllAssetRepresentationsAtPath(prefabStage.assetPath);
+
+                foreach (var materiaSetter in prefabStage.prefabContentsRoot.GetComponentsInChildren<MateriaSetter>())
+                {
+                    var mesh = CustomPrefabEnvironment.GetMeshSubassetFromAsset(subassets, materiaSetter);
+                    
+                    materiaSetter.SetMesh(mesh);
+                }
+                
+            }
+            
+        }
+
         private void DrawIMGUI()
         {
             _materiaReorderableList = new ReorderableList(serializedObject, serializedObject.FindProperty("MateriaSetterSlots"), false, true, false, false);
             DrawMateriaReorderableList();
-            var materiaReorderableList = new IMGUIContainer(() => MateriaReorderableList());
+            var materiaReorderableList = new IMGUIContainer(MateriaReorderableList);
             _IMGUIContainer.Add(materiaReorderableList);
         }
 
@@ -78,7 +96,7 @@ namespace Materiator
             _materiaReorderableList.DoLayoutList();
         }
 
-        public void DrawMateriaReorderableList()
+        private void DrawMateriaReorderableList()
         {
             _materiaReorderableList.drawHeaderCallback = (Rect rect) =>
             {

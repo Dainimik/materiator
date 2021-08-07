@@ -13,14 +13,15 @@ namespace Materiator
         public static bool CheckAllSystems(MateriaSetterEditor editor)
         {
             var materiaSetter = editor.MateriaSetter;
+            var gameObject = materiaSetter.gameObject;
             var root = editor.Root;
 
             Mesh m = null;
             Mesh sm = null;
-            var mf = materiaSetter.gameObject.GetComponent<MeshFilter>();
-            var r = materiaSetter.gameObject.GetComponent<Renderer>();
-            var mr = materiaSetter.gameObject.GetComponent<MeshRenderer>();
-            var smr = materiaSetter.gameObject.GetComponent<SkinnedMeshRenderer>();
+            var mf = gameObject.GetComponent<MeshFilter>();
+            var r = gameObject.GetComponent<Renderer>();
+            var mr = gameObject.GetComponent<MeshRenderer>();
+            var smr = gameObject.GetComponent<SkinnedMeshRenderer>();
             
             if (mf != null)
                 m = mf.sharedMesh;
@@ -30,10 +31,12 @@ namespace Materiator
 
             if ((mr != null && smr != null) || (mf != null && smr != null))
             {
+                materiaSetter.IsMeshSetUp = false;
                 return ErrorMessage(editor, "Please use either only a SKINNED MESH RENDERER component alone or a MESH FILTER + MESH RENDERER component combo.");
             }
             else if (r == null && mf == null)
             {
+                materiaSetter.IsMeshSetUp = false;
                 return ErrorMessage(
                     editor,
                     "Please first add a MESH FILTER or a SKINNED MESH RENDERER component to this Game Object.",
@@ -45,6 +48,7 @@ namespace Materiator
             }
             else if (mr != null && mf == null)
             {
+                materiaSetter.IsMeshSetUp = false;
                 return ErrorMessage(
                     editor,
                     "Please first add a MESH FILTER component to this Game Object. ",
@@ -55,6 +59,7 @@ namespace Materiator
             }
             else if (smr == null && mr == null && mf == null)
             {
+                materiaSetter.IsMeshSetUp = false;
                 return ErrorMessage(
                     editor,
                     "Please first add a MESH RENDERER or a SKINNED MESH RENDERER component to this Game Object.",
@@ -66,6 +71,7 @@ namespace Materiator
             }
             else if (smr == null && mr == null && mf != null)
             {
+                materiaSetter.IsMeshSetUp = false;
                 return ErrorMessage(
                     editor,
                     "Please first add a MESH RENDERER component to this Game Object.",

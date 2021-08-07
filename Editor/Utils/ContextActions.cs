@@ -12,17 +12,18 @@ namespace Materiator
 
         public static void AddMeshFilter(MateriaSetterEditor editor)
         {
-            editor.MateriaSetter.gameObject.AddComponent<MeshFilter>();
+            var mf = editor.MateriaSetter.gameObject.AddComponent<MeshFilter>();
+            mf.sharedMesh = editor.MateriaSetter.OriginalMesh;
         }
 
         public static void AddMeshRenderer(MateriaSetterEditor editor)
         {
-            editor.MateriaSetter.gameObject.AddComponent<MeshRenderer>();
+            editor.MateriaSetter.Renderer = editor.MateriaSetter.gameObject.AddComponent<MeshRenderer>();
         }
 
         public static void AddSkinnedMeshRenderer(MateriaSetterEditor editor)
         {
-            editor.MateriaSetter.gameObject.AddComponent<SkinnedMeshRenderer>();
+            editor.MateriaSetter.Renderer = editor.MateriaSetter.gameObject.AddComponent<SkinnedMeshRenderer>();
         }
 
         public static void RevertToOriginalMesh(MateriaSetterEditor editor)

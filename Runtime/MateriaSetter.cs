@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Materiator
@@ -7,7 +6,7 @@ namespace Materiator
     [DisallowMultipleComponent]
     public class MateriaSetter : MonoBehaviour
     {
-        public bool IsInitialized;
+        public bool IsMeshSetUp;
         
         public Renderer Renderer;
 
@@ -16,22 +15,6 @@ namespace Materiator
 
         public Mesh OriginalMesh;
         public Mesh Mesh;
-
-        private void Awake()
-        {
-            Initialize();
-            
-            ExecuteAtlas();
-        }
-
-        public void Initialize()
-        {
-            Renderer = GetComponent<Renderer>();
-            
-            SetUpMesh();
-
-            IsInitialized = true;
-        }
 
         public void ExecuteAtlas(MateriaAtlas atlas = null, Mesh mesh = null)
         {
@@ -43,7 +26,21 @@ namespace Materiator
 
         public void LoadAtlas(MateriaAtlas atlas, Mesh mesh)
         {
-            if (atlas == null || Renderer == null) return;
+            if (atlas == null)
+            {
+                Debug.LogError("[MATERIA SETTER] LoadAtlas aborted because atlas is null.");
+                return;
+            }
+            if (Renderer == null)
+            {
+                Debug.LogError("[MATERIA SETTER] LoadAtlas aborted because Renderer is null.");
+                return;
+            }
+            if (mesh == null)
+            {
+                Debug.LogError("[MATERIA SETTER] LoadAtlas aborted because mesh is null.");
+                return;
+            }
 
             Renderer.sharedMaterial = atlas.Material;
 
@@ -76,34 +73,40 @@ namespace Materiator
             foreach (var slot in MateriaSetterSlots)
             {
                 if (slot.Tag == null) continue;
+                if (!atlas.AtlasItems.ContainsKey(slot.Tag)) continue;
+                
+                var destRect = atlas.AtlasItems[slot.Tag].Rect;
 
-                if (atlas.AtlasItems.ContainsKey(slot.Tag))
-                {
-                    var destRect = atlas.AtlasItems[slot.Tag].Rect;
-
-                    /*
+                /*
                      * Optimization can be made here to only shift the UVs if (slot.Rect != destRect).
-                     * However, when implemenmted this way, slot.Rect refers to the MateriaSetterSlot
+                     * However, when implemented this way, slot.Rect refers to the MateriaSetterSlot
                      * rect value which is set when loading an atlas and not the rect value of the actual
-                     * UVs of the mesh. Threfore, if we load an atlas in the editor, rect values
+                     * UVs of the mesh. Therefore, if we load an atlas in the editor, rect values
                      * are set and when we enter play mode, (slot.Rect == destRect) returns true and
                      * the UVs are not shifted.
                      * */
 
-                    MeshUtils.ShiftUVs(mesh, slot.MeshData, destRect);
-                    slot.Rect.Set(destRect.x, destRect.y, destRect.width, destRect.height);
+                MeshUtils.ShiftUVs(mesh, slot.MeshData, destRect);
+                slot.Rect.Set(destRect.x, destRect.y, destRect.width, destRect.height);
 
-                    slot.Materia = atlas.AtlasItems[slot.Tag].MateriaSlot.Materia;
-                }
+                slot.Materia = atlas.AtlasItems[slot.Tag].MateriaSlot.Materia;
             }
         }
 
-        private void SetUpMesh()
+        public void SetUpMesh()
         {
-            OriginalMesh = MeshUtils.GetSharedMesh(gameObject);
+            if (IsMeshSetUp) return;
             
             Mesh = MeshUtils.CopyMesh(OriginalMesh);
             MeshUtils.SetSharedMesh(Mesh, gameObject);
+
+            IsMeshSetUp = true;
+        }
+
+        public void SetMesh(Mesh mesh)
+        {
+            Mesh = mesh;
+            MeshUtils.SetSharedMesh(mesh, gameObject);
         }
 
         private MateriaSetterSlot GetMateriaSetterSlotFromTag(MateriaTag tag)

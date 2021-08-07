@@ -7,6 +7,15 @@ namespace Materiator
 {
     public class ModelPostprocessor : AssetPostprocessor
     {
+        private void OnPostprocessModel(GameObject g)
+        {
+            var modelImporter = assetImporter as ModelImporter;
+
+            modelImporter.bakeAxisConversion = true;
+
+            modelImporter.SaveAndReimport();
+        }
+
         private void OnPostprocessGameObjectWithUserProperties(GameObject go, string[] names, object[] values)
         {
             for (int i = 0; i < names.Length; i++)
@@ -32,7 +41,8 @@ namespace Materiator
 
             var ms = go.AddComponent<MateriaSetter>();
             ms.MateriaSetterSlots = new List<MateriaSetterSlot>();
-            ms.Mesh = MeshUtils.GetSharedMesh(go);
+            ms.OriginalMesh = MeshUtils.GetSharedMesh(go); // I need OriginalMesh set here because it needs to be set without MateriaSetter awake triggering.
+            ms.Renderer = go.GetComponent<Renderer>();
 
             var i = 0;
             foreach (var data in info.Data)
@@ -40,10 +50,12 @@ namespace Materiator
                 var name = data.M;
                 var rect = GetRectFromFloatArray(data.R);
 
-                var tag = materiaTags.Where(tag => tag.name == name).FirstOrDefault();
-                var slot = new MateriaSetterSlot(i, rect, name, tag != null ? tag : null);
+                var tag = materiaTags.FirstOrDefault(tag => tag.name == name);
+                var slot = new MateriaSetterSlot(i, rect, name, tag != null ? tag : null)
+                {
+                    MeshData = GetMeshData(rect, ms.OriginalMesh)
+                };
 
-                slot.MeshData = GetMeshData(rect, ms.Mesh);
 
                 ms.MateriaSetterSlots.Add(slot);
 
@@ -63,7 +75,7 @@ namespace Materiator
             var colors = new List<Color>();
             var uvs = new List<Vector2>();
 
-            for (int i = 0; i < mesh.uv.Length; i++)
+            for (var i = 0; i < mesh.uv.Length; i++)
             {
                 var uv = mesh.uv[i];
                 var color = Color.white;
