@@ -5,8 +5,8 @@ namespace Materiator
     [CreateAssetMenu(menuName = "Materiator/Material Data", fileName = "MaterialData")]
     public class MaterialData : MateriatorScriptableObject
     {
-        public ShaderData ShaderData { get { return _shaderData; } }
-        public Material Material { get { return _material; } }
+        public ShaderData ShaderData => _shaderData;
+        public Material Material => _material;
 
         [SerializeField] private ShaderData _shaderData;
         [SerializeField] private Material _material;

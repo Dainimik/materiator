@@ -1,7 +1,4 @@
 ﻿using System.Collections.Generic;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 using UnityEngine;
 
 namespace Materiator
@@ -18,12 +15,10 @@ namespace Materiator
 #if UNITY_EDITOR
         public Texture2D PreviewIcon;
 
-        public void AddProperties(List<MateriatorShaderProperty> properties)
+        public void AddProperties(IEnumerable<MateriatorShaderProperty> properties)
         {
-            for (int i = 0; i < properties.Count; i++)
+            foreach (var property in properties)
             {
-                var property = properties[i];
-
                 Properties.Add(property);
             }
         }

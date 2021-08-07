@@ -34,7 +34,7 @@ namespace Materiator
         {
             InitializeEditor<MateriaAtlas>();
 
-            IMGUIContainer defaultInspector = new IMGUIContainer(() => DrawDefaultInspector());
+            var defaultInspector = new IMGUIContainer(() => DrawDefaultInspector());
             //IMGUIContainer.Add(defaultInspector);
 
             MateriaSection = new MateriaSection(this, "MateriaSlots");
