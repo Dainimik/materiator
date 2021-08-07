@@ -9,7 +9,7 @@ namespace Materiator
             var uvs = new Vector2[mesh.uv.Length];
             mesh.uv.CopyTo(uvs, 0);
 
-            for (int i = 0; i < meshData.Indices.Length; i++)
+            for (var i = 0; i < meshData.Indices.Length; i++)
             {
                 var index = meshData.Indices[i];
                 var uv = meshData.UVs[i];
@@ -20,7 +20,7 @@ namespace Materiator
             mesh.uv = uvs;
         }
 
-        public static void SetVertexColor(Mesh mesh, MeshData meshData, Color color, bool replace = false)
+        public static void SetVertexColors(Mesh mesh, MeshData meshData, Color color, bool replace = false)
         {
             var colors = new Color[mesh.colors.Length];
 
@@ -32,7 +32,7 @@ namespace Materiator
 
             mesh.colors.CopyTo(colors, 0);
 
-            for (int i = 0; i < meshData.Indices.Length; i++)
+            for (var i = 0; i < meshData.Indices.Length; i++)
             {
                 var index = meshData.Indices[i];
                 var currentColor = meshData.Colors[i];
@@ -48,7 +48,7 @@ namespace Materiator
         public static Mesh GetSharedMesh(GameObject go)
         {
             var mf = go.GetComponent<MeshFilter>();
-
+            
             if (mf == null)
             {
                 var smr = go.GetComponent<SkinnedMeshRenderer>();
@@ -66,6 +66,7 @@ namespace Materiator
         public static void SetSharedMesh(Mesh mesh, GameObject go)
         {
             var mf = go.GetComponent<MeshFilter>();
+            
             if (mf == null)
             {
                 var smr = go.GetComponent<SkinnedMeshRenderer>();
@@ -80,7 +81,7 @@ namespace Materiator
 
         public static Mesh CopyMesh(Mesh mesh)
         {
-            return Mesh.Instantiate(mesh);
+            return Object.Instantiate(mesh);
         }
     }
 }

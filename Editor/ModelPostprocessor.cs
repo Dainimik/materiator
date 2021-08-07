@@ -7,6 +7,7 @@ namespace Materiator
 {
     public class ModelPostprocessor : AssetPostprocessor
     {
+        // TODO: This function needs to be removed as it is here only due to convenience
         private void OnPostprocessModel(GameObject g)
         {
             var modelImporter = assetImporter as ModelImporter;
@@ -18,7 +19,7 @@ namespace Materiator
 
         private void OnPostprocessGameObjectWithUserProperties(GameObject go, string[] names, object[] values)
         {
-            for (int i = 0; i < names.Length; i++)
+            for (var i = 0; i < names.Length; i++)
             {
                 var name = names[i];
                 var value = values[i];
@@ -34,7 +35,7 @@ namespace Materiator
             }
         }
 
-        private void ProcessMateriatorTag(string value, GameObject go)
+        private static void ProcessMateriatorTag(string value, GameObject go)
         {
             var materiaTags = AssetUtils.FindAssets<MateriaTag>();
             var info = CreateFromJSON(value.Remove(0, 1));
@@ -55,8 +56,7 @@ namespace Materiator
                 {
                     MeshData = GetMeshData(rect, ms.OriginalMesh)
                 };
-
-
+                
                 ms.MateriaSetterSlots.Add(slot);
 
                 i++;
@@ -67,7 +67,7 @@ namespace Materiator
                 ms.MateriaAtlas = defaultAtlas;
         }
 
-        private MeshData GetMeshData(Rect rect, Mesh mesh)
+        private static MeshData GetMeshData(Rect rect, Mesh mesh)
         {
             var meshData = new MeshData();
 
@@ -99,15 +99,12 @@ namespace Materiator
             return meshData;
         }
 
-        private Rect GetRectFromFloatArray(float[] array)
+        private static Rect GetRectFromFloatArray(float[] array)
         {
-            if (array.Length != 4)
-                return new Rect();
-
-            return new Rect(array[0], array[1], array[2], array[3]);
+            return array.Length != 4 ? new Rect() : new Rect(array[0], array[1], array[2], array[3]);
         }
 
-        public static MateriatorInfoCollection CreateFromJSON(string jsonString)
+        private static MateriatorInfoCollection CreateFromJSON(string jsonString)
         {
             return JsonUtility.FromJson<MateriatorInfoCollection>(jsonString);
         }

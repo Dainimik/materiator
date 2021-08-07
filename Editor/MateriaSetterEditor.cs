@@ -78,9 +78,7 @@ namespace Materiator
                     
                     materiaSetter.SetMesh(mesh);
                 }
-                
             }
-            
         }
 
         private void DrawIMGUI()

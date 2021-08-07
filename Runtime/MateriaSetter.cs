@@ -8,11 +8,10 @@ namespace Materiator
     {
         public bool IsMeshSetUp;
         
-        public Renderer Renderer;
-
         public MateriaAtlas MateriaAtlas;
         public List<MateriaSetterSlot> MateriaSetterSlots;
 
+        public Renderer Renderer;
         public Mesh OriginalMesh;
         public Mesh Mesh;
 
@@ -54,18 +53,22 @@ namespace Materiator
             LoadAtlas(MateriaAtlas, Mesh);
         }
 
-        public void SetVertexColor(MateriaTag tag, Color color, bool replace = false)
+        public void SetUpMesh()
         {
-            var meshData = GetMateriaSetterSlotFromTag(tag).MeshData;
-            MeshUtils.SetVertexColor(Mesh, meshData, color, replace);
+            if (IsMeshSetUp) return;
+            
+            Mesh = MeshUtils.CopyMesh(OriginalMesh);
+            MeshUtils.SetSharedMesh(Mesh, gameObject);
+
+            IsMeshSetUp = true;
         }
 
-        public void SetVertexColor(string slotName, Color color, bool replace = false)
+        public void SetMesh(Mesh mesh)
         {
-            var meshData = GetMateriaSetterSlotFromName(slotName).MeshData;
-            MeshUtils.SetVertexColor(Mesh, meshData, color, replace);
+            Mesh = mesh;
+            MeshUtils.SetSharedMesh(mesh, gameObject);
         }
-
+        
         private void ShiftUVs(MateriaAtlas atlas, Mesh mesh)
         {
             if (atlas == null) return;
@@ -88,25 +91,20 @@ namespace Materiator
 
                 MeshUtils.ShiftUVs(mesh, slot.MeshData, destRect);
                 slot.Rect.Set(destRect.x, destRect.y, destRect.width, destRect.height);
-
                 slot.Materia = atlas.AtlasItems[slot.Tag].MateriaSlot.Materia;
             }
         }
-
-        public void SetUpMesh()
+        
+        public void SetVertexColor(MateriaTag tag, Color color, bool replace = false)
         {
-            if (IsMeshSetUp) return;
-            
-            Mesh = MeshUtils.CopyMesh(OriginalMesh);
-            MeshUtils.SetSharedMesh(Mesh, gameObject);
-
-            IsMeshSetUp = true;
+            var meshData = GetMateriaSetterSlotFromTag(tag).MeshData;
+            MeshUtils.SetVertexColors(Mesh, meshData, color, replace);
         }
 
-        public void SetMesh(Mesh mesh)
+        public void SetVertexColor(string slotName, Color color, bool replace = false)
         {
-            Mesh = mesh;
-            MeshUtils.SetSharedMesh(mesh, gameObject);
+            var meshData = GetMateriaSetterSlotFromName(slotName).MeshData;
+            MeshUtils.SetVertexColors(Mesh, meshData, color, replace);
         }
 
         private MateriaSetterSlot GetMateriaSetterSlotFromTag(MateriaTag tag)
