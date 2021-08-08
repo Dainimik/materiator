@@ -2,6 +2,7 @@
     <Style src="Materiator.uss" />
     <ui:VisualElement>
         <ui:IMGUIContainer name="IMGUIContainer" />
+        <ui:Button text="Scan Shader" name="ScanShaderButton" />
         <ui:Button text="Update Materias" name="UpdateMateriasButton" />
     </ui:VisualElement>
 </ui:UXML>

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace Materiator
 
         private SerializedProperty _shader;
 
+        private Button _scanShaderButton;
         private Button _updateMateriasButton;
 
         private List<KeyValuePair<int, MateriatorShaderProperty>> _newProperties;
@@ -29,7 +31,7 @@ namespace Materiator
         {
             InitializeEditor<ShaderData>();
 
-            IMGUIContainer defaultInspector = new IMGUIContainer(() => IMGUI());
+            var defaultInspector = new IMGUIContainer(() => IMGUI());
             _IMGUIContainer.Add(defaultInspector);
 
             return root;
@@ -37,10 +39,10 @@ namespace Materiator
 
         private void IMGUI()
         {
-            base.DrawDefaultInspector();
+            DrawDefaultInspector();
         }
 
-        private int GetRequiredTextureCount(List<ShaderProperty> shaderProperties)
+        private int GetRequiredTextureCount(IEnumerable<ShaderProperty> shaderProperties)
         {
             var count = 0f;
 
@@ -57,75 +59,96 @@ namespace Materiator
 
             var shader = (Shader)_shader.objectReferenceValue;
 
-            if (shader)
+            if (!shader) return;
+            
+            var shaderPropertyNames = new List<string>();
+            var shaderPropertyPropertyNames = new List<string>();
+            var propertyCount = ShaderUtil.GetPropertyCount(shader);
+            _newProperties = new List<KeyValuePair<int, MateriatorShaderProperty>>();
+            var index = 0;
+
+            for (int i = 0; i < propertyCount; i++)
             {
-                var shaderPropertyNames = new List<string>();
-                var shaderPropertyPropertyNames = new List<string>();
-                var propertyCount = ShaderUtil.GetPropertyCount(shader);
-                _newProperties = new List<KeyValuePair<int, MateriatorShaderProperty>>();
-                var index = 0;
+                var attrs = shader.GetPropertyAttributes(i);
 
-                for (int i = 0; i < propertyCount; i++)
+                if (attrs.Where(attr => attr == "MateriaFloat").Count() > 0 || attrs.Where(attr => attr == "MateriaColor").Count() > 0)
                 {
-                    var attrs = shader.GetPropertyAttributes(i);
+                    var propName = ShaderUtil.GetPropertyDescription(shader, i);
+                    shaderPropertyNames.Add(propName);
 
-                    if (attrs.Where(attr => attr == "MateriaFloat").Count() > 0 || attrs.Where(attr => attr == "MateriaColor").Count() > 0)
+                    var propPropertyName = ShaderUtil.GetPropertyName(shader, i);
+                    shaderPropertyPropertyNames.Add(propPropertyName);
+
+                    if (shaderDataProperties.Where(n => n.PropertyName == propPropertyName).Count() == 0)
                     {
-                        var propName = ShaderUtil.GetPropertyDescription(shader, i);
-                        shaderPropertyNames.Add(propName);
+                        MateriatorShaderProperty prop = null;
 
-                        var propPropertyName = ShaderUtil.GetPropertyName(shader, i);
-                        shaderPropertyPropertyNames.Add(propPropertyName);
-
-                        if (shaderDataProperties.Where(n => n.PropertyName == propPropertyName).Count() == 0)
+                        if (attrs.Contains("MateriaColor"))
                         {
-                            MateriatorShaderProperty prop = null;
-
-                            if (attrs.Contains("MateriaColor"))
-                            {
-                                //prop = new ColorShaderProperty(propName, propPropertyName);
-                            }
-                            else if (attrs.Contains("MateriaFloat"))
-                            {
-                                //prop = new FloatShaderProperty(propName, propPropertyName);
-                            }
-
-                            if (prop != null && !shaderDataProperties.Contains(prop))
-                            {
-                                shaderDataProperties.Insert(index, prop);
-                                _newProperties.Add(new KeyValuePair<int, MateriatorShaderProperty>(index, prop));
-                            }
+                            //prop = new ColorShaderProperty(propName, propPropertyName);
                         }
-                        index++;
-                    }
-
-                    if (attrs.Where(attr => attr == "MateriaKeyword").Count() > 0)
-                    {
-                        var prop = ShaderUtil.GetPropertyName(shader, i);
-
-                        if (keywords.Where(n => n == prop).Count() == 0)
+                        else if (attrs.Contains("MateriaFloat"))
                         {
-                            if (attrs.Contains("MateriaKeyword"))
-                            {
-                                keywords.Add(prop);
-                            }
+                            //prop = new FloatShaderProperty(propName, propPropertyName);
+                        }
+
+                        if (prop != null && !shaderDataProperties.Contains(prop))
+                        {
+                            shaderDataProperties.Insert(index, prop);
+                            _newProperties.Add(new KeyValuePair<int, MateriatorShaderProperty>(index, prop));
+                        }
+                    }
+                    index++;
+                }
+
+                if (attrs.Where(attr => attr == "MateriaKeyword").Count() > 0)
+                {
+                    var prop = ShaderUtil.GetPropertyName(shader, i);
+
+                    if (keywords.Where(n => n == prop).Count() == 0)
+                    {
+                        if (attrs.Contains("MateriaKeyword"))
+                        {
+                            keywords.Add(prop);
                         }
                     }
                 }
-
-                _propertiesToRemove.Clear();
-
-                for (var i = 0; i < _shaderData.MateriatorShaderProperties.Count; i++)
-                {
-                    if (!shaderPropertyPropertyNames.Contains(_shaderData.MateriatorShaderProperties[i].PropertyName))
-                    {
-                        _propertiesToRemove.Add(_shaderData.MateriatorShaderProperties[i].PropertyName);
-                        _shaderData.MateriatorShaderProperties.RemoveAt(i);
-                    }
-                }
-
-                UpdateMaterias();
             }
+
+            _propertiesToRemove.Clear();
+
+            for (var i = 0; i < _shaderData.MateriatorShaderProperties.Count; i++)
+            {
+                if (!shaderPropertyPropertyNames.Contains(_shaderData.MateriatorShaderProperties[i].PropertyName))
+                {
+                    _propertiesToRemove.Add(_shaderData.MateriatorShaderProperties[i].PropertyName);
+                    _shaderData.MateriatorShaderProperties.RemoveAt(i);
+                }
+            }
+
+            UpdateMaterias();
+        }
+
+        private void ScanShader()
+        {
+            foreach (var (propertyName, propertyDescription) in GetShaderPropertyNames(_shaderData.Shader))
+            {
+                _shaderData.MateriatorShaderProperties.Add(new MateriatorShaderProperty(propertyDescription, propertyName));
+            }
+        }
+
+        private static IEnumerable<Tuple<string, string>> GetShaderPropertyNames(Shader shader)
+        {
+            var propertyNames = new List<Tuple<string, string>>();
+
+            for (var i = 0; i < ShaderUtil.GetPropertyCount(shader); i++)
+            {
+                if (ShaderUtil.GetPropertyType(shader, i) != ShaderUtil.ShaderPropertyType.TexEnv) continue;
+
+                propertyNames.Add(new Tuple<string, string>(ShaderUtil.GetPropertyName(shader, i), ShaderUtil.GetPropertyDescription(shader, i)));
+            }
+
+            return propertyNames;
         }
 
         private void UpdateMaterias()
@@ -149,7 +172,7 @@ namespace Materiator
 
         private void RemoveOldPropertiesFromMateria(Materia materia)
         {
-            for (int i = 0; i < materia.Properties.Count; i++)
+            for (var i = 0; i < materia.Properties.Count; i++)
             {
                 var prop = materia.Properties[i];
 
@@ -158,7 +181,7 @@ namespace Materiator
                     materia.Properties.Remove(prop);
                 }
 
-                for (int j = 0; j < prop.Values.Count; j++)
+                for (var j = 0; j < prop.Values.Count; j++)
                 {
                     var value = prop.Values[j];
 
@@ -176,11 +199,11 @@ namespace Materiator
 
         private void AddNewPropertiesToMateria(Materia materia)
         {
-            for (int i = 0; i < _shaderData.MateriatorShaderProperties.Count; i++)
+            for (var i = 0; i < _shaderData.MateriatorShaderProperties.Count; i++)
             {
                 var prop = _shaderData.MateriatorShaderProperties[i];
 
-                if (materia.Properties.Where(p => p.PropertyName == prop.PropertyName).Count() == 0)
+                if (materia.Properties.All(p => p.PropertyName != prop.PropertyName))
                 {
                     materia.Properties.Insert(_shaderData.MateriatorShaderProperties.IndexOf(prop), ObjectCopier.Clone(prop));
                     //materia.Properties.Insert(_shaderData.MateriatorShaderProperties.IndexOf(prop), prop);
@@ -206,7 +229,7 @@ namespace Materiator
         {
             var properties = materia.Properties;
 
-            for (int i = 0; i < _shaderData.MateriatorShaderProperties.Count; i++)
+            for (var i = 0; i < _shaderData.MateriatorShaderProperties.Count; i++)
             {
                 var materiaProp = properties[i];
                 var shaderDataProp = _shaderData.MateriatorShaderProperties[i];
@@ -233,6 +256,7 @@ namespace Materiator
 
         protected override void RegisterCallbacks()
         {
+            _scanShaderButton.clicked += ScanShader;
             _updateMateriasButton.clicked += UpdateMaterias;
         }
 
@@ -241,6 +265,7 @@ namespace Materiator
             _shader = serializedObject.FindProperty("Shader");
 
             _IMGUIContainer = root.Q<IMGUIContainer>("IMGUIContainer");
+            _scanShaderButton = root.Q<Button>("ScanShaderButton");
             _updateMateriasButton = root.Q<Button>("UpdateMateriasButton");
         }
 

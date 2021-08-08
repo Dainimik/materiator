@@ -146,9 +146,7 @@ namespace Materiator
 
         private Texture2D CreateTexture2D(int x, int y, TextureFormat textureFormat, FilterMode filterMode, string name, bool temporary = false, Color ? color = null)
         {
-            var tex = new Texture2D(x, y, textureFormat, false);
-            tex.filterMode = filterMode;
-            tex.name = name;
+            var tex = new Texture2D(x, y, textureFormat, false) {filterMode = filterMode, name = name};
 
             if (temporary)
             {

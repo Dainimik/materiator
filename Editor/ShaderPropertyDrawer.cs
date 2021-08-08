@@ -16,11 +16,8 @@ namespace Materiator
             EditorGUI.BeginProperty(position, label, property);
 
             //if (_properties == null || GUI.Button(new Rect(position.x, position.y, position.width, position.height), "Refresh properties"))
-            if (_properties == null)
-            {
-                _properties = GetMateriaProperties((attribute as ShaderPropertyAttribute).FieldType)
-                    .Where(prop => !prop.IsSubclassOf(typeof(UnityEngine.Object))).ToArray();
-            }
+            _properties ??= GetMateriaProperties((attribute as ShaderPropertyAttribute).FieldType)
+                .Where(prop => !prop.IsSubclassOf(typeof(UnityEngine.Object))).ToArray();
 
             if (property.managedReferenceFullTypename != "")
             {
@@ -45,7 +42,7 @@ namespace Materiator
             return EditorGUI.GetPropertyHeight(property, label, true);
         }
 
-        public static Type[] GetMateriaProperties(Type interfaceType)
+        private static Type[] GetMateriaProperties(Type interfaceType)
         {
             var types = AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes());
             return types.Where(p => interfaceType.IsAssignableFrom(p) && !p.IsAbstract).ToArray();
