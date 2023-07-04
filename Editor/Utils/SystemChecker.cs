@@ -22,14 +22,19 @@ namespace Materiator
             var r = gameObject.GetComponent<Renderer>();
             var mr = gameObject.GetComponent<MeshRenderer>();
             var smr = gameObject.GetComponent<SkinnedMeshRenderer>();
-            
+
             if (mf != null)
                 m = mf.sharedMesh;
 
             if (smr != null)
                 sm = smr.sharedMesh;
 
-            if ((mr != null && smr != null) || (mf != null && smr != null))
+            if (!materiaSetter.OriginalMesh)
+            {
+                materiaSetter.IsMeshSetUp = false;
+                return ErrorMessage(editor, "Mesh does not have any tag data. Please export the mesh with tag data.");
+            }
+            else if ((mr != null && smr != null) || (mf != null && smr != null))
             {
                 materiaSetter.IsMeshSetUp = false;
                 return ErrorMessage(editor, "Please use either only a SKINNED MESH RENDERER component alone or a MESH FILTER + MESH RENDERER component combo.");
